@@ -16,7 +16,7 @@ export function newState() {
     milestones: {},            // 已解鎖里程碑索引(永久,不隨扣分消失){dim: maxIndex}
     daily: { date: null, byExercise: {} }, // 當天各項目累積原始量(隔日歸零)
     records: [],               // 練功紀錄
-    steps: { total: 0, resolved: 0 },      // resolved = 已觸發事件數
+    steps: { total: 0, resolved: 0, byDate: {} }, // resolved = 已觸發事件數;byDate = 各日已登記步數
     inventory: {},             // {itemId: count}
     debuffs: [],               // 目前身上的 debuff id
     flags: {},                 // 抉擇紀錄,影響後續事件
@@ -88,6 +88,24 @@ export function levels(state) {
 export function addSteps(state, amount) {
   if (!(amount > 0)) throw new Error("步數必須大於 0");
   state.steps.total += Math.floor(amount);
+}
+
+export const MAX_DAILY_STEPS = 30000;   // 單日採計上限(防灌步數)
+export const WARN_DAILY_STEPS = 20000;  // 達此門檻標記提示
+
+/**
+ * 登記某日步數:每日一次、單日封頂(防洗分 ①)。
+ * 「只能記今天或昨天」由 UI 決定傳入的 date。
+ * 回傳 {applied, capped, warned};該日已記過則丟錯。
+ */
+export function logSteps(state, amount, date) {
+  if (!(amount > 0)) throw new Error("步數必須大於 0");
+  if (!state.steps.byDate) state.steps.byDate = {}; // 舊存檔相容
+  if (state.steps.byDate[date] != null) throw new Error("這一天已經記過步數");
+  const applied = Math.min(Math.floor(amount), MAX_DAILY_STEPS);
+  state.steps.byDate[date] = applied;
+  state.steps.total += applied;
+  return { applied, capped: Math.floor(amount) > applied, warned: applied >= WARN_DAILY_STEPS };
 }
 
 /** 尚未觸發的事件數 */

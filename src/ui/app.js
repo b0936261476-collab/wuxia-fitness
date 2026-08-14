@@ -1,8 +1,8 @@
 // UI 接線:載入資料檔、綁定操作、渲染畫面
 
 import {
-  logExercise, addSteps, pendingEventCount, startNextEvent, resolveEvent,
-  useItem, levels
+  logExercise, logSteps, pendingEventCount, startNextEvent, resolveEvent,
+  useItem, levels, MAX_DAILY_STEPS
 } from "../engine/game.js";
 import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
 import { currentCoefficient } from "../engine/decay.js";
@@ -31,9 +31,14 @@ async function loadData() {
   Object.assign(data, { exercises, events, titles, items });
 }
 
-function today() {
+function dateWithOffset(offsetDays) {
   const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function today() {
+  return dateWithOffset(0);
 }
 
 function dimName(key) {
@@ -175,6 +180,11 @@ function renderRoad() {
   const pending = pendingEventCount(state);
   $("#pending-count").textContent = pending;
   $("#walk-btn").disabled = pending <= 0 && !state.pendingEvent;
+  const bd = state.steps.byDate || {};
+  const t = bd[today()], y = bd[dateWithOffset(-1)];
+  $("#steps-status").textContent =
+    `今天:${t != null ? `已記 ${t.toLocaleString()} 步` : "未記"}|昨天:${y != null ? `已記 ${y.toLocaleString()} 步` : "未記"}` +
+    `(每日一次,單日最多採計 ${MAX_DAILY_STEPS.toLocaleString()} 步)`;
   renderEventArea();
   renderJournal();
 }
@@ -383,9 +393,23 @@ function bindEvents() {
     e.preventDefault();
     const amount = Number($("#steps-amount").value);
     if (!(amount > 0)) return;
-    addSteps(state, amount);
+    const offset = Number($("#steps-day").value);
+    const dayLabel = offset === 0 ? "今天" : "昨天";
+    let res;
+    try {
+      res = logSteps(state, amount, dateWithOffset(offset));
+    } catch {
+      alert(`${dayLabel}已經記過步數了。一日一記,莫要重複。`);
+      return;
+    }
     save();
     $("#steps-amount").value = "";
+    const flash = $("#road-flash");
+    flash.hidden = false;
+    let msg = `${dayLabel}記上了 ${res.applied.toLocaleString()} 步。`;
+    if (res.capped) msg += `(單日最多採計 ${MAX_DAILY_STEPS.toLocaleString()} 步,超出不計)`;
+    if (res.warned) msg += " 日行兩萬步,俠士當真健步如飛!";
+    flash.textContent = msg;
     renderAll();
   });
 

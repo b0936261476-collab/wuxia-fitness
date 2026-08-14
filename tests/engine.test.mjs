@@ -8,8 +8,9 @@ import { effectiveAmount, currentCoefficient } from "../src/engine/decay.js";
 import { thresholdForLevel, levelFromExp, milestoneTitle } from "../src/engine/exp.js";
 import { successRate, weightedStatValue } from "../src/engine/check.js";
 import {
-  newState, logExercise, addSteps, pendingEventCount,
-  startNextEvent, resolveEvent, useItem, gainItem, levels
+  newState, logExercise, addSteps, logSteps, pendingEventCount,
+  startNextEvent, resolveEvent, useItem, gainItem, levels,
+  MAX_DAILY_STEPS, WARN_DAILY_STEPS
 } from "../src/engine/game.js";
 import {
   startTraining, stopTraining, cancelTraining, trainingElapsedMs
@@ -157,6 +158,29 @@ test("計時修煉:單次以 maxSessionMinutes 封頂", () => {
   startTraining(s, data, "paobu", 0);
   const res = stopTraining(s, data, "2026-08-14", 10 * 3600_000); // 掛機10小時
   assert.equal(res.minutes, data.exercises.maxSessionMinutes);
+});
+
+// ---------- 步數登記規則 ----------
+
+test("logSteps:每日一次、單日封頂、兩萬步標記", () => {
+  const s = newState();
+  const r1 = logSteps(s, 8000, "2026-08-14");
+  assert.deepEqual(r1, { applied: 8000, capped: false, warned: false });
+  assert.throws(() => logSteps(s, 100, "2026-08-14")); // 同日重複擋下
+  const r2 = logSteps(s, 99999, "2026-08-13");         // 封頂
+  assert.equal(r2.applied, MAX_DAILY_STEPS);
+  assert.ok(r2.capped && r2.warned);
+  const r3 = logSteps(s, WARN_DAILY_STEPS, "2026-08-12");
+  assert.ok(r3.warned && !r3.capped);
+  assert.equal(s.steps.total, 8000 + MAX_DAILY_STEPS + WARN_DAILY_STEPS);
+});
+
+test("logSteps:舊存檔沒有 byDate 也能登記", () => {
+  const s = newState();
+  delete s.steps.byDate;
+  logSteps(s, 5000, "2026-08-14");
+  assert.equal(s.steps.byDate["2026-08-14"], 5000);
+  assert.equal(s.steps.total, 5000);
 });
 
 // ---------- 步數與事件 ----------

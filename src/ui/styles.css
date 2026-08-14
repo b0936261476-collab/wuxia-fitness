@@ -126,6 +126,7 @@ select, input[type="number"], textarea {
 }
 .inline-form { display: flex; gap: 8px; margin-bottom: 10px; }
 .inline-form input { margin-top: 0; }
+.inline-form select { margin-top: 0; width: auto; flex-shrink: 0; }
 
 .btn {
   font-family: inherit;

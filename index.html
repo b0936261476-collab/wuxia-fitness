@@ -70,9 +70,15 @@
       <div class="card">
         <h2>輸入步數</h2>
         <form id="steps-form" class="inline-form">
-          <input type="number" id="steps-amount" min="1" step="1" placeholder="今日步數,如 8000" required />
+          <select id="steps-day">
+            <option value="0">今天</option>
+            <option value="-1">昨天</option>
+          </select>
+          <input type="number" id="steps-amount" min="1" step="1" placeholder="步數,如 8000" required />
           <button type="submit" class="btn primary">記上</button>
         </form>
+        <p class="hint" id="steps-status"></p>
+        <div id="road-flash" class="flash" hidden></div>
         <p>行動力:每 1000 步觸發一次事件。待觸發事件:<strong id="pending-count">0</strong></p>
         <button id="walk-btn" class="btn walk" disabled>前 行</button>
       </div>
