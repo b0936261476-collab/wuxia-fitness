@@ -448,6 +448,32 @@ function bindEvents() {
   });
 }
 
+// ---------- 捷徑步數回報(iPhone 捷徑開啟 ?steps=8000 自動登記)----------
+
+function handleStepsParam() {
+  const params = new URLSearchParams(location.search);
+  const raw = Math.floor(Number(params.get("steps")));
+  if (!(raw > 0)) return;
+  const offset = params.get("day") === "-1" ? -1 : 0;
+  const dayLabel = offset === 0 ? "今天" : "昨天";
+  history.replaceState(null, "", location.pathname); // 清掉參數,避免重新整理重複觸發
+
+  const flash = $("#road-flash");
+  flash.hidden = false;
+  try {
+    const res = logSteps(state, raw, dateWithOffset(offset));
+    save();
+    let msg = `健康 App 回報:${dayLabel}記上了 ${res.applied.toLocaleString()} 步。`;
+    if (res.capped) msg += `(單日最多採計 ${MAX_DAILY_STEPS.toLocaleString()} 步,超出不計)`;
+    if (res.warned) msg += " 日行兩萬步,俠士當真健步如飛!";
+    flash.textContent = msg;
+  } catch {
+    flash.textContent = `健康 App 回報:${dayLabel}已經記過步數,未重複登記。`;
+  }
+  // 切到江湖路分頁讓玩家看到結果
+  document.querySelector('[data-tab="road"]').click();
+}
+
 // ---------- 啟動 ----------
 
 (async function main() {
@@ -459,5 +485,6 @@ function bindEvents() {
   }
   state = loadState();
   bindEvents();
+  handleStepsParam();
   renderAll();
 })();
