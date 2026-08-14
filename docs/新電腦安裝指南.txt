@@ -1,0 +1,82 @@
+══════════════════════════════════════════
+ 一步一江湖 — 新電腦安裝指南
+══════════════════════════════════════════
+
+在新電腦打開 PowerShell(按開始鍵,輸入 powershell,按 Enter),
+照順序把每一段指令複製貼上、按 Enter 執行。
+
+──────────────────────────────
+① 安裝 Git
+──────────────────────────────
+
+winget install --id Git.Git --accept-source-agreements --accept-package-agreements
+
+──────────────────────────────
+② 安裝 GitHub CLI
+──────────────────────────────
+
+winget install --id GitHub.cli --accept-source-agreements --accept-package-agreements
+
+──────────────────────────────
+③ 安裝 Node.js(執行遊戲用)
+──────────────────────────────
+
+winget install --id OpenJS.NodeJS.LTS --accept-source-agreements --accept-package-agreements
+
+──────────────────────────────
+④ 關掉 PowerShell,重新開一個
+──────────────────────────────
+
+這步不能跳過!剛裝好的程式要重開視窗才找得到。
+
+──────────────────────────────
+⑤ 登入 GitHub
+──────────────────────────────
+
+gh auth login
+
+問題照這樣選:
+  Where do you use GitHub?            → GitHub.com
+  Preferred protocol?                 → HTTPS
+  Authenticate Git with credentials?  → Yes
+  How to authenticate?                → Login with a web browser
+
+它會顯示一組八位數代碼(像 XXXX-XXXX),
+到瀏覽器開 https://github.com/login/device
+登入 GitHub 帳號後輸入那組代碼,按 Authorize。
+
+──────────────────────────────
+⑥ 下載專案(放到桌面)
+──────────────────────────────
+
+cd $HOME\Desktop; gh repo clone b0936261476-collab/wuxia-fitness
+
+──────────────────────────────
+⑦ 啟動遊戲
+──────────────────────────────
+
+cd $HOME\Desktop\wuxia-fitness; npm run serve
+
+然後開瀏覽器進 http://localhost:5173 就能玩了。
+
+══════════════════════════════════════════
+ 以後每次使用(①~⑥ 只需做一次)
+══════════════════════════════════════════
+
+玩之前先拉最新版(在 wuxia-fitness 資料夾裡):
+
+    git pull
+
+有改東西的話,結束時推上去:
+
+    git add -A
+    git commit -m "說明改了什麼"
+    git push
+
+══════════════════════════════════════════
+ 注意:遊戲進度不會跟著同步
+══════════════════════════════════════════
+
+遊戲進度存在瀏覽器裡,搬進度的方法:
+  舊電腦:遊戲「行囊」分頁 → 匯出存檔 → 複製文字傳過去
+  新電腦:遊戲「行囊」分頁 → 貼上文字 → 匯入存檔
