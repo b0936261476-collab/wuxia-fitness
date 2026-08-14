@@ -1,0 +1,363 @@
+// UI 接線:載入資料檔、綁定操作、渲染畫面
+
+import {
+  logExercise, addSteps, pendingEventCount, startNextEvent, resolveEvent,
+  useItem, levels
+} from "../engine/game.js";
+import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
+import { currentCoefficient } from "../engine/decay.js";
+import { loadState, saveState, exportSave, importSave, resetSave } from "../engine/storage.js";
+
+const $ = (sel) => document.querySelector(sel);
+
+const data = {};
+let state;
+
+const TYPE_LABELS = {
+  daily: "日常見聞", choice: "抉擇分支", duel: "對決切磋",
+  fortune: "機緣奇遇", clinic: "醫者仁心"
+};
+
+async function loadData() {
+  const [exercises, events, titles, items] = await Promise.all(
+    ["exercises", "events", "titles", "items"].map((n) =>
+      fetch(`data/${n}.json`).then((r) => {
+        if (!r.ok) throw new Error(`載入 data/${n}.json 失敗`);
+        return r.json();
+      })
+    )
+  );
+  Object.assign(data, { exercises, events, titles, items });
+}
+
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function dimName(key) {
+  return data.exercises.dimensions.find((d) => d.key === key)?.name ?? key;
+}
+
+function save() {
+  saveState(state);
+}
+
+// ---------- 渲染 ----------
+
+function renderAll() {
+  renderTitleLine();
+  renderHero();
+  renderTrain();
+  renderRoad();
+  renderBag();
+}
+
+function renderTitleLine() {
+  const { thresholds, titles } = data.titles.milestones;
+  const parts = ["群俠錄:暫無排名"];
+  for (const d of DIMENSIONS) {
+    const idx = state.milestones[d];
+    if (idx != null && idx >= 0) parts.push(`${dimName(d)}:${titles[d][idx]}`);
+  }
+  $("#title-line").textContent = parts.join(" ‧ ");
+}
+
+function renderHero() {
+  const grid = $("#stats-grid");
+  const { thresholds, titles } = data.titles.milestones;
+  grid.innerHTML = DIMENSIONS.map((d) => {
+    const exp = state.exp[d];
+    const p = levelProgress(exp);
+    const idx = state.milestones[d];
+    const title = idx != null && idx >= 0 ? titles[d][idx] : "";
+    const pct = Math.min(100, (p.current / p.needed) * 100);
+    return `<div class="stat-card">
+      <div><span class="stat-name">${dimName(d)}</span><span class="stat-level">Lv.${p.level}</span></div>
+      <div class="stat-title">${title}</div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="stat-exp">${Math.floor(exp)} / ${p.next}(距下一級 ${Math.ceil(p.needed - p.current)})</div>
+    </div>`;
+  }).join("");
+  $("#hero-steps").textContent = state.steps.total.toLocaleString();
+}
+
+function renderTrain() {
+  const sel = $("#exercise-select");
+  if (!sel.options.length) {
+    sel.innerHTML = data.exercises.categories.map((cat) => {
+      const opts = data.exercises.exercises
+        .filter((e) => e.category === cat.key)
+        .map((e) => `<option value="${e.id}">${e.name}</option>`)
+        .join("");
+      return `<optgroup label="${cat.name}">${opts}</optgroup>`;
+    }).join("");
+  }
+  updateTierHint();
+  renderTodayLog();
+}
+
+function updateTierHint() {
+  const ex = data.exercises.exercises.find((e) => e.id === $("#exercise-select").value);
+  if (!ex) return;
+  const cat = data.exercises.categories.find((c) => c.key === ex.category);
+  $("#exercise-unit").textContent = cat.unit;
+  const cum = state.daily.date === today() ? (state.daily.byExercise[ex.id] || 0) : 0;
+  const coef = currentCoefficient(cum, ex.tierSize, data.exercises.coefficients);
+  const weights = Object.entries(ex.weights)
+    .map(([d, w]) => `${dimName(d)}×${w}`)
+    .join("、");
+  $("#tier-hint").textContent =
+    `權重:${weights}|遞減階梯:每 ${ex.tierSize} ${cat.unit}|今日已累積 ${cum} ${cat.unit},目前係數 ${Math.round(coef * 100)}%`;
+}
+
+function renderTodayLog() {
+  const box = $("#today-log");
+  const rows = state.records.filter((r) => r.date === today());
+  if (!rows.length) {
+    box.innerHTML = `<p class="empty">今日尚未練功。拳不離手,曲不離口。</p>`;
+    return;
+  }
+  box.innerHTML = `<table>
+    <tr><th>項目</th><th>原始量</th><th>有效量</th><th>六維收穫</th></tr>
+    ${rows.map((r) => `<tr>
+      <td>${r.name}</td><td>${r.amount}</td><td>${r.effective}</td>
+      <td>${Object.entries(r.gains).map(([d, v]) => `${dimName(d)}+${Math.round(v)}`).join(" ")}</td>
+    </tr>`).join("")}
+  </table>`;
+}
+
+function renderRoad() {
+  const pending = pendingEventCount(state);
+  $("#pending-count").textContent = pending;
+  $("#walk-btn").disabled = pending <= 0 && !state.pendingEvent;
+  renderEventArea();
+  renderJournal();
+}
+
+function renderEventArea(lastEntry = null) {
+  const area = $("#event-area");
+  const ev = state.pendingEvent;
+
+  if (!ev && !lastEntry) {
+    area.innerHTML = "";
+    return;
+  }
+
+  if (ev) {
+    const questClass = ev.source === "quest" ? " quest-event" : "";
+    const typeLabel = ev.source === "quest"
+      ? `支線‧${data.events.quest.name}`
+      : TYPE_LABELS[ev.type] ?? ev.type;
+    let controls;
+    if (ev.type === "choice") {
+      controls = `<div class="event-options">${ev.options
+        .map((o, i) => `<button class="btn" data-choice="${i}">${o.text}</button>`)
+        .join("")}</div>`;
+    } else if (ev.type === "duel" || ev.type === "fortune") {
+      const label = ev.type === "duel" ? "出 手" : "一探究竟";
+      controls = `<div class="event-options"><button class="btn primary" data-resolve>${label}</button></div>`;
+    } else {
+      controls = `<div class="event-options"><button class="btn primary" data-resolve>繼 續</button></div>`;
+    }
+    area.innerHTML = `<div class="event-card${questClass}">
+      <span class="event-type">${typeLabel}</span>
+      <h3>${ev.title}</h3>
+      <p class="event-text">${ev.text}</p>
+      ${controls}
+    </div>`;
+    area.querySelectorAll("[data-choice]").forEach((btn) =>
+      btn.addEventListener("click", () => onResolve(Number(btn.dataset.choice)))
+    );
+    area.querySelector("[data-resolve]")?.addEventListener("click", () => onResolve(null));
+    return;
+  }
+
+  // 顯示剛結算完的結果
+  const e = lastEntry;
+  const cls = e.success === true ? "success" : e.success === false ? "failure" : "";
+  const rateLine = e.rate != null
+    ? `<p class="event-rate">判定成功率 ${Math.round(e.rate * 100)}% — ${e.success ? "成功" : "失敗"}</p>` : "";
+  const doneLine = e.questDone ? `<p class="event-rate">✦ 支線「${data.events.quest.name}」完成!</p>` : "";
+  area.innerHTML = `<div class="event-card">
+    <span class="event-type">${TYPE_LABELS[e.type] ?? e.type}</span>
+    <h3>${e.title}</h3>
+    <p class="event-text">${e.text}</p>
+    ${e.choice ? `<p class="event-rate">你的選擇:${e.choice}</p>` : ""}
+    <p class="event-result ${cls}">${e.resultText}</p>
+    ${rateLine}${doneLine}
+  </div>`;
+}
+
+function renderJournal() {
+  const box = $("#journal");
+  if (!state.journal.length) {
+    box.innerHTML = `<p class="empty">尚未踏出第一步。輸入步數,江湖便在腳下。</p>`;
+    return;
+  }
+  box.innerHTML = [...state.journal].reverse().slice(0, 50).map((e) => {
+    const tag = e.source === "quest" ? `支線` : TYPE_LABELS[e.type] ?? e.type;
+    const outcome = e.success === true ? "(成功)" : e.success === false ? "(失敗)" : "";
+    return `<div class="journal-entry">
+      <div class="j-head">第 ${e.n} 里 ‧ ${tag}${outcome}</div>
+      <div><strong>${e.title}</strong>${e.choice ? ` — ${e.choice}` : ""}</div>
+      <div class="j-result">${e.resultText}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderBag() {
+  const inv = $("#inventory");
+  const entries = Object.entries(state.inventory);
+  if (!entries.length) {
+    inv.innerHTML = `<p class="empty">行囊空空,倒也輕便。</p>`;
+  } else {
+    inv.innerHTML = entries.map(([id, count]) => {
+      const item = data.items.items.find((i) => i.id === id);
+      const usable = item?.type === "consumable";
+      return `<div class="item-row">
+        <div>
+          <div>${item?.name ?? id} × ${count}</div>
+          <div class="item-desc">${item?.description ?? ""}</div>
+        </div>
+        ${usable ? `<button class="btn" data-use="${id}">使用</button>` : ""}
+      </div>`;
+    }).join("");
+    inv.querySelectorAll("[data-use]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const cured = useItem(state, data, btn.dataset.use);
+        if (cured) {
+          const d = data.items.debuffs.find((x) => x.id === cured);
+          alert(`用藥之後,「${d?.name ?? cured}」痊癒了。`);
+        } else {
+          alert("目前沒有這味藥能治的傷。留著吧,江湖路長。");
+        }
+        save();
+        renderAll();
+      })
+    );
+  }
+
+  const dbox = $("#debuff-list");
+  if (!state.debuffs.length) {
+    dbox.innerHTML = `<p class="empty">身輕體健,百病不侵。</p>`;
+  } else {
+    dbox.innerHTML = state.debuffs.map((id) => {
+      const d = data.items.debuffs.find((x) => x.id === id);
+      return `<div class="debuff-row">
+        <span class="debuff-name">${d?.name ?? id}</span>
+        <p>${d?.description ?? ""}</p>
+        <p>${d?.cureHint ?? ""}</p>
+      </div>`;
+    }).join("");
+  }
+
+  const q = $("#quest-status");
+  const questName = data.events.quest.name;
+  const statusText = {
+    none: "尚未觸發。多走走,江湖自會找上你。",
+    active: `「${questName}」進行中 — 第 ${state.quest.stage + 1} / ${data.events.quest.stages.length} 階段`,
+    failed: `「${questName}」中斷,日後行路時有機會重新來過。`,
+    done: `「${questName}」已完成。`
+  }[state.quest.status];
+  q.innerHTML = `<p>${statusText}</p>`;
+}
+
+// ---------- 操作 ----------
+
+function onResolve(optionIndex) {
+  const entry = resolveEvent(state, data, Math.random, optionIndex);
+  save();
+  renderAll();
+  renderEventArea(entry);
+}
+
+function bindEvents() {
+  // 分頁
+  $("#tabs").addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab");
+    if (!btn) return;
+    document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === btn));
+    document.querySelectorAll(".panel").forEach((p) =>
+      p.classList.toggle("active", p.id === `tab-${btn.dataset.tab}`)
+    );
+  });
+
+  // 練功
+  $("#exercise-select").addEventListener("change", updateTierHint);
+  $("#exercise-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const id = $("#exercise-select").value;
+    const amount = Number($("#exercise-amount").value);
+    if (!(amount > 0)) return;
+    const { effective, gains } = logExercise(state, data, id, amount, today());
+    save();
+    const gainText = Object.entries(gains)
+      .map(([d, v]) => `${dimName(d)} +${Math.round(v)}`)
+      .join("、");
+    const flash = $("#train-result");
+    flash.hidden = false;
+    flash.textContent = `登記成功!有效量 ${Math.round(effective * 100) / 100},六維收穫:${gainText}`;
+    $("#exercise-amount").value = "";
+    renderAll();
+  });
+
+  // 步數
+  $("#steps-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const amount = Number($("#steps-amount").value);
+    if (!(amount > 0)) return;
+    addSteps(state, amount);
+    save();
+    $("#steps-amount").value = "";
+    renderAll();
+  });
+
+  // 前行
+  $("#walk-btn").addEventListener("click", () => {
+    if (state.pendingEvent) {
+      renderEventArea();
+      return;
+    }
+    const ev = startNextEvent(state, data);
+    if (!ev) return;
+    save();
+    renderRoad();
+  });
+
+  // 存檔
+  $("#export-btn").addEventListener("click", () => {
+    $("#save-io").value = exportSave(state);
+  });
+  $("#import-btn").addEventListener("click", () => {
+    try {
+      state = importSave($("#save-io").value);
+      save();
+      renderAll();
+      alert("匯入成功。");
+    } catch (err) {
+      alert(`匯入失敗:${err.message}`);
+    }
+  });
+  $("#reset-btn").addEventListener("click", () => {
+    if (confirm("確定要重新開始?所有進度將清空,無法復原。")) {
+      state = resetSave();
+      save();
+      renderAll();
+    }
+  });
+}
+
+// ---------- 啟動 ----------
+
+(async function main() {
+  try {
+    await loadData();
+  } catch (err) {
+    document.body.innerHTML = `<p style="padding:40px;text-align:center">資料載入失敗:${err.message}<br>請用本機伺服器開啟(如 npx serve),不要直接雙擊 html。</p>`;
+    return;
+  }
+  state = loadState();
+  bindEvents();
+  renderAll();
+})();

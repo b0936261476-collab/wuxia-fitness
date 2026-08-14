@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>一步一江湖 — 武林運動模擬器</title>
+  <link rel="stylesheet" href="src/ui/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>一步一江湖</h1>
+    <p class="subtitle">武林運動模擬器</p>
+    <p id="title-line" class="title-line">群俠錄:暫無排名</p>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="hero">俠客</button>
+    <button class="tab" data-tab="train">練功</button>
+    <button class="tab" data-tab="road">江湖路</button>
+    <button class="tab" data-tab="bag">行囊</button>
+  </nav>
+
+  <main>
+    <!-- 俠客 -->
+    <section id="tab-hero" class="panel active">
+      <div id="stats-grid" class="stats-grid"></div>
+      <div class="card muted-card">
+        <p>累積步數:<strong id="hero-steps">0</strong> 步</p>
+        <p class="hint">群俠錄為全服排名稱號,需多人共享資料。單機版暫無排名,武道里程碑不受影響。</p>
+      </div>
+    </section>
+
+    <!-- 練功 -->
+    <section id="tab-train" class="panel">
+      <div class="card">
+        <h2>記錄運動</h2>
+        <form id="exercise-form">
+          <label>
+            項目
+            <select id="exercise-select"></select>
+          </label>
+          <label>
+            數量(<span id="exercise-unit">下</span>)
+            <input type="number" id="exercise-amount" min="1" step="1" required />
+          </label>
+          <p class="hint" id="tier-hint"></p>
+          <button type="submit" class="btn primary">登記</button>
+        </form>
+        <div id="train-result" class="flash" hidden></div>
+      </div>
+      <div class="card">
+        <h2>今日練功</h2>
+        <div id="today-log" class="today-log"></div>
+      </div>
+    </section>
+
+    <!-- 江湖路 -->
+    <section id="tab-road" class="panel">
+      <div class="card">
+        <h2>輸入步數</h2>
+        <form id="steps-form" class="inline-form">
+          <input type="number" id="steps-amount" min="1" step="1" placeholder="今日步數,如 8000" required />
+          <button type="submit" class="btn primary">記上</button>
+        </form>
+        <p>行動力:每 1000 步觸發一次事件。待觸發事件:<strong id="pending-count">0</strong></p>
+        <button id="walk-btn" class="btn walk" disabled>前 行</button>
+      </div>
+      <div id="event-area"></div>
+      <div class="card">
+        <h2>江湖路歷程</h2>
+        <div id="journal"></div>
+      </div>
+    </section>
+
+    <!-- 行囊 -->
+    <section id="tab-bag" class="panel">
+      <div class="card">
+        <h2>物品</h2>
+        <div id="inventory"></div>
+      </div>
+      <div class="card">
+        <h2>狀態</h2>
+        <div id="debuff-list"></div>
+      </div>
+      <div class="card">
+        <h2>支線</h2>
+        <div id="quest-status"></div>
+      </div>
+      <div class="card">
+        <h2>存檔</h2>
+        <div class="save-actions">
+          <button id="export-btn" class="btn">匯出存檔</button>
+          <button id="import-btn" class="btn">匯入存檔</button>
+          <button id="reset-btn" class="btn danger">重新開始</button>
+        </div>
+        <textarea id="save-io" rows="4" placeholder="匯出的存檔會顯示在這裡;匯入時把存檔貼進來再按「匯入存檔」"></textarea>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="src/ui/app.js"></script>
+</body>
+</html>

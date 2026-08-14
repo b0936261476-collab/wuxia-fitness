@@ -1,0 +1,61 @@
+{
+  "items": [
+    {
+      "id": "liaoshangyao",
+      "name": "療傷藥",
+      "type": "consumable",
+      "description": "跌打鋪老師傅祖傳藥膏,聞起來嗆,抹起來燙,但真的有效。",
+      "cures": ["dieda"]
+    },
+    {
+      "id": "qingxinsan",
+      "name": "清心散",
+      "type": "consumable",
+      "description": "一包淡青色藥粉,以山泉送服,可平定紊亂的氣息。",
+      "cures": ["qixi"]
+    },
+    {
+      "id": "canpo-ditu",
+      "name": "殘破地圖",
+      "type": "curio",
+      "description": "老嫗賣給你的半張地圖,墨跡暈開,只認得出「斷雲崗」三個字。",
+      "flagOnGain": "has_map"
+    },
+    {
+      "id": "miji-qingshen",
+      "name": "《輕身訣》殘頁",
+      "type": "manual",
+      "description": "崖壁旁拾得的殘頁,記載一套提縱之法。研讀後身法大進。",
+      "expOnGain": { "light": 500 }
+    },
+    {
+      "id": "zangfeng-pai",
+      "name": "藏鋒木牌",
+      "type": "quest",
+      "description": "半塊烏木牌,刻著「藏鋒」二字,斷口處像是被人硬生生掰開的。"
+    },
+    {
+      "id": "miji-zangfeng",
+      "name": "《藏鋒入門篇》",
+      "type": "manual",
+      "description": "藏鋒山門的入門功法,字跡工整,首頁只有八個字:藏鋒於鞘,守拙於心。",
+      "expOnGain": { "light": 300, "inner": 300, "hard": 300, "soft": 300, "eye": 300, "ear": 300 }
+    }
+  ],
+  "debuffs": [
+    {
+      "id": "dieda",
+      "name": "跌打損傷",
+      "description": "渾身痠痛,使不上勁。後續事件判定成功率 −10%。",
+      "successMod": -0.1,
+      "cureHint": "使用療傷藥、遇上郎中,或抵達醫館可解除。"
+    },
+    {
+      "id": "qixi",
+      "name": "氣息紊亂",
+      "description": "內息岔了道,提氣時胸口發悶。後續事件判定成功率 −10%。",
+      "successMod": -0.1,
+      "cureHint": "使用清心散、遇上郎中,或抵達醫館可解除。"
+    }
+  ]
+}

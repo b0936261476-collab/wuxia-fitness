@@ -1,0 +1,11 @@
+{
+  "name": "wuxia-fitness",
+  "version": "0.1.0",
+  "description": "一步一江湖 — 武林運動模擬器:用真實運動累積六維武學,用走路步數推進江湖劇情",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/**/*.test.mjs",
+    "serve": "npx --yes serve -l 5173 ."
+  }
+}
