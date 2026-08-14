@@ -23,6 +23,7 @@ export function newState() {
     seenOnce: [],              // 已出現過的一次性事件
     quest: { status: "none", stage: 0 },   // none | active | failed | done
     pendingEvent: null,        // 進行中、待結算的事件
+    training: null,            // 計時修煉 {exerciseId, startedAt} 或 null
     journal: []                // 江湖路歷程
   };
 }

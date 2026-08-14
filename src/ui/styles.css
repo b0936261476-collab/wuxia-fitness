@@ -163,6 +163,17 @@ select, input[type="number"], textarea {
   font-size: 0.92rem;
 }
 
+/* 計時修煉 */
+.timer-display {
+  font-size: 2.6rem;
+  text-align: center;
+  letter-spacing: 0.08em;
+  color: var(--accent-dark);
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 2px;
+}
+.timer-actions { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+
 /* 今日練功表 */
 .today-log table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .today-log th, .today-log td { text-align: left; padding: 6px 4px; border-bottom: 1px dashed var(--border); }

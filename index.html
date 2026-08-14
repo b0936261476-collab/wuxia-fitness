@@ -39,13 +39,24 @@
             項目
             <select id="exercise-select"></select>
           </label>
-          <label>
-            數量(<span id="exercise-unit">下</span>)
-            <input type="number" id="exercise-amount" min="1" step="1" required />
-          </label>
+          <div id="manual-entry">
+            <label>
+              數量(<span id="exercise-unit">下</span>)
+              <input type="number" id="exercise-amount" min="1" step="1" required />
+            </label>
+          </div>
           <p class="hint" id="tier-hint"></p>
-          <button type="submit" class="btn primary">登記</button>
+          <button type="submit" class="btn primary" id="log-btn">登記</button>
         </form>
+        <div id="timer-box" hidden>
+          <div id="timer-display" class="timer-display">00:00</div>
+          <p class="hint">按分鐘的運動採實時計時:按「開始修煉」起算,運動完回來按「收功」。不足一分鐘不計,單次最長 3 小時。中途關掉網頁沒關係,計時會記在存檔裡。</p>
+          <div class="timer-actions">
+            <button type="button" id="timer-start" class="btn primary">開始修煉</button>
+            <button type="button" id="timer-stop" class="btn primary" hidden>收 功</button>
+            <button type="button" id="timer-cancel" class="btn" hidden>放 棄</button>
+          </div>
+        </div>
         <div id="train-result" class="flash" hidden></div>
       </div>
       <div class="card">

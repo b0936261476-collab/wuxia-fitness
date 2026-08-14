@@ -6,6 +6,7 @@ import {
 } from "../engine/game.js";
 import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
 import { currentCoefficient } from "../engine/decay.js";
+import { startTraining, stopTraining, cancelTraining, trainingElapsedMs } from "../engine/training.js";
 import { loadState, saveState, exportSave, importSave, resetSave } from "../engine/storage.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -93,8 +94,51 @@ function renderTrain() {
       return `<optgroup label="${cat.name}">${opts}</optgroup>`;
     }).join("");
   }
+  if (state.training) sel.value = state.training.exerciseId;
   updateTierHint();
+  updateTrainMode();
   renderTodayLog();
+}
+
+// ---------- 計時修煉 ----------
+
+let timerTick = null;
+
+function selectedExercise() {
+  return data.exercises.exercises.find((e) => e.id === $("#exercise-select").value);
+}
+
+function fmtElapsed(ms) {
+  const s = Math.floor(ms / 1000);
+  const hh = Math.floor(s / 3600);
+  const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  const ss = String(s % 60).padStart(2, "0");
+  return hh > 0 ? `${hh}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+/** 依所選項目切換「手動登記」與「計時修煉」兩種模式 */
+function updateTrainMode() {
+  const timed = selectedExercise()?.category === "minute";
+  $("#manual-entry").hidden = timed;
+  $("#exercise-amount").disabled = timed; // 停用才不會擋表單驗證
+  $("#log-btn").hidden = timed;
+  $("#timer-box").hidden = !timed;
+  renderTimer();
+}
+
+function renderTimer() {
+  const running = !!state.training;
+  $("#timer-start").hidden = running;
+  $("#timer-stop").hidden = !running;
+  $("#timer-cancel").hidden = !running;
+  $("#exercise-select").disabled = running;
+  if (running) {
+    $("#timer-display").textContent = fmtElapsed(trainingElapsedMs(state, Date.now()));
+    if (!timerTick) timerTick = setInterval(renderTimer, 1000);
+  } else {
+    $("#timer-display").textContent = "00:00";
+    if (timerTick) { clearInterval(timerTick); timerTick = null; }
+  }
 }
 
 function updateTierHint() {
@@ -284,10 +328,14 @@ function bindEvents() {
   });
 
   // 練功
-  $("#exercise-select").addEventListener("change", updateTierHint);
+  $("#exercise-select").addEventListener("change", () => {
+    updateTierHint();
+    updateTrainMode();
+  });
   $("#exercise-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const id = $("#exercise-select").value;
+    if (selectedExercise()?.category === "minute") return; // 按分鐘一律走計時
     const amount = Number($("#exercise-amount").value);
     if (!(amount > 0)) return;
     const { effective, gains } = logExercise(state, data, id, amount, today());
@@ -300,6 +348,34 @@ function bindEvents() {
     flash.textContent = `登記成功!有效量 ${Math.round(effective * 100) / 100},六維收穫:${gainText}`;
     $("#exercise-amount").value = "";
     renderAll();
+  });
+
+  // 計時修煉
+  $("#timer-start").addEventListener("click", () => {
+    startTraining(state, data, $("#exercise-select").value, Date.now());
+    save();
+    renderTimer();
+  });
+  $("#timer-stop").addEventListener("click", () => {
+    const res = stopTraining(state, data, today(), Date.now());
+    save();
+    const flash = $("#train-result");
+    flash.hidden = false;
+    if (!res) {
+      flash.textContent = "不足一分鐘,這趟就當熱身,未登記。";
+    } else {
+      const gainText = Object.entries(res.gains)
+        .map(([d, v]) => `${dimName(d)} +${Math.round(v)}`)
+        .join("、");
+      flash.textContent = `收功!實練 ${res.minutes} 分鐘,有效量 ${Math.round(res.effective * 100) / 100},六維收穫:${gainText}`;
+    }
+    renderAll();
+  });
+  $("#timer-cancel").addEventListener("click", () => {
+    if (!confirm("確定放棄本次修煉?計時將不會登記。")) return;
+    cancelTraining(state);
+    save();
+    renderTimer();
   });
 
   // 步數

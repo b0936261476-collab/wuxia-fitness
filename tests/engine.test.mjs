@@ -11,6 +11,9 @@ import {
   newState, logExercise, addSteps, pendingEventCount,
   startNextEvent, resolveEvent, useItem, gainItem, levels
 } from "../src/engine/game.js";
+import {
+  startTraining, stopTraining, cancelTraining, trainingElapsedMs
+} from "../src/engine/training.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const loadJson = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
@@ -116,6 +119,44 @@ test("里程碑永久保留,扣分不會摘除稱號", () => {
   assert.equal(s.milestones.light, 0); // 稱號仍在
   const t = data.titles.milestones;
   assert.equal(milestoneTitle(5000, t.thresholds, t.titles.light), "掠影追風");
+});
+
+// ---------- 計時修煉 ----------
+
+test("計時修煉:實際計時30分鐘跑步 → 輕功1710", () => {
+  const s = newState();
+  startTraining(s, data, "paobu", 0);
+  assert.equal(trainingElapsedMs(s, 90_000), 90_000);
+  const res = stopTraining(s, data, "2026-08-14", 30 * 60_000);
+  assert.equal(res.minutes, 30);
+  assert.equal(s.exp.light, 1710);
+  assert.equal(s.training, null);
+});
+
+test("計時修煉:不足一分鐘不登記", () => {
+  const s = newState();
+  startTraining(s, data, "paobu", 0);
+  const res = stopTraining(s, data, "2026-08-14", 59_000);
+  assert.equal(res, null);
+  assert.equal(s.exp.light, 0);
+  assert.equal(s.training, null);
+});
+
+test("計時修煉:按次運動不可計時、進行中擋重複開始", () => {
+  const s = newState();
+  assert.throws(() => startTraining(s, data, "fudi", 0));
+  startTraining(s, data, "paobu", 0);
+  assert.throws(() => startTraining(s, data, "kuaizou", 5));
+  cancelTraining(s);
+  assert.equal(s.training, null);
+  assert.equal(s.exp.light, 0);
+});
+
+test("計時修煉:單次以 maxSessionMinutes 封頂", () => {
+  const s = newState();
+  startTraining(s, data, "paobu", 0);
+  const res = stopTraining(s, data, "2026-08-14", 10 * 3600_000); // 掛機10小時
+  assert.equal(res.minutes, data.exercises.maxSessionMinutes);
 });
 
 // ---------- 步數與事件 ----------
