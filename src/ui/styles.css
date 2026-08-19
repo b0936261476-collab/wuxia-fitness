@@ -239,3 +239,30 @@ select, input[type="number"], textarea {
   .site-header h1 { font-size: 1.5rem; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* 事件 v2:察覺/輾壓級提示框、判定形態徽章、轉段 */
+.perception-box {
+  margin: 10px 0;
+  padding: 10px 12px;
+  background: rgba(168, 132, 44, 0.10);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 4px 4px 0;
+}
+.perception-box.crush {
+  background: rgba(140, 47, 27, 0.08);
+  border-left-color: var(--accent);
+}
+.perception-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: var(--gold);
+  color: #fdf7ec;
+  letter-spacing: 0.2em;
+  margin-bottom: 6px;
+}
+.perception-box.crush .perception-tag { background: var(--accent); }
+.form-badge { margin-left: 6px; background: var(--ink); }
+.event-text.zhuan { color: var(--ink-light); font-style: normal; border-left: 2px dashed var(--border); padding-left: 10px; }
+.event-card .event-text { line-height: 1.9; margin-bottom: 10px; }

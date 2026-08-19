@@ -3,19 +3,16 @@
 
 import { effectiveAmount } from "./decay.js";
 import { DIMENSIONS, levelFromExp } from "./exp.js";
-import { weightedStatValue } from "./check.js";
-import { successRateV2 } from "./tags.js";
 import { generateTalents, wuxingMultiplier, openingFateLine } from "./talent.js";
+import { startEventV2, presentEventV2, chooseOptionV2, chooseSubV2, laborOnExercise } from "./events2.js";
 import {
-  allMax, applyDamage, recover, RECOVERY_RATE, TILI_EXERCISE_RECOVERY_MULTIPLIER,
-  TILI_COST_PER_EVENT, hpDebuffEffects, qiDebuffEffects, tiliDebuffEffects,
-  HP_DEBUFF_TABLE, QI_DEBUFF_TABLE, TILI_DEBUFF_TABLE, isDead
+  allMax, applyDamage, recover, RECOVERY_RATE, TILI_EXERCISE_RECOVERY_MULTIPLIER
 } from "./resources.js";
 import {
   newTrialProgress, recordTrialProgress, isTrialComplete,
   recoveredAttemptLevel, attemptBreakthrough
 } from "./rebirth.js";
-import { titleTiers, balancedTier, equippedTitle } from "./titles.js";
+import { equippedTitle } from "./titles.js";
 import { playerRankSnapshot, integerMilestonesCrossed, surpassedNpcs, surpassFameReward } from "./npcs.js";
 import { newReputation, addFame } from "./reputation.js";
 
@@ -40,11 +37,11 @@ export function newState() {
     records: [],               // 練功紀錄
     steps: { total: 0, resolved: 0, byDate: {} }, // resolved = 已觸發事件數;byDate = 各日已登記步數
     inventory: {},             // {itemId: count}
-    debuffs: [],               // 目前身上的 debuff id
-    flags: {},                 // 抉擇紀錄,影響後續事件
-    seenOnce: [],              // 已出現過的一次性事件
-    quest: { status: "none", stage: 0 },   // none | active | failed | done
-    pendingEvent: null,        // 進行中、待結算的事件
+    debuffs: [],               // 目前身上的 debuff id(M4殘留,§4.4 後不再有事件發放)
+    flags: {},                 // 抉擇紀錄(Flag 三命運 §6.6),影響後續事件
+    flagDates: {},             // 各 flag 落地日期(minDaysSince 樓梯階距用)
+    labor: null,               // 勞務折銀狀態(§9.11.4){active, startDate, dayPoints, fullDates, lastExerciseDate}
+    pendingEvent: null,        // 進行中、待結算的事件(events2.js 生命週期)
     training: null,            // 計時修煉 {exerciseId, startedAt} 或 null
     journal: []                // 江湖路歷程
   };
@@ -195,6 +192,9 @@ export function logExercise(state, data, exerciseId, amount, date) {
   }
   addExp(state, gains, data);
 
+  // §9.11.4 勞務折銀:湊錢中,當日有效經驗總量計入工錢(滿日=掙一兩)
+  laborOnExercise(state, data, date, Object.values(gains).reduce((a, b) => a + b, 0));
+
   // §5.1 重生中:原始申報量(非扣過遞減的有效值)同時累積進六大試煉進度
   if (state.rebirth) recordTrialProgress(state.rebirth.progress, exerciseId, amount);
 
@@ -273,185 +273,51 @@ export function pendingEventCount(state) {
 }
 
 /**
- * 前行:抽出下一個事件,存入 state.pendingEvent。
- * 支線進行中 → 優先支線下一階段;否則有機率(重)啟支線;否則抽隨機池。
+ * 前行:抽出下一個事件(events2.js v2 生命週期),存入 state.pendingEvent。
+ * 勞務結算(§9.11.4)優先插隊;其餘依 conditions/cooldown/weightFlags 抽池。
+ * @param {string} todayStr 今天日期(YYYY-MM-DD),樓梯階距與勞務期限都靠它
  */
-export function startNextEvent(state, data, rng = Math.random) {
+export function startNextEvent(state, data, todayStr, rng = Math.random) {
   if (state.pendingEvent) return state.pendingEvent;
   if (state.rebirth) return null; // §5.1:重生中無法觸發新事件,得先完成六大試煉
   if (pendingEventCount(state) <= 0) return null;
 
-  const ev = drawEvent(state, data, rng);
+  const ev = startEventV2(state, data, todayStr, rng);
+  if (!ev) return null; // 池子全在冷卻/條件不符:不消耗步數,明日再來
   state.steps.resolved += 1;
-  state.pendingEvent = ev;
   return ev;
 }
 
-function drawEvent(state, data, rng) {
-  const { quest } = data.events;
-  if (state.quest.status === "active") {
-    return { source: "quest", ...quest.stages[state.quest.stage] };
-  }
-  const canStart = state.quest.status === "none" || state.quest.status === "failed";
-  if (canStart && rng() < data.events.questStartChance) {
-    state.quest = { status: "active", stage: 0 };
-    return { source: "quest", ...quest.stages[0] };
-  }
-  const pool = data.events.randomPool.filter((e) => {
-    if (e.once && state.seenOnce.includes(e.id)) return false;
-    if (e.requiresFlag && !state.flags[e.requiresFlag]) return false;
-    if (e.forbidsFlag && state.flags[e.forbidsFlag]) return false;
-    return true;
-  });
-  const ev = pool[Math.floor(rng() * pool.length)];
-  return { source: "random", ...ev };
+/** 呈現用視圖(UI 渲染入口) */
+export function presentEvent(state, data) {
+  return presentEventV2(state, data);
+}
+
+function finalizeHooks(state, data) {
+  return {
+    afterResolve: (s, entry) => {
+      // §8.5 自動配戴:有判定維度→配該維里程碑稱號;否則配群俠錄/均衡
+      const checkStats = entry.judgedDim ? { [entry.judgedDim]: 1 } : undefined;
+      entry.equippedTitle = equippedTitle(s, data, checkStats).title;
+      entry.ranking = updateRanking(s, data);
+    },
+    onDeath: (s) => {
+      if (!s.rebirth) s.rebirth = { progress: newTrialProgress() };
+    }
+  };
 }
 
 /**
- * 結算 pendingEvent。choice 事件需傳入 optionIndex。
- * 回傳寫入 journal 的紀錄。
+ * 選擇選項(immediate 事件傳 null)。回傳 {done, sub?, entry?}。
+ * done=false 表示進入巢狀抉擇,續呼叫 chooseSub。
  */
-export function resolveEvent(state, data, rng = Math.random, optionIndex = null) {
-  const ev = state.pendingEvent;
-  if (!ev) throw new Error("沒有進行中的事件");
-
-  // §4.3/§6.1:每次事件固定消耗體力100點(創角前無資源可扣,略過)。
-  // TODO(M5):體力耗竭(【筋疲力竭】)應阻止觸發新事件、只能走休息事件,此處先只扣值不擋流程。
-  if (state.resources) damageResource(state, "tili", TILI_COST_PER_EVENT);
-
-  const entry = {
-    n: state.steps.resolved,
-    id: ev.id,
-    source: ev.source,
-    type: ev.type,
-    title: ev.title,
-    text: ev.text
-  };
-
-  if (ev.type === "choice") {
-    if (optionIndex == null) throw new Error("抉擇事件需要選擇");
-    const opt = ev.options[optionIndex];
-    entry.choice = opt.text;
-    entry.resultText = opt.outcome.text;
-    applyOutcome(state, data, opt.outcome);
-  } else if (ev.type === "duel" || ev.type === "fortune") {
-    const lv = levels(state);
-    let relevantLevel = weightedStatValue(ev.check.stats, lv);
-
-    const percents = resourcePercents(state); // null 直到創角完成
-    if (percents) {
-      // §4.1 血量 DEBUFF 的「六維-X%」是額外的整體乘數,不是標籤修正,直接乘進相關等級。
-      relevantLevel *= hpDebuffEffects(percents.hp).sixdimMultiplier;
-    }
-
-    // TODO(M4殘留):舊版 debuff(跌打損傷/氣息紊亂)仍是固定扣減,尚未併入三資源;
-    // 等這批舊 debuff 內容改走資源DoT(§4.4)後可移除這行與 debuffModifier()。
-    const legacyModifier = debuffModifier(state, data);
-
-    const checkStatsDims = Object.keys(ev.check.stats || {});
-    const titleTagList = [...checkStatsDims.map((d) => `title_${d}`), "title_balanced"];
-
-    const baseRate = successRateV2({
-      relevantLevel,
-      benchmarkLevel: ev.check.benchmarkLevel,
-      tagList: [...(ev.check.tags || []), ...titleTagList], // 天賦/資源標籤(§6.4)+稱號輕加成(§8.4)
-      ctx: {
-        talents: state.talents ?? undefined,
-        eventCategory: ev.eventCategory,
-        resourcePercents: percents ?? undefined,
-        debuffTables: percents
-          ? { hp: HP_DEBUFF_TABLE, qi: QI_DEBUFF_TABLE, tili: TILI_DEBUFF_TABLE }
-          : undefined,
-        titleTiers: titleTiers(state),
-        balancedTier: balancedTier(state)
-      },
-      tagsData: data.tags
-    });
-    const rate = Math.min(0.95, Math.max(0.05, baseRate + legacyModifier));
-    const success = rng() < rate;
-    entry.rate = round2(rate);
-    entry.success = success;
-    const outcome = success ? ev.success : ev.failure;
-    entry.resultText = outcome.text;
-    if (!success && outcome.kind === "questFail" && ev.source === "quest") {
-      state.quest = { status: "failed", stage: 0 };
-    }
-    applyOutcome(state, data, outcome);
-  } else {
-    // daily / clinic
-    const outcome = ev.outcome;
-    if (ev.type === "clinic") {
-      entry.resultText = applyClinic(state, data, outcome);
-    } else {
-      entry.resultText = outcome.text;
-      applyOutcome(state, data, outcome);
-    }
-  }
-
-  if (ev.once && !state.seenOnce.includes(ev.id)) state.seenOnce.push(ev.id);
-
-  // 支線推進:非失敗即進入下一階段;走完即完成
-  if (ev.source === "quest" && state.quest.status === "active") {
-    if (entry.success !== false || ev.failure?.kind !== "questFail") {
-      state.quest.stage += 1;
-      if (state.quest.stage >= data.events.quest.stages.length) {
-        state.quest = { status: "done", stage: 0 };
-        entry.questDone = true;
-      }
-    }
-  }
-
-  entry.equippedTitle = equippedTitle(state, data, ev.check?.stats).title;
-  entry.ranking = updateRanking(state, data);
-
-  state.pendingEvent = null;
-  state.journal.push(entry);
-  return entry;
+export function chooseOption(state, data, choiceId, todayStr, rng = Math.random) {
+  return chooseOptionV2(state, data, choiceId, todayStr, rng, finalizeHooks(state, data));
 }
 
-function debuffModifier(state, data) {
-  let mod = 0;
-  for (const id of state.debuffs) {
-    const d = data.items.debuffs.find((x) => x.id === id);
-    if (d) mod += d.successMod;
-  }
-  return mod;
-}
-
-function applyOutcome(state, data, outcome) {
-  if (!outcome) return;
-  if (outcome.exp) addExp(state, outcome.exp, data);
-  if (outcome.flag) state.flags[outcome.flag] = true;
-  if (outcome.gainItem) gainItem(state, data, outcome.gainItem);
-  if (outcome.loseItem) {
-    if (state.inventory[outcome.loseItem] > 0) {
-      state.inventory[outcome.loseItem] -= 1;
-      if (state.inventory[outcome.loseItem] === 0) delete state.inventory[outcome.loseItem];
-    }
-  }
-  if (outcome.debuff && !state.debuffs.includes(outcome.debuff)) {
-    state.debuffs.push(outcome.debuff);
-  }
-  // §4.4:事件失敗一律直接扣資源(絕對值,依§4.1傷害檔位),取代舊版debuff/exp懲罰
-  if (outcome.damage && state.resources) {
-    for (const [key, amount] of Object.entries(outcome.damage)) {
-      damageResource(state, key, amount);
-    }
-    if (isDead(state.resources.hp) && !state.rebirth) {
-      state.rebirth = { progress: newTrialProgress() };
-    }
-  }
-}
-
-function applyClinic(state, data, outcome) {
-  const had = state.debuffs.length > 0;
-  if (!had) return outcome.textHealthy;
-  if (outcome.cureAll) {
-    state.debuffs = [];
-  } else if (outcome.cureOne) {
-    state.debuffs.shift();
-  }
-  return outcome.textCured;
+/** 巢狀抉擇第二步 */
+export function chooseSub(state, data, subId, todayStr, rng = Math.random) {
+  return chooseSubV2(state, data, subId, todayStr, rng, finalizeHooks(state, data));
 }
 
 export function gainItem(state, data, itemId) {

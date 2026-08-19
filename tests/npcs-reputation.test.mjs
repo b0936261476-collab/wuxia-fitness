@@ -14,7 +14,20 @@ import {
   newReputation, addFame, addInfamy, tierIndexFor, bucketOf,
   evaluationText, reputationSnapshot, hypocriteMultiplier, prodigalMultiplier
 } from "../src/engine/reputation.js";
-import { newState, createCharacter, addExp, resolveEvent, startNextEvent, addSteps } from "../src/engine/game.js";
+import { newState, createCharacter, addExp, chooseOption, startNextEvent, addSteps } from "../src/engine/game.js";
+import { eligibleEvents } from "../src/engine/events2.js";
+
+/** 結算一個「B選項無任何效果」的日常事件,輪換避開冷卻 */
+const NEUTRAL_EVENTS = ["DA-003_rain_shelter", "DA-001_teahouse_storyteller", "DA-002_sugar_figurine"];
+let neutralIdx = 0;
+function resolveOneNeutral(s, useData) {
+  const id = NEUTRAL_EVENTS[neutralIdx++ % NEUTRAL_EVENTS.length];
+  const candidates = eligibleEvents(s, useData, "2026-08-19");
+  const idx = candidates.findIndex((c) => c.ev.eventId === id);
+  const total = candidates.reduce((a, c) => a + c.weight, 0);
+  startNextEvent(s, useData, "2026-08-19", () => (idx + 0.5) / total);
+  return chooseOption(s, useData, "B", "2026-08-19").entry;
+}
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const loadJson = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
@@ -202,28 +215,24 @@ test("updateRanking:data.npcs不存在時優雅跳過(向後相容,不報錯)", 
   const s = newState();
   const dataWithoutNpcs = { ...data, npcs: undefined };
   addSteps(s, 1000);
-  startNextEvent(s, dataWithoutNpcs, () => 0.99);
-  const entry = resolveEvent(s, dataWithoutNpcs, () => 0.5, null);
+  const entry = resolveOneNeutral(s, dataWithoutNpcs);
   assert.equal(entry.ranking, null);
 });
 
-test("resolveEvent:超越具名NPC時獲得俠名獎勵+記flag,且同一NPC只觸發一次", () => {
+test("事件結算:超越具名NPC時獲得俠名獎勵+記flag,且同一NPC只觸發一次", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
 
   // 第一次結算:六維皆0,建立排名基準線(lastKnownRank≈9000+);首次呼叫不算「超越」
-  addSteps(s, 1000);
-  startNextEvent(s, data, () => 0.99);
-  resolveEvent(s, data, () => 0.5, null);
+  addSteps(s, 3000);
+  resolveOneNeutral(s, data);
   assert.equal(s.reputation.fame, 0);
 
   // 練到 levelSum 遠超過第100名門檻(約165),確保下次結算會偵測到大量超越
   for (const dim of ["light", "inner", "hard", "soft", "eye", "ear"]) {
     addExp(s, { [dim]: 100000 }, data);
   }
-  addSteps(s, 1000);
-  startNextEvent(s, data, () => 0.99);
-  const entry = resolveEvent(s, data, () => 0.5, null);
+  const entry = resolveOneNeutral(s, data);
 
   assert.ok(entry.ranking);
   assert.ok(entry.ranking.surpassed.length > 0);
@@ -233,8 +242,6 @@ test("resolveEvent:超越具名NPC時獲得俠名獎勵+記flag,且同一NPC只�
 
   // 再結算一次事件,排名沒再變動,不應該對同一批NPC重複發獎勵
   const fameAfterFirst = s.reputation.fame;
-  addSteps(s, 1000);
-  startNextEvent(s, data, () => 0.99);
-  resolveEvent(s, data, () => 0.5, null);
+  resolveOneNeutral(s, data);
   assert.equal(s.reputation.fame, fameAfterFirst);
 });

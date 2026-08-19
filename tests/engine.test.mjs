@@ -9,7 +9,7 @@ import { thresholdForLevel, levelFromExp, milestoneTitle } from "../src/engine/e
 import { successRate, weightedStatValue } from "../src/engine/check.js";
 import {
   newState, logExercise, addSteps, logSteps, pendingEventCount,
-  startNextEvent, resolveEvent, useItem, gainItem, levels, createCharacter,
+  startNextEvent, chooseOption, chooseSub, useItem, gainItem, levels, createCharacter,
   MAX_DAILY_STEPS, WARN_DAILY_STEPS
 } from "../src/engine/game.js";
 import {
@@ -185,145 +185,41 @@ test("logSteps:舊存檔沒有 byDate 也能登記", () => {
   assert.equal(s.steps.total, 5000);
 });
 
-// ---------- 步數與事件 ----------
+// ---------- 步數與事件(v2 事件庫細節測試見 events2.test.mjs) ----------
 
 test("每1000步觸發一次事件,一次輸入依序結算", () => {
   const s = newState();
   addSteps(s, 3500);
   assert.equal(pendingEventCount(s), 3);
-  const rng = () => 0.99; // 不啟動支線,抽池子最後一個
   for (let i = 0; i < 3; i++) {
-    const ev = startNextEvent(s, data, rng);
+    const ev = startNextEvent(s, data, "2026-08-19", () => 0.99);
     assert.ok(ev);
-    resolveEvent(s, data, rng, ev.type === "choice" ? 0 : null);
+    const view = { ...s.pendingEvent };
+    // 挑第一個可見選項結算(daily/choice 皆可走)
+    const evDef = data.events.pool.find((e) => e.eventId === view.id);
+    const first = evDef.beats.cheng.choices.find((c) => !c.requirePerception && !c.requireCrush && !c.autoWhenInsufficient);
+    const res = chooseOption(s, data, first ? first.id : null, "2026-08-19", () => 0.99);
+    if (!res.done) {
+      // 巢狀抉擇:挑第一個子選項收尾
+      const subs = s.pendingEvent;
+      assert.equal(subs.phase, "sub");
+      const evDef2 = data.events.pool.find((e) => e.eventId === subs.id);
+      let o = evDef2.beats.he.byChoice[subs.subSource];
+      if (subs.subBranch) o = o[subs.subBranch];
+      chooseSub(s, data, o.subChoices[0].id, "2026-08-19");
+    }
   }
   assert.equal(pendingEventCount(s), 0);
-  assert.equal(startNextEvent(s, data, rng), null);
+  assert.equal(startNextEvent(s, data, "2026-08-19", () => 0.99), null);
   assert.equal(s.journal.length, 3);
 });
 
-test("支線全程成功:四階段完成並取得秘笈", () => {
-  const s = newState();
-  addSteps(s, 4000);
-  const rng = () => 0.01; // 必啟動支線、判定必成功
-  for (let i = 0; i < 4; i++) {
-    const ev = startNextEvent(s, data, rng);
-    assert.equal(ev.source, "quest");
-    resolveEvent(s, data, rng, null);
-  }
-  assert.equal(s.quest.status, "done");
-  assert.equal(s.inventory["miji-zangfeng"], 1);
-  assert.equal(s.inventory["zangfeng-pai"], undefined); // 木牌已交出
-  assert.ok(s.flags.zangfeng_done);
-  assert.equal(s.exp.light, 150 + 300); // 攔路獎勵 + 秘笈加成
-  assert.equal(s.exp.eye, 150 + 300);   // 尋路獎勵 + 秘笈加成
-});
-
-test("支線失敗可重啟,不會卡死", () => {
-  const s = newState();
-  addSteps(s, 10000);
-  // 第一階段(敘事)啟動
-  let rng = () => 0.01;
-  startNextEvent(s, data, rng);
-  resolveEvent(s, data, rng, null);
-  assert.equal(s.quest.status, "active");
-  // 第二階段判定失敗 → 支線中斷
-  startNextEvent(s, data, rng);
-  resolveEvent(s, data, () => 0.999, null);
-  assert.equal(s.quest.status, "failed");
-  assert.equal(s.quest.stage, 0);
-  // 之後隨機抽選中有機率從頭重啟
-  const ev = startNextEvent(s, data, () => 0.01);
-  assert.equal(ev.source, "quest");
-  assert.equal(ev.id, "zf-1");
-});
-
-test("debuff 影響成功率且不自動消退;療傷藥可解除", () => {
+test("療傷藥仍可解除舊版 debuff(M4殘留,物品系統相容)", () => {
   const s = newState();
   s.debuffs.push("dieda");
-  addSteps(s, 1000);
-  // 抽到對決事件(醉漢):以「過濾後」的池子計算抽選位置
-  const filtered = data.events.randomPool.filter(
-    (e) => !(e.requiresFlag && !s.flags[e.requiresFlag]) && !(e.once && s.seenOnce.includes(e.id))
-  );
-  const idx = filtered.findIndex((e) => e.id === "duel-zuihan");
-  const drawRng = (() => {
-    let calls = 0;
-    return () => (calls++ === 0 ? 0.99 : (idx + 0.5) / filtered.length);
-  })();
-  const ev = startNextEvent(s, data, drawRng);
-  assert.equal(ev.id, "duel-zuihan");
-  // §0.3 引擎:Lv0 vs benchmarkLevel 1 → 50%+(0-1)*3%=47%;debuff -10% → 37%;rng 0.5 未命中 → 失敗
-  resolveEvent(s, data, () => 0.5, null);
-  assert.equal(s.journal[0].success, false);
-  assert.ok(s.debuffs.includes("dieda")); // 不會自動消退
   gainItem(s, data, "liaoshangyao");
   const cured = useItem(s, data, "liaoshangyao");
   assert.equal(cured, "dieda");
   assert.equal(s.debuffs.length, 0);
   assert.equal(s.inventory["liaoshangyao"], undefined);
-});
-
-test("懲罰改資源DoT後(§4.4):fortune-laoyuan 失敗扣血量150點,不會扣到負值", () => {
-  const s = newState();
-  createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
-  s.resources.hp = 100; // 故意設得比傷害檔位(150)還低
-  addSteps(s, 1000);
-  const filtered = data.events.randomPool.filter(
-    (e) => !(e.requiresFlag && !s.flags[e.requiresFlag]) && !(e.once && s.seenOnce.includes(e.id))
-  );
-  const idx = filtered.findIndex((e) => e.id === "fortune-laoyuan");
-  let calls = 0;
-  const rng = () => {
-    calls++;
-    if (calls === 1) return 0.99;                          // 不啟動支線
-    if (calls === 2) return (idx + 0.5) / filtered.length; // 抽老猿
-    return 0.999;                                          // 判定失敗
-  };
-  startNextEvent(s, data, rng);
-  resolveEvent(s, data, rng, null);
-  const entry = s.journal.find((j) => j.type !== "fate");
-  assert.equal(entry.success, false);
-  assert.equal(s.resources.hp, 0); // 150點傷害打在100血上,floor在0而非負值
-  assert.ok(s.rebirth); // 血量歸零觸發重生(§5.1)
-});
-
-test("一次性事件不重複出現", () => {
-  const s = newState();
-  s.seenOnce.push("choice-qigai", "choice-qiandai", "choice-laoyu", "duel-mengmian");
-  const seen = new Set();
-  addSteps(s, 50000);
-  for (let i = 0; i < 50; i++) {
-    // 第一次呼叫(支線判定)回 0.99,第二次(抽池)掃過整個池子
-    let calls = 0;
-    const rng = () => (calls++ === 0 ? 0.99 : i / 50);
-    const ev = startNextEvent(s, data, rng);
-    seen.add(ev.id);
-    resolveEvent(s, data, () => 0.5, ev.type === "choice" ? 0 : null);
-  }
-  for (const id of ["choice-qigai", "choice-qiandai", "choice-laoyu", "duel-mengmian"]) {
-    assert.ok(!seen.has(id), `${id} 不應再出現`);
-  }
-});
-
-test("事件資料完整性:引用的物品與 debuff 都存在", () => {
-  const itemIds = new Set(data.items.items.map((i) => i.id));
-  const debuffIds = new Set(data.items.debuffs.map((d) => d.id));
-  const allEvents = [...data.events.randomPool, ...data.events.quest.stages];
-  for (const ev of allEvents) {
-    const outcomes = [
-      ev.outcome, ev.success, ev.failure,
-      ...(ev.options ?? []).map((o) => o.outcome)
-    ].filter(Boolean);
-    for (const o of outcomes) {
-      if (o.gainItem) assert.ok(itemIds.has(o.gainItem), `${ev.id} 引用未知物品 ${o.gainItem}`);
-      if (o.loseItem) assert.ok(itemIds.has(o.loseItem), `${ev.id} 引用未知物品 ${o.loseItem}`);
-      if (o.debuff) assert.ok(debuffIds.has(o.debuff), `${ev.id} 引用未知 debuff ${o.debuff}`);
-    }
-    if (ev.check) {
-      for (const dim of Object.keys(ev.check.stats)) {
-        assert.ok(["light", "inner", "hard", "soft", "eye", "ear"].includes(dim));
-      }
-    }
-  }
 });

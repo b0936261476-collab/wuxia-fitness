@@ -9,7 +9,8 @@ import {
   titleTiers, balancedTier, currentBalancedTitle,
   rankingTitleForPercentile, equippedTitle
 } from "../src/engine/titles.js";
-import { newState, addExp, createCharacter, resolveEvent, startNextEvent, addSteps } from "../src/engine/game.js";
+import { newState, addExp, createCharacter, chooseOption, startNextEvent, addSteps } from "../src/engine/game.js";
+import { eligibleEvents } from "../src/engine/events2.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const loadJson = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
@@ -138,48 +139,39 @@ test("rankingTitleForPercentile:各百分位帶對應正確稱號", () => {
 
 // ---------- game.js 整合 ----------
 
-test("resolveEvent:結算後entry.equippedTitle反映當下自動配戴的稱號", () => {
+/** 強制抽中 DU-001 碼頭比腕(判定維=硬功)的 rng */
+function drawArmWrestle(state) {
+  const candidates = eligibleEvents(state, data, "2026-08-19");
+  const idx = candidates.findIndex((c) => c.ev.eventId === "DU-001_arm_wrestle_dock");
+  const total = candidates.reduce((a, c) => a + c.weight, 0);
+  return () => (idx + 0.5) / total;
+}
+
+test("事件結算後 entry.equippedTitle 反映當下自動配戴的稱號", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
-  addExp(s, { hard: 5500 }, data); // 解鎖「鐵骨錚錚」
+  addExp(s, { hard: 5500 }, data); // 硬功 Lv.10,解鎖「鐵骨錚錚」
   addSteps(s, 1000);
-  const filtered = data.events.randomPool.filter(
-    (e) => !(e.requiresFlag && !s.flags[e.requiresFlag]) && !(e.once && s.seenOnce.includes(e.id))
-  );
-  const idx = filtered.findIndex((e) => e.id === "duel-zuihan"); // check.stats={hard:1}
-  const drawRng = (() => {
-    let calls = 0;
-    return () => (calls++ === 0 ? 0.99 : (idx + 0.5) / filtered.length);
-  })();
-  startNextEvent(s, data, drawRng);
-  const entry = resolveEvent(s, data, () => 0.5, null);
+  startNextEvent(s, data, "2026-08-19", drawArmWrestle(s));
+  const { entry } = chooseOption(s, data, "A", "2026-08-19", () => 0.5); // A=硬功判定
   assert.equal(entry.equippedTitle, "鐵骨錚錚");
 });
 
-test("resolveEvent:里程碑輕加成確實提高判定成功率", () => {
-  const drawDuelZuihan = (state) => {
-    const filtered = data.events.randomPool.filter(
-      (e) => !(e.requiresFlag && !state.flags[e.requiresFlag]) && !(e.once && state.seenOnce.includes(e.id))
-    );
-    const idx = filtered.findIndex((e) => e.id === "duel-zuihan");
-    let calls = 0;
-    return () => (calls++ === 0 ? 0.99 : (idx + 0.5) / filtered.length);
-  };
-
+test("里程碑輕加成確實提高判定成功率", () => {
   const withoutTitle = newState();
   createCharacter(withoutTitle, [{ questionId: "q03", optionId: "a" }], data);
   withoutTitle.exp.hard = 100;
   addSteps(withoutTitle, 1000);
-  startNextEvent(withoutTitle, data, drawDuelZuihan(withoutTitle));
-  const entryNoTitle = resolveEvent(withoutTitle, data, () => 0.5, null);
+  startNextEvent(withoutTitle, data, "2026-08-19", drawArmWrestle(withoutTitle));
+  const entryNoTitle = chooseOption(withoutTitle, data, "A", "2026-08-19", () => 0.99).entry;
 
   const withTitle = newState();
   createCharacter(withTitle, [{ questionId: "q03", optionId: "a" }], data);
   withTitle.exp.hard = 100;
   addExp(withTitle, { hard: 5400 }, data); // 補到解鎖「鐵骨錚錚」
   addSteps(withTitle, 1000);
-  startNextEvent(withTitle, data, drawDuelZuihan(withTitle));
-  const entryWithTitle = resolveEvent(withTitle, data, () => 0.5, null);
+  startNextEvent(withTitle, data, "2026-08-19", drawArmWrestle(withTitle));
+  const entryWithTitle = chooseOption(withTitle, data, "A", "2026-08-19", () => 0.99).entry;
 
   assert.ok(entryNoTitle.rate != null && entryWithTitle.rate != null);
   assert.ok(entryWithTitle.rate > entryNoTitle.rate);

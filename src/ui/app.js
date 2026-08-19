@@ -1,8 +1,8 @@
 // UI 接線:載入資料檔、綁定操作、渲染畫面
 
 import {
-  logExercise, logSteps, pendingEventCount, startNextEvent, resolveEvent,
-  useItem, levels, MAX_DAILY_STEPS
+  logExercise, logSteps, pendingEventCount, startNextEvent, presentEvent,
+  chooseOption, chooseSub, useItem, levels, MAX_DAILY_STEPS
 } from "../engine/game.js";
 import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
 import { currentCoefficient } from "../engine/decay.js";
@@ -15,9 +15,9 @@ const data = {};
 let state;
 
 const TYPE_LABELS = {
-  daily: "日常見聞", choice: "抉擇分支", duel: "對決切磋",
-  fortune: "機緣奇遇", clinic: "醫者仁心"
+  daily: "日常見聞", choice: "抉擇分支", duel: "對決切磋", fortune: "機緣奇遇"
 };
+const FORM_LABELS = { crush: "輾壓", awe: "險境" };
 
 async function loadData() {
   const [exercises, events, titles, items, tags, quiz, npcs, reputation] = await Promise.all(
@@ -189,41 +189,60 @@ function renderRoad() {
   renderJournal();
 }
 
+function paragraphs(text, cls) {
+  if (!text) return "";
+  return text.split("\n").filter((t) => t.trim())
+    .map((t) => `<p class="${cls}">${t}</p>`).join("");
+}
+
 function renderEventArea(lastEntry = null) {
   const area = $("#event-area");
-  const ev = state.pendingEvent;
+  const view = presentEvent(state, data);
 
-  if (!ev && !lastEntry) {
+  if (!view && !lastEntry) {
     area.innerHTML = "";
     return;
   }
 
-  if (ev) {
-    const questClass = ev.source === "quest" ? " quest-event" : "";
-    const typeLabel = ev.source === "quest"
-      ? `支線‧${data.events.quest.name}`
-      : TYPE_LABELS[ev.type] ?? ev.type;
-    let controls;
-    if (ev.type === "choice") {
-      controls = `<div class="event-options">${ev.options
-        .map((o, i) => `<button class="btn" data-choice="${i}">${o.text}</button>`)
-        .join("")}</div>`;
-    } else if (ev.type === "duel" || ev.type === "fortune") {
-      const label = ev.type === "duel" ? "出 手" : "一探究竟";
-      controls = `<div class="event-options"><button class="btn primary" data-resolve>${label}</button></div>`;
-    } else {
-      controls = `<div class="event-options"><button class="btn primary" data-resolve>繼 續</button></div>`;
+  if (view) {
+    const typeLabel = TYPE_LABELS[view.eventType] ?? view.eventType;
+    const formBadge = FORM_LABELS[view.form]
+      ? `<span class="event-type form-badge">${FORM_LABELS[view.form]}</span>` : "";
+
+    // 巢狀抉擇階段:只顯示前段結果與第二層選項
+    if (view.phase === "sub") {
+      area.innerHTML = `<div class="event-card">
+        <span class="event-type">${typeLabel}</span>${formBadge}
+        <h3>${view.title}</h3>
+        ${paragraphs(view.subPrefixText, "event-text")}
+        <div class="event-options">${view.choices
+          .map((o) => `<button class="btn" data-sub="${o.id}">${o.text}</button>`).join("")}</div>
+      </div>`;
+      area.querySelectorAll("[data-sub]").forEach((btn) =>
+        btn.addEventListener("click", () => onChoose(btn.dataset.sub, true))
+      );
+      return;
     }
-    area.innerHTML = `<div class="event-card${questClass}">
-      <span class="event-type">${typeLabel}</span>
-      <h3>${ev.title}</h3>
-      <p class="event-text">${ev.text}</p>
+
+    const reveal = view.revealText
+      ? `<div class="perception-box"><span class="perception-tag">察覺</span>${paragraphs(view.revealText, "event-text")}</div>` : "";
+    const crush = view.crushText
+      ? `<div class="perception-box crush"><span class="perception-tag">洞若觀火</span>${paragraphs(view.crushText, "event-text")}</div>` : "";
+    const controls = view.immediate
+      ? `<div class="event-options"><button class="btn primary" data-choice="">繼 續</button></div>`
+      : `<div class="event-options">${view.choices
+          .map((o) => `<button class="btn" data-choice="${o.id}">${o.text}</button>`).join("")}</div>`;
+
+    area.innerHTML = `<div class="event-card">
+      <span class="event-type">${typeLabel}</span>${formBadge}
+      <h3>${view.title}</h3>
+      ${paragraphs(view.qi, "event-text")}
+      ${reveal}${crush}
       ${controls}
     </div>`;
     area.querySelectorAll("[data-choice]").forEach((btn) =>
-      btn.addEventListener("click", () => onResolve(Number(btn.dataset.choice)))
+      btn.addEventListener("click", () => onChoose(btn.dataset.choice || null, false))
     );
-    area.querySelector("[data-resolve]")?.addEventListener("click", () => onResolve(null));
     return;
   }
 
@@ -232,14 +251,14 @@ function renderEventArea(lastEntry = null) {
   const cls = e.success === true ? "success" : e.success === false ? "failure" : "";
   const rateLine = e.rate != null
     ? `<p class="event-rate">判定成功率 ${Math.round(e.rate * 100)}% — ${e.success ? "成功" : "失敗"}</p>` : "";
-  const doneLine = e.questDone ? `<p class="event-rate">✦ 支線「${data.events.quest.name}」完成!</p>` : "";
   area.innerHTML = `<div class="event-card">
     <span class="event-type">${TYPE_LABELS[e.type] ?? e.type}</span>
     <h3>${e.title}</h3>
-    <p class="event-text">${e.text}</p>
     ${e.choice ? `<p class="event-rate">你的選擇:${e.choice}</p>` : ""}
-    <p class="event-result ${cls}">${e.resultText}</p>
-    ${rateLine}${doneLine}
+    ${e.subChoice ? `<p class="event-rate">${e.subChoice}</p>` : ""}
+    ${e.zhuanText ? paragraphs(e.zhuanText, "event-text zhuan") : ""}
+    <div class="event-result ${cls}">${paragraphs(e.resultText, "event-text")}</div>
+    ${rateLine}
   </div>`;
 }
 
@@ -250,12 +269,15 @@ function renderJournal() {
     return;
   }
   box.innerHTML = [...state.journal].reverse().slice(0, 50).map((e) => {
-    const tag = e.source === "quest" ? `支線` : TYPE_LABELS[e.type] ?? e.type;
+    if (e.type === "fate") {
+      return `<div class="journal-entry"><div class="j-head">命格</div><div class="j-result">${e.text}</div></div>`;
+    }
+    const tag = TYPE_LABELS[e.type] ?? e.type;
     const outcome = e.success === true ? "(成功)" : e.success === false ? "(失敗)" : "";
     return `<div class="journal-entry">
-      <div class="j-head">第 ${e.n} 里 ‧ ${tag}${outcome}</div>
+      <div class="j-head">第 ${e.n} 里 ‧ ${tag}${outcome}${e.form && FORM_LABELS[e.form] ? ` ‧ ${FORM_LABELS[e.form]}` : ""}</div>
       <div><strong>${e.title}</strong>${e.choice ? ` — ${e.choice}` : ""}</div>
-      <div class="j-result">${e.resultText}</div>
+      <div class="j-result">${(e.resultText || "").split("\n")[0]}</div>
     </div>`;
   }).join("");
 }
@@ -307,23 +329,28 @@ function renderBag() {
   }
 
   const q = $("#quest-status");
-  const questName = data.events.quest.name;
-  const statusText = {
-    none: "尚未觸發。多走走,江湖自會找上你。",
-    active: `「${questName}」進行中 — 第 ${state.quest.stage + 1} / ${data.events.quest.stages.length} 階段`,
-    failed: `「${questName}」中斷,日後行路時有機會重新來過。`,
-    done: `「${questName}」已完成。`
-  }[state.quest.status];
-  q.innerHTML = `<p>${statusText}</p>`;
+  if (state.labor?.active) {
+    const rule = data.events.config.labor;
+    q.innerHTML = `<p>【湊錢中】欠下的,用汗水還。滿日 ${state.labor.fullDates.length} / ${rule.targetFullDays} ——
+      當日練功有效經驗達 ${rule.dailyEffectiveExpThreshold} 即為一個滿日,一天至多一兩。連續 ${rule.abandonZeroDays} 天不動,就當是放棄了。</p>`;
+  } else {
+    q.innerHTML = `<p>眼下沒有牽掛。江湖的帳,記在路上——你做過的事,它都記得。</p>`;
+  }
 }
 
 // ---------- 操作 ----------
 
-function onResolve(optionIndex) {
-  const entry = resolveEvent(state, data, Math.random, optionIndex);
+function onChoose(choiceId, isSub) {
+  const result = isSub
+    ? chooseSub(state, data, choiceId, today())
+    : chooseOption(state, data, choiceId, today());
   save();
-  renderAll();
-  renderEventArea(entry);
+  if (result.done) {
+    renderAll();
+    renderEventArea(result.entry);
+  } else {
+    renderEventArea(); // 進入巢狀抉擇,重新渲染第二層選項
+  }
 }
 
 function bindEvents() {
@@ -419,8 +446,13 @@ function bindEvents() {
       renderEventArea();
       return;
     }
-    const ev = startNextEvent(state, data);
-    if (!ev) return;
+    const ev = startNextEvent(state, data, today());
+    if (!ev) {
+      const flash = $("#road-flash");
+      flash.hidden = false;
+      flash.textContent = "官道上一時清靜,沒遇上什麼事。改日再走走吧。";
+      return;
+    }
     save();
     renderRoad();
   });

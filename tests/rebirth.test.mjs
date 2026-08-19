@@ -103,7 +103,7 @@ test("重生中無法觸發新事件(§5.1)", () => {
   s.rebirth = { progress: newTrialProgress() };
 
   addSteps(s, 1000);
-  const ev = startNextEvent(s, data, () => 0.5);
+  const ev = startNextEvent(s, data, "2026-01-01", () => 0.5);
   assert.equal(ev, null);
 });
 
@@ -148,7 +148,7 @@ test("attemptRebirthCompletion:全流程——歸零→試煉達標→復活滿�
   assert.equal(s.talents.genggu, gengguBefore + result.amount);
 
   addSteps(s, 1000);
-  const ev = startNextEvent(s, data, () => 0.99);
+  const ev = startNextEvent(s, data, "2026-01-01", () => 0.99);
   assert.ok(ev);
 });
 

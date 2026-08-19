@@ -13,8 +13,10 @@ import {
 import {
   newState, createCharacter, resourceMax, resourcePercents,
   damageResource, tickResourceRecovery, logExercise,
-  addSteps, startNextEvent, resolveEvent
+  addSteps, startNextEvent, chooseOption
 } from "../src/engine/game.js";
+import { eligibleEvents } from "../src/engine/events2.js";
+import { thresholdForLevel } from "../src/engine/exp.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const loadJson = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
@@ -177,42 +179,43 @@ test("tickResourceRecovery:自然恢復隨時數增加,體力當日有運動則�
   assert.ok(s2.resources.tili > tiliNoExercise); // 有運動恢復更多(×1.5)
 });
 
-test("resolveEvent:每次事件固定扣體力100點(§4.3/§6.1)", () => {
+/** 強制抽中指定事件的 rng(v2 可抽池位置) */
+function rngForEvent(s, eventId) {
+  const candidates = eligibleEvents(s, data, "2026-01-01");
+  const idx = candidates.findIndex((c) => c.ev.eventId === eventId);
+  const total = candidates.reduce((a, c) => a + c.weight, 0);
+  return () => (idx + 0.5) / total;
+}
+
+test("事件結算:每次事件固定扣體力100點(§4.3/§6.1)", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
   const before = s.resources.tili;
   addSteps(s, 1000);
-  startNextEvent(s, data, () => 0.99); // 抽日常事件,避開支線
-  resolveEvent(s, data, () => 0.5, null);
+  startNextEvent(s, data, "2026-01-01", rngForEvent(s, "DA-003_rain_shelter"));
+  chooseOption(s, data, "B", "2026-01-01");
   assert.equal(s.resources.tili, before - TILI_COST_PER_EVENT);
 });
 
-test("resolveEvent:創角前(無資源)事件仍可正常結算,不報錯", () => {
+test("事件結算:創角前(無資源)事件仍可正常結算,不報錯", () => {
   const s = newState();
   assert.equal(s.resources, null);
   addSteps(s, 1000);
-  startNextEvent(s, data, () => 0.99);
-  const entry = resolveEvent(s, data, () => 0.5, null);
+  startNextEvent(s, data, "2026-01-01", rngForEvent(s, "DA-003_rain_shelter"));
+  const { entry } = chooseOption(s, data, "B", "2026-01-01");
   assert.ok(entry);
   assert.equal(s.resources, null); // 仍維持 null,沒有意外寫入
 });
 
-test("resolveEvent:血量重傷時,六維乘數會拉低判定用等級,成功率不會頂到封頂", () => {
+test("事件判定:血量重傷時,六維乘數會拉低判定用等級,成功率不會頂到封頂", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
-  s.exp.hard = 5000; // 練到很高等級,原本足以讓 duel-zuihan(benchmarkLevel 1)輕鬆封頂95%
-  damageResource(s, "hp", s.resources.hp * 0.95); // 打到剩5% → 重傷
+  s.exp.hard = thresholdForLevel(11); // 硬功 Lv.11:對 DU-001(基準6)原本 50%+15%=65%+,但比值 11/6<2 不觸發輾壓
+  damageResource(s, "hp", s.resources.hp * 0.95); // 打到剩5% → 重傷,六維×0.5
 
   addSteps(s, 1000);
-  const filtered = data.events.randomPool.filter(
-    (e) => !(e.requiresFlag && !s.flags[e.requiresFlag]) && !(e.once && s.seenOnce.includes(e.id))
-  );
-  const idx = filtered.findIndex((e) => e.id === "duel-zuihan");
-  const drawRng = (() => {
-    let calls = 0;
-    return () => (calls++ === 0 ? 0.99 : (idx + 0.5) / filtered.length);
-  })();
-  startNextEvent(s, data, drawRng);
-  const entry = resolveEvent(s, data, () => 0.99, null);
-  assert.ok(entry.rate < 0.95); // 重傷六維×0.5後,不會頂到封頂
+  startNextEvent(s, data, "2026-01-01", rngForEvent(s, "DU-001_arm_wrestle_dock"));
+  const { entry } = chooseOption(s, data, "A", "2026-01-01", () => 0.99);
+  // Lv11×0.5=5.5 vs 基準6 → 約48.5%,遠低於未受傷的65%
+  assert.ok(entry.rate < 0.55);
 });
