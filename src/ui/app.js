@@ -19,11 +19,13 @@ const TYPE_LABELS = {
 };
 const FORM_LABELS = { crush: "輾壓", awe: "險境" };
 
+const DATA_VERSION = "m7-2"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives"];
   const loaded = await Promise.all(
     names.map((n) =>
-      fetch(`data/${n}.json`).then((r) => {
+      fetch(`data/${n}.json?v=${DATA_VERSION}`).then((r) => {
         if (!r.ok) throw new Error(`載入 data/${n}.json 失敗`);
         return r.json();
       })
@@ -521,8 +523,15 @@ function handleStepsParam() {
 
 const QUIZ_DRAW_COUNT = 12;
 let quizState = null;
+let quizBound = false;
 
 function startQuiz() {
+  if (!data.quiz?.questions?.length) {
+    // 資料沒載齊(多半是瀏覽器快取拿到舊檔),給玩家一條活路而不是白畫面
+    $("#quiz-overlay").hidden = false;
+    $("#quiz-question").textContent = "算命先生的卦攤好像還沒擺好……請重新整理頁面(電腦按 Ctrl+F5)。";
+    return;
+  }
   const pool = [...data.quiz.questions];
   // 洗牌抽 12 題
   for (let i = pool.length - 1; i > 0; i--) {
@@ -530,8 +539,33 @@ function startQuiz() {
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   quizState = { questions: pool.slice(0, QUIZ_DRAW_COUNT), index: 0, answers: [] };
+  bindQuizOnce();
   $("#quiz-overlay").hidden = false;
   renderQuizQuestion();
+}
+
+// 事件委派掛在 overlay 容器上:就算翻譯外掛替換了按鈕節點,點擊仍然有效
+function bindQuizOnce() {
+  if (quizBound) return;
+  quizBound = true;
+  $("#quiz-overlay").addEventListener("click", (e) => {
+    const opt = e.target.closest("[data-opt]");
+    if (opt && quizState) {
+      const q = quizState.questions[quizState.index];
+      quizState.answers.push({ questionId: q.id, optionId: opt.dataset.opt });
+      quizState.index += 1;
+      if (quizState.index < quizState.questions.length) {
+        renderQuizQuestion();
+      } else {
+        finishQuiz();
+      }
+      return;
+    }
+    if (e.target.closest("#quiz-done")) {
+      $("#quiz-overlay").hidden = true;
+      renderAll();
+    }
+  });
 }
 
 function renderQuizQuestion() {
@@ -541,17 +575,6 @@ function renderQuizQuestion() {
   $("#quiz-options").innerHTML = q.options
     .map((o) => `<button class="btn quiz-opt" data-opt="${o.id}">${o.text}</button>`)
     .join("");
-  $("#quiz-options").querySelectorAll("[data-opt]").forEach((btn) =>
-    btn.addEventListener("click", () => {
-      quizState.answers.push({ questionId: q.id, optionId: btn.dataset.opt });
-      quizState.index += 1;
-      if (quizState.index < quizState.questions.length) {
-        renderQuizQuestion();
-      } else {
-        finishQuiz();
-      }
-    })
-  );
 }
 
 function finishQuiz() {
@@ -566,10 +589,6 @@ function finishQuiz() {
       <p class="fate-line">「${fate.line}」</p>
       <button class="btn primary" id="quiz-done">踏上旅途</button>
     </div>`;
-  $("#quiz-done").addEventListener("click", () => {
-    $("#quiz-overlay").hidden = true;
-    renderAll();
-  });
 }
 
 // ---------- 啟動 ----------

@@ -115,8 +115,8 @@
     </section>
   </main>
 
-  <!-- 創角:心理測驗(§1.2)。未創角時由 app.js 開啟 -->
-  <div id="quiz-overlay" hidden>
+  <!-- 創角:心理測驗(§1.2)。未創角時由 app.js 開啟。translate="no":防瀏覽器翻譯外掛偷換節點弄丟按鈕事件 -->
+  <div id="quiz-overlay" hidden translate="no" class="notranslate">
     <div class="quiz-card">
       <h2>入江湖之前</h2>
       <p class="hint">村口的算命先生攔住你,說走江湖的人,得先讓他看看「命底」。他問了你幾個問題——憑直覺答,沒有對錯。</p>
