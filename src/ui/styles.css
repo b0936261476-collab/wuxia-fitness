@@ -284,10 +284,11 @@ select, input[type="number"], textarea {
   inset: 0;
   background: rgba(43, 38, 32, 0.75);
   display: flex;
-  align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 16px;
+  overflow-y: auto; /* 內容比螢幕高時(手機)可捲動,按鈕不會被切在畫面外 */
+  -webkit-overflow-scrolling: touch;
 }
 .quiz-card {
   background: var(--card);
@@ -296,6 +297,8 @@ select, input[type="number"], textarea {
   padding: 24px;
   max-width: 520px;
   width: 100%;
+  margin: auto 0; /* 內容矮時垂直置中,高時自然從頂端排起 */
+  height: fit-content;
 }
 .quiz-card h2 {
   color: var(--accent-dark);

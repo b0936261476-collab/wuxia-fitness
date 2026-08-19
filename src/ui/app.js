@@ -486,6 +486,7 @@ function bindEvents() {
       state = resetSave();
       save();
       renderAll();
+      startQuiz(); // 重頭來過:先讓算命先生再看一次命底
     }
   });
 }
@@ -563,7 +564,7 @@ function finishQuiz() {
     <div class="fate-reveal">
       <p class="fate-label">村口的算命先生瞇眼看了你半天,只說了一句——</p>
       <p class="fate-line">「${fate.line}」</p>
-      <button class="btn primary" id="quiz-done">上 路</button>
+      <button class="btn primary" id="quiz-done">踏上旅途</button>
     </div>`;
   $("#quiz-done").addEventListener("click", () => {
     $("#quiz-overlay").hidden = true;
