@@ -1,0 +1,900 @@
+{
+  "note": "百強名冊(§9.5/9.7.7)。name/nickname/rank 取自《江湖百強榜・人物設定集》v2(2026-08-16)與《百強被超越反應詞》v1——權威內容在那兩份文件,此檔只放引擎需要的結構化欄位。levelSum 不在此存放固定值,改由 rankBandLevelSum 分布帶即時生成(§9.7.3,含±3%抖動),避免跟設計文件的數值決策脫鉤。loreLine 除 #1-3 已由設計對話定版外,其餘留待設計者從人物設定集摘要或另行撰寫。surpassReaction 為 #11-100 被超越時的江湖快報反應詞(§9.9普通檔);十強(#1-10)不用此表,應走「真容事件」深度互動(§9.7.5①)。",
+  "top100": [
+    {
+      "rank": 1,
+      "name": "沈聽雪",
+      "nickname": "天下第一閒人",
+      "loreLine": "「天下第一閒人?哈,她自己取的渾名罷了。」——說這話的人,還沒見過她出劍",
+      "flags": []
+    },
+    {
+      "rank": 2,
+      "name": "蕭凌雪",
+      "nickname": "天下第二",
+      "loreLine": "「天下第一和第二,十年沒打過一場。江湖等這一戰,等得鬍子都白了。」",
+      "flags": []
+    },
+    {
+      "rank": 3,
+      "name": "顧驚鴻",
+      "nickname": "劍下留人",
+      "loreLine": "「『劍下留人』顧驚鴻?哼,天下第三的劍,殺不死一隻雞。」",
+      "flags": []
+    },
+    {
+      "rank": 4,
+      "name": "韓長風",
+      "nickname": "箭無虛發",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 5,
+      "name": "柳青鸞",
+      "nickname": "一諾千金",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 6,
+      "name": "裴景明",
+      "nickname": "百戰百敗",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 7,
+      "name": "玄泠子",
+      "nickname": "羽化未登仙",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 8,
+      "name": "阿蠻",
+      "nickname": "烈焰紅顏",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 9,
+      "name": "祁子墨",
+      "nickname": "棋差一著",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 10,
+      "name": "阿禾",
+      "nickname": "一飯之恩",
+      "loreLine": null,
+      "flags": []
+    },
+    {
+      "rank": 11,
+      "name": "展孤舟",
+      "nickname": "一劍江湖路",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「又過去一個。」他搖著櫓笑了笑,「江湖跟江水一樣,攔不住要往前的。」"
+    },
+    {
+      "rank": 12,
+      "name": "上官執",
+      "nickname": "千斤壓境",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】烈山堂後山那夜的錘聲,比平時多響了一個時辰。"
+    },
+    {
+      "rank": 13,
+      "name": "蘇挽秋",
+      "nickname": "一曲醉江湖",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】她給自己斟了一杯,朝榜文的方向遙遙一舉:「醒著的我替你高興——醉著的那個,改天自己找你。」"
+    },
+    {
+      "rank": 14,
+      "name": "獨孤晚",
+      "nickname": "半步劍聖",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排名是全的,劍是半的。」他淡淡道,「你贏的是全的那部分。」"
+    },
+    {
+      "rank": 15,
+      "name": "童初雪",
+      "nickname": "小神醫/毒手童真",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「哼,超就超嘛!」她把藥杵一放,「等你哪天中了毒,看你還神氣!……喂,我不是真的要下毒的意思。」"
+    },
+    {
+      "rank": 16,
+      "name": "風無極",
+      "nickname": "一步天涯",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】有人在官道上見過他,問起榜上的事,他笑了笑,腳步沒有停。"
+    },
+    {
+      "rank": 17,
+      "name": "墨如觀",
+      "nickname": "盲劍問道",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「名次?」盲眼劍客側了側頭,「我連榜都沒看過。你且往上走,上面比下面吵。」"
+    },
+    {
+      "rank": 18,
+      "name": "江挽歌",
+      "nickname": "紅妝白骨",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】胭脂鋪的老闆娘照著鏡子,輕輕描眉:「好事啊。名字排得越前,越沒人來翻舊帳。」"
+    },
+    {
+      "rank": 19,
+      "name": "聞人歸",
+      "nickname": "歸人未歸",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「好。」將軍望著南方,「江湖多一個能打的,邊關的擔子,興許能早一天卸。」"
+    },
+    {
+      "rank": 20,
+      "name": "花無淚",
+      "nickname": "一笑千愁",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「喲,踩著我往上爬呀?」她笑著拋來一壺酒,「拿去。爬得越高,越需要這個。」"
+    },
+    {
+      "rank": 21,
+      "name": "秦孤鳴",
+      "nickname": "劍聖遺子",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】據說他盯著榜文看了很久——看的不是你的名字,是你名字上面那個「獨孤」二字還隔多遠。"
+    },
+    {
+      "rank": 22,
+      "name": "雲千帆",
+      "nickname": "護鏡人",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排名於我無妨。」守鏡人垂目,「只盼你往上走的路,別經過我守的湖。」"
+    },
+    {
+      "rank": 23,
+      "name": "白無常",
+      "nickname": "半生半死",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「你贏的是三成的我。」他說得很平靜,「這樣最好。十成的那個,誰都別見。」"
+    },
+    {
+      "rank": 24,
+      "name": "沙月",
+      "nickname": "大漠孤狼",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「名次拿去。」她擦著刀,「若在路上見過狼頭紋樣的兵刃——來告訴我,什麼都換。」"
+    },
+    {
+      "rank": 25,
+      "name": "顧清弦",
+      "nickname": "一曲未成",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「你出招時停頓過嗎?」琴劍名家認真地問,「沒有?……那你確實該在我前面。」"
+    },
+    {
+      "rank": 26,
+      "name": "陸文昭",
+      "nickname": "朝隱夜俠",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】白日裡那位陸大人聽聞此事,只公事公辦地點了點頭;當夜,屋簷上有人朝你的方向拱了拱手。"
+    },
+    {
+      "rank": 27,
+      "name": "慕容徹",
+      "nickname": "無敵最寂寞",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「好,好啊。」他大笑三聲,笑聲末尾輕了下去,「年輕人,往上走。上面……有點冷清。」"
+    },
+    {
+      "rank": 28,
+      "name": "阿爾斯楞",
+      "nickname": "絲路劍魂",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「中原的冊子肯寫你,是你的本事!」他用力拍你肩膀,「哪天也教它寫寫我的彎刀!」"
+    },
+    {
+      "rank": 29,
+      "name": "史晝夜",
+      "nickname": "白日夜叉",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】白日的郎中聽聞道賀,困惑地笑說自己何曾在什麼榜上;當夜,榜文前有個影子站了很久。"
+    },
+    {
+      "rank": 30,
+      "name": "崆峒老人",
+      "nickname": "烈士暮年",
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「好,好。」老人撫須,眼裡是真的高興,「老夫這名次,早該讓給你們這些後生了。」"
+    },
+    {
+      "rank": 31,
+      "name": "玄一真人",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「紅塵的冊子,錄不了方外的人。」真人稽首,「道友請往前——前面才是紅塵。」"
+    },
+    {
+      "rank": 32,
+      "name": "凌霄子",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「江湖代有才人出。」崑崙掌門頷首,「望君名次向前之日,亦是俠名向前之時。」"
+    },
+    {
+      "rank": 33,
+      "name": "藥無涯",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排我前面的人,遲早會來求我一次。」老谷主笑瞇瞇的,「不急,老夫等得起。」"
+    },
+    {
+      "rank": 34,
+      "name": "血修羅",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排我前面?」他舔了舔刀鋒,「好啊。這樣殺了你,才夠痛快。」"
+    },
+    {
+      "rank": 35,
+      "name": "石不言",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【旁白】深山裡那人依舊枯坐。你的名字排過了他,山中一片寂靜——司天監的硃筆註記還在:此位存疑。"
+    },
+    {
+      "rank": 36,
+      "name": "童蠱魔",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】沒有反應。知情人都說,寧可他永遠不知道你的名字。"
+    },
+    {
+      "rank": 37,
+      "name": "討飯真人",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「老叫花子的名次不值錢。」幫主晃著酒葫蘆,「倒是你——想知道點什麼的話,現在有資格來問了。」"
+    },
+    {
+      "rank": 38,
+      "name": "柳長風",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「後生可畏。」劍宗掌門微微一笑,「江南劍宗的門,為你這樣的年輕人常開。」"
+    },
+    {
+      "rank": 39,
+      "name": "墨承影",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】天機閣深處,閣主在你的名字旁落了一子。沒人知道那盤棋在算什麼。"
+    },
+    {
+      "rank": 40,
+      "name": "啞婆婆",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【旁白】村口的繡攤如常。只是那日新繡的花樣裡,多了一道向上的紋路——懂陣法的人說,那是「讓」。"
+    },
+    {
+      "rank": 41,
+      "name": "邪影",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】暗處傳話:排名換不來命。血手門的舊帳,遲早一筆一筆算。"
+    },
+    {
+      "rank": 42,
+      "name": "上官烈",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「有點門道!」堂主聲如洪鐘,「比我那個躲在後山的兒子強——」話說一半,他忽然閉了嘴。"
+    },
+    {
+      "rank": 43,
+      "name": "笑面閻羅",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜恭喜,少年英雄!」他笑得無比真誠,「改日設宴,一定要請你喝杯茶。」"
+    },
+    {
+      "rank": 44,
+      "name": "花無憂",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「往上走吧,孩子。」谷主的笑意帶著滄桑,「只是記著——別讓什麼人,成了你的詛咒。」"
+    },
+    {
+      "rank": 45,
+      "name": "卓不歸",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「你使什麼兵器?」他眼睛亮了,「刀?不是刀?……不是刀啊。」他失去了全部興趣。"
+    },
+    {
+      "rank": 46,
+      "name": "龐一劍",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「名次先讓你。」老劍客一板一眼,「親事不急,劍,也不急。」"
+    },
+    {
+      "rank": 47,
+      "name": "打鐵匠老拐",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【本人】鐵匠沒抬頭,錘聲不停:「排前面的人,兵器磨損得快。要打新的,趁早來。」"
+    },
+    {
+      "rank": 48,
+      "name": "了塵",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「名次是身外物。」師太合十,頓了頓,「……不過施主劍走偏鋒,收勢太急,改了為好。」"
+    },
+    {
+      "rank": 49,
+      "name": "骨收藏家",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「往上走,往上走。」閣主優雅地笑,「養得越高,越是上品。」"
+    },
+    {
+      "rank": 50,
+      "name": "岳問心",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「你超我之時,可曾有愧於心?」他認真等你回答,「沒有?那便是真本事。恭喜。」"
+    },
+    {
+      "rank": 51,
+      "name": "米長生",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「榜?什麼榜?」他撓撓頭,拳頭還在半空比劃,「哦哦,恭喜恭喜。剛那招我還沒打完——」"
+    },
+    {
+      "rank": 52,
+      "name": "鞭無情",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】她握鞭的手緊了一下,又鬆開了。江海盟上下,悄悄鬆了口氣。"
+    },
+    {
+      "rank": 53,
+      "name": "苗不繼",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排名,呵。」他逗著罐裡的蠱,「蟲子從來不排名,蟲子只分——活的,和死的。」"
+    },
+    {
+      "rank": 54,
+      "name": "星滿月",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「星象昨夜就說了,有名字要往上走。」老祭司望天,「草原記住你了,年輕人。」"
+    },
+    {
+      "rank": 55,
+      "name": "戲子李三",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【本人】「好戲,好戲!」他在台上一個亮相,水袖翻飛,「今晚加一折——就唱少俠您的成名路!」"
+    },
+    {
+      "rank": 56,
+      "name": "醉道人",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「貧道早算到了。」他打著酒嗝,「……算到什麼?忘了。總之算到了,賒杯酒慶祝慶祝?」"
+    },
+    {
+      "rank": 57,
+      "name": "弓不歇",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「名次不重要。」他頭也不抬地削著弓身,「你要是懂弓,坐下聊聊;不懂,恭喜,慢走。」"
+    },
+    {
+      "rank": 58,
+      "name": "藥不悔",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「有意思。」他跛著腳湊近,盯著你看,「氣色不錯……要不要試試我新配的——不試?可惜。」"
+    },
+    {
+      "rank": 59,
+      "name": "鐵梅",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排名歸排名。」女捕頭面無表情,「犯了案,照抓。」頓了頓,「——恭喜。」"
+    },
+    {
+      "rank": 60,
+      "name": "陳玉樓",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜。」玉面公子笑容無懈可擊,「往後江湖相見,望你我……都客客氣氣的。」"
+    },
+    {
+      "rank": 61,
+      "name": "談無憂",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「妙啊,這一步棋走得妙。」他擺開棋盤,「來來來,復盤復盤——誒,人呢?」"
+    },
+    {
+      "rank": 62,
+      "name": "桑十步",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「你走路腳跟太沉!」房梁上傳來聲音,「排名讓你,步法不讓!」"
+    },
+    {
+      "rank": 63,
+      "name": "阮小蠻",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】繡娘手上的針線沒停:「恭喜客官。」針尖在光下閃了一閃,「繡莊的規矩,貴客打八折。」"
+    },
+    {
+      "rank": 64,
+      "name": "紅姑",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「好樣的!」山大王拍桌大笑,「哪天路過我的山,報名字——買路錢全免,酒管夠!」"
+    },
+    {
+      "rank": 65,
+      "name": "賭命郎",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「敢不敢賭一把?」他搖著骰盅笑,「賭你三個月後,還在我前面。」"
+    },
+    {
+      "rank": 66,
+      "name": "小九",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【本人】「榜?」野孩子咬著半個炊餅,「哦。那玩意兒能吃嗎?」"
+    },
+    {
+      "rank": 67,
+      "name": "賣魚翁",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【本人】「排過老夫啦?」他盯著浮標,「嗯。當年排過老夫的人,後來都成了人物……也可能是老夫記錯了。」"
+    },
+    {
+      "rank": 68,
+      "name": "瘋書生",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】瘋子當街大笑,索紙題字,墨跡淋漓不成句。有人撿了那張紙——據說懂的人看了,半月不能寐。"
+    },
+    {
+      "rank": 69,
+      "name": "火燒天",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】沒有反應。願你永遠不要引起他的注意。"
+    },
+    {
+      "rank": 70,
+      "name": "錢通天",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜恭喜。」錢莊主的算盤打得飛快,「名次高,信用就高——要用錢,隨時來,利息好談。」"
+    },
+    {
+      "rank": 71,
+      "name": "傅錦",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「本公子傅錦,錦衣衛傅家的傅!」他先報了家門,才不情不願地拱手,「……技不如人,認了。」"
+    },
+    {
+      "rank": 72,
+      "name": "馮子期",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「你靠的是什麼?」他盯著你,「自己練的?」得到答案後,他鄭重抱拳:「那你受得起。」"
+    },
+    {
+      "rank": 73,
+      "name": "秦如意",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜。」鏢局女主人遞來一張名帖,「往後走鏢缺人手,如意鏢局給你留頭一份的價。」"
+    },
+    {
+      "rank": 74,
+      "name": "白公子",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「巧了,本公子昨夜鬥雞贏了三場,沒空練劍。」他打著哈欠,指節上還有新繭。"
+    },
+    {
+      "rank": 75,
+      "name": "老鴇娘",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】慈眉善目的老婦人聽聞了你的名字,笑著記下了。你最好祈禱她只是記性好。"
+    },
+    {
+      "rank": 76,
+      "name": "種花婆婆",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「排名?那是什麼花?」婆婆頭也不回地澆水,「不開花的東西,不值得記。」"
+    },
+    {
+      "rank": 77,
+      "name": "江臨風",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「不服!」少年劍客攔在路中央,「今日不服,明日不服!——約戰!地點你挑!」"
+    },
+    {
+      "rank": 78,
+      "name": "柳掌櫃",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「客官高升啦。」老闆娘添了一碟小菜,「這碟算我請的。往後路難走,記得回來吃口熱的。」"
+    },
+    {
+      "rank": 79,
+      "name": "賣糖翁",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「小友,吃糖。」老翁遞來一支糖人——捏的竟是你的模樣,踏在一級級往上的臺階上。"
+    },
+    {
+      "rank": 80,
+      "name": "賣國生",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【旁白】朝中那位大人在名冊上掃過你的名字,停了半息,繼續批他的公文。僅僅半息。"
+    },
+    {
+      "rank": 81,
+      "name": "清微子",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜施主。」道姑稽首,眼底掠過一絲悵然,「塵世的名次,終究是有人在意的啊。」"
+    },
+    {
+      "rank": 82,
+      "name": "唐三少",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「等等等等——」他從懷裡掏出個小玩意,「新做的賀禮,拉這根線就……欸別跑啊,真的不會炸!」"
+    },
+    {
+      "rank": 83,
+      "name": "小飛燕",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「好厲害!」她翻了個跟斗鼓掌,「下次賣藝缺個壓軸的,来客串不?分你三成賞錢!」"
+    },
+    {
+      "rank": 84,
+      "name": "趙天佑",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜恭喜,本侯爺今晚醉仙樓擺酒!」他湊近壓低聲音,「……手頭若緊,跟我說,別跟別人說。」"
+    },
+    {
+      "rank": 85,
+      "name": "呼延烈",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「請教!」年輕槍手抱拳,眼睛發亮,「師父說,超過我的人都值得學——你的功夫,怎麼練的?」"
+    },
+    {
+      "rank": 86,
+      "name": "林小滿",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「榜啊?」獵戶姑娘掂了掂新打的野雞,「恭喜。晚上加菜,要不要來?」"
+    },
+    {
+      "rank": 87,
+      "name": "柳三",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【本人】醒木一拍:「列位!今日新書——《無名小卒力壓百曉生》!主角是誰?遠在天邊,近在……喏,那位!」"
+    },
+    {
+      "rank": 88,
+      "name": "明心",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】小和尚合十,笑得憨厚:「阿彌陀佛,恭喜施主。施主練十遍的地方,小僧再練一百遍就是。」"
+    },
+    {
+      "rank": 89,
+      "name": "石頭",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「哇——」小乞丐眼睛瞪圓,「你超過我啦?太好了!幫主說,被強的人超過,是福氣!」"
+    },
+    {
+      "rank": 90,
+      "name": "柳映月",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「哼,」大小姐別過頭,「也就……比我強一點點。下次我帶真傢伙。」她的劍明明就在腰上。"
+    },
+    {
+      "rank": 91,
+      "name": "錢曉曉",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】算盤劈啪一響:「按你這成長率,年化了不得。」她遞來一張紙,「入股嗎?我看好你。」"
+    },
+    {
+      "rank": 92,
+      "name": "顧念慈",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「不算不算!」她跺腳,「那天我心情不好!……好啦恭喜你啦,哼,請你吃飯,不許拒絕!」"
+    },
+    {
+      "rank": 93,
+      "name": "錢多多",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【本人】「英雄!」富家子熱情迎上,「多少錢?你這身功夫,多少錢肯教我?開個價!」"
+    },
+    {
+      "rank": 94,
+      "name": "孟青雲",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「厲害厲害!」少爺由衷佩服,「不像我,都是運氣——欸你說巧不巧,昨天又有塊匾差點砸我,又沒砸中!」"
+    },
+    {
+      "rank": 95,
+      "name": "聞音",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜。」守廬人溫和地笑,「若在江湖上,見過用弓的高手……請帶句話:弓廬還亮著燈。」"
+    },
+    {
+      "rank": 96,
+      "name": "沈婉如",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【旁白】深閨裡的小姐聽聞榜文變動,將手中的劍譜合上,望了窗外很久很久。"
+    },
+    {
+      "rank": 97,
+      "name": "柳眠雪",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「太好了,又一個往上跑的!」逃嫁的姑娘揮拳,「等等我,我馬上追上來——江湖這麼大,別跑太快!」"
+    },
+    {
+      "rank": 98,
+      "name": "唐子軒",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「妙哉!」落第書生撫掌,「此乃『後來者居上』之破題——且慢,容我以此為題,賦詩一首——」"
+    },
+    {
+      "rank": 99,
+      "name": "阿柱",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [],
+      "surpassReaction": "【本人】「恭喜恭喜!」他笑得見牙不見眼,「俺師兄說過,被超過不丟人,停下來才丟人!」"
+    },
+    {
+      "rank": 100,
+      "name": "蒙面少年",
+      "nickname": null,
+      "loreLine": null,
+      "flags": [
+        "disputed"
+      ],
+      "surpassReaction": "【旁白】說書人替全江湖說了那句話:「恭喜少俠勝過蒙面人——勝的是紙上那個。」蒙面人本人,無人尋得。"
+    }
+  ],
+  "rankBandLevelSum": {
+    "note": "百強 levelSum 分布帶(§9.7.3),生成腳本依此線性插值 + ±3% 抖動。",
+    "1": [
+      1200,
+      1200
+    ],
+    "2-3": [
+      1050,
+      1100
+    ],
+    "4-6": [
+      950,
+      1040
+    ],
+    "7-10": [
+      780,
+      940
+    ],
+    "11-20": [
+      620,
+      770
+    ],
+    "21-30": [
+      520,
+      615
+    ],
+    "31-40": [
+      440,
+      515
+    ],
+    "41-50": [
+      380,
+      435
+    ],
+    "51-60": [
+      325,
+      375
+    ],
+    "61-70": [
+      275,
+      320
+    ],
+    "71-80": [
+      230,
+      270
+    ],
+    "81-90": [
+      185,
+      225
+    ],
+    "91-100": [
+      150,
+      180
+    ]
+  },
+  "totalLedger": {
+    "note": "萬人總冊生成參數(§9.7.1/§9.7.7)。約 10,000 人,#101 以下為程序生成無名記錄,按需生成不存個體資料。",
+    "size": 10000,
+    "playerStartRankOutside": 9000,
+    "surnamePool": [
+      "張",
+      "李",
+      "王",
+      "陳",
+      "林",
+      "黃",
+      "劉"
+    ],
+    "professionPool": [
+      "鏢師",
+      "捕快",
+      "船工",
+      "遊方郎中",
+      "落魄書生",
+      "貨郎"
+    ],
+    "originPool": [
+      "洛陽",
+      "江南",
+      "北疆",
+      "大漠",
+      "苗疆",
+      "西域"
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "note": "觸發器註冊表(§9.3/§9.4)。優先權由高至低;一個事件槽只消化一個中斷,其餘按 priority 留佇列。",
+  "triggers": [
+    {
+      "id": "rebirth",
+      "type": "PRIORITY_INTERRUPT",
+      "priority": 100,
+      "condition": "resources.hp.current <= 0",
+      "checkpoint": ["afterEventResolve"],
+      "oneShot": false,
+      "action": "injectEvent('event_rebirth', queuePosition=0)"
+    },
+    {
+      "id": "mingpu_reveal",
+      "type": "PRIORITY_INTERRUPT",
+      "priority": 90,
+      "condition": "sixdim.levelSum >= 300 && !flags.mingpu_done",
+      "checkpoint": ["afterEventResolve", "afterLevelUp"],
+      "oneShot": true,
+      "action": "injectEvent('event_mingpu_reveal', queuePosition=0)"
+    },
+    {
+      "id": "title_bestow",
+      "type": "PRIORITY_INTERRUPT",
+      "priority": 80,
+      "condition": "milestone.justUnlocked != null",
+      "checkpoint": ["afterLevelUp"],
+      "oneShot": false,
+      "action": "injectEvent('event_title_bestow', queuePosition=0)"
+    },
+    {
+      "id": "self_awareness_intro",
+      "type": "PRIORITY_INTERRUPT",
+      "priority": 70,
+      "condition": "!flags.self_awareness_done",
+      "checkpoint": ["afterEventResolve"],
+      "oneShot": true,
+      "action": "injectEvent('event_self_awareness', queuePosition=0)"
+    },
+    {
+      "id": "quest_next_stage",
+      "type": "PRIORITY_INTERRUPT",
+      "priority": 50,
+      "condition": "quest.status == 'active'",
+      "checkpoint": ["afterEventResolve"],
+      "oneShot": false,
+      "action": "injectEvent(quest.stages[quest.stage], queuePosition=0)"
+    },
+    {
+      "id": "whisper_low_luck",
+      "type": "NARRATIVE_INJECT",
+      "condition": "talent.yunqi < 10",
+      "checkpoint": ["beforeNarrativeRender"],
+      "probability": 0.001,
+      "cooldown": "5 events",
+      "exempt": ["prologue", "priorityInterrupt"],
+      "action": "decorateBeat('qi'|'he', whisperPool['low_luck'])"
+    },
+    {
+      "id": "debuff_narrative",
+      "type": "NARRATIVE_INJECT",
+      "condition": "debuffs.justChanged",
+      "checkpoint": ["beforeNarrativeRender"],
+      "probability": 1.0,
+      "cooldown": "0 events",
+      "exempt": [],
+      "action": "decorateBeat('he', debuffNarrativePool[debuffs.justChanged])"
+    }
+  ]
+}

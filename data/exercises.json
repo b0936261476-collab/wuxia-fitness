@@ -1,47 +1,412 @@
 {
-  "coefficients": [1.0, 0.85, 0.7, 0.55, 0.4],
+  "coefficients": [
+    1.0,
+    0.85,
+    0.7,
+    0.55,
+    0.4
+  ],
   "maxSessionMinutes": 180,
   "dimensions": [
-    { "key": "light", "name": "輕功" },
-    { "key": "inner", "name": "內功" },
-    { "key": "hard",  "name": "硬功" },
-    { "key": "soft",  "name": "軟功" },
-    { "key": "eye",   "name": "眼功" },
-    { "key": "ear",   "name": "耳功" }
+    {
+      "key": "light",
+      "name": "輕功"
+    },
+    {
+      "key": "inner",
+      "name": "內功"
+    },
+    {
+      "key": "hard",
+      "name": "硬功"
+    },
+    {
+      "key": "soft",
+      "name": "軟功"
+    },
+    {
+      "key": "eye",
+      "name": "眼功"
+    },
+    {
+      "key": "ear",
+      "name": "耳功"
+    }
   ],
   "categories": [
-    { "key": "count",    "name": "按次計算",   "unit": "下" },
-    { "key": "minute",   "name": "按分鐘計算", "unit": "分鐘" },
-    { "key": "distance", "name": "按距離計算", "unit": "公尺" }
+    {
+      "key": "count",
+      "name": "按次計算",
+      "unit": "下"
+    },
+    {
+      "key": "minute",
+      "name": "按分鐘計算",
+      "unit": "分鐘"
+    },
+    {
+      "key": "distance",
+      "name": "按距離計算",
+      "unit": "公尺"
+    }
   ],
   "exercises": [
-    { "id": "tiaosheng",     "name": "跳繩",           "category": "count",    "unitSize": 1,   "tierSize": 200, "weights": { "light": 1.6, "inner": 1.2, "soft": 0.4 } },
-    { "id": "kaihetiao",     "name": "開合跳",         "category": "count",    "unitSize": 1,   "tierSize": 100, "weights": { "light": 0.4, "inner": 0.4, "soft": 0.4 } },
-    { "id": "bobitiao",      "name": "波比跳",         "category": "count",    "unitSize": 1,   "tierSize": 10,  "weights": { "light": 5, "inner": 5, "hard": 5, "soft": 5 } },
-    { "id": "fudi",          "name": "伏地挺身",       "category": "count",    "unitSize": 1,   "tierSize": 20,  "weights": { "inner": 2, "hard": 5 } },
-    { "id": "shendun",       "name": "深蹲",           "category": "count",    "unitSize": 1,   "tierSize": 20,  "weights": { "inner": 3, "hard": 5, "soft": 3 } },
-    { "id": "shenduntiao",   "name": "深蹲跳",         "category": "count",    "unitSize": 1,   "tierSize": 10,  "weights": { "light": 3, "inner": 2, "hard": 5 } },
-    { "id": "tunqiao",       "name": "臀橋",           "category": "count",    "unitSize": 1,   "tierSize": 30,  "weights": { "inner": 3, "hard": 3, "soft": 3 } },
-
-    { "id": "paobu",         "name": "跑步",           "category": "minute",   "unitSize": 1,   "tierSize": 20,  "weights": { "light": 60, "inner": 60 } },
-    { "id": "kuaizou",       "name": "快走",           "category": "minute",   "unitSize": 1,   "tierSize": 30,  "weights": { "light": 50, "inner": 30 } },
-    { "id": "palouti",       "name": "爬樓梯",         "category": "minute",   "unitSize": 1,   "tierSize": 10,  "weights": { "light": 50, "inner": 50, "hard": 40 } },
-    { "id": "hexin",         "name": "核心訓練",       "category": "minute",   "unitSize": 1,   "tierSize": 10,  "weights": { "inner": 20, "hard": 80 } },
-    { "id": "yujia",         "name": "瑜珈",           "category": "minute",   "unitSize": 1,   "tierSize": 20,  "weights": { "inner": 20, "soft": 20 } },
-    { "id": "lanqiu",        "name": "籃球",           "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 40, "inner": 20, "hard": 20, "eye": 30, "ear": 10 } },
-    { "id": "yumaoqiu",      "name": "羽毛球",         "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 40, "inner": 20, "soft": 10, "eye": 40, "ear": 20 } },
-    { "id": "zhuoqiu",       "name": "桌球",           "category": "minute",   "unitSize": 1,   "tierSize": 20,  "weights": { "light": 10, "inner": 10, "eye": 60, "ear": 30 } },
-    { "id": "wangqiu",       "name": "網球",           "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 40, "inner": 20, "hard": 10, "soft": 10, "eye": 40, "ear": 20 } },
-    { "id": "paiqiu",        "name": "排球",           "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 30, "inner": 20, "hard": 10, "eye": 40, "ear": 20 } },
-    { "id": "zuqiu",         "name": "足球",           "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 50, "inner": 30, "hard": 20, "eye": 30, "ear": 10 } },
-    { "id": "bangqiu",       "name": "棒球/壘球",      "category": "minute",   "unitSize": 1,   "tierSize": 20,  "weights": { "light": 20, "inner": 10, "hard": 10, "eye": 40, "ear": 10 } },
-    { "id": "gaoerfu",       "name": "高爾夫",         "category": "minute",   "unitSize": 1,   "tierSize": 30,  "weights": { "light": 10, "inner": 10, "eye": 50, "ear": 30 } },
-    { "id": "danche-ping",   "name": "腳踏車(平地)",   "category": "minute",   "unitSize": 1,   "tierSize": 20,  "weights": { "light": 50, "inner": 40, "hard": 10, "eye": 10 } },
-    { "id": "danche-po",     "name": "腳踏車(爬坡)",   "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 40, "inner": 40, "hard": 40, "eye": 10 } },
-    { "id": "huaxue-shuang", "name": "滑雪(雙板)",     "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 30, "inner": 20, "hard": 30, "soft": 20, "eye": 30, "ear": 40 } },
-    { "id": "huaxue-dan",    "name": "滑雪板(單板)",   "category": "minute",   "unitSize": 1,   "tierSize": 12,  "weights": { "light": 20, "inner": 20, "hard": 30, "soft": 30, "eye": 30, "ear": 50 } },
-    { "id": "liubing",       "name": "溜冰/直排輪",    "category": "minute",   "unitSize": 1,   "tierSize": 15,  "weights": { "light": 40, "inner": 20, "hard": 20, "soft": 20, "eye": 20, "ear": 40 } },
-
-    { "id": "chongci",       "name": "間歇衝刺",       "category": "distance", "unitSize": 100, "tierSize": 300, "weights": { "light": 50, "inner": 30, "hard": 30 } }
+    {
+      "id": "tiaosheng",
+      "name": "跳繩",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 200,
+      "weights": {
+        "light": 1.6,
+        "inner": 1.2,
+        "soft": 0.4
+      }
+    },
+    {
+      "id": "kaihetiao",
+      "name": "開合跳",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 100,
+      "weights": {
+        "light": 0.4,
+        "inner": 0.4,
+        "soft": 0.4
+      }
+    },
+    {
+      "id": "bobitiao",
+      "name": "波比跳",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 10,
+      "weights": {
+        "light": 5,
+        "inner": 5,
+        "hard": 5,
+        "soft": 5
+      }
+    },
+    {
+      "id": "fudi",
+      "name": "伏地挺身",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "inner": 2,
+        "hard": 5
+      }
+    },
+    {
+      "id": "shendun",
+      "name": "深蹲",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "inner": 3,
+        "hard": 5,
+        "soft": 3
+      }
+    },
+    {
+      "id": "shenduntiao",
+      "name": "深蹲跳",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 10,
+      "weights": {
+        "light": 3,
+        "inner": 2,
+        "hard": 5
+      }
+    },
+    {
+      "id": "tunqiao",
+      "name": "臀橋",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 30,
+      "weights": {
+        "inner": 3,
+        "hard": 3,
+        "soft": 3
+      }
+    },
+    {
+      "id": "paobu",
+      "name": "跑步",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "light": 60,
+        "inner": 60
+      }
+    },
+    {
+      "id": "kuaizou",
+      "name": "快走",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 30,
+      "weights": {
+        "light": 50,
+        "inner": 30
+      }
+    },
+    {
+      "id": "palouti",
+      "name": "爬樓梯",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 10,
+      "weights": {
+        "light": 50,
+        "inner": 50,
+        "hard": 40
+      }
+    },
+    {
+      "id": "hexin",
+      "name": "核心訓練",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 10,
+      "weights": {
+        "inner": 20,
+        "hard": 80
+      }
+    },
+    {
+      "id": "yujia",
+      "name": "瑜珈",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "inner": 20,
+        "soft": 20
+      }
+    },
+    {
+      "id": "lanqiu",
+      "name": "籃球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 40,
+        "inner": 20,
+        "hard": 20,
+        "eye": 30,
+        "ear": 10
+      }
+    },
+    {
+      "id": "yumaoqiu",
+      "name": "羽毛球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 40,
+        "inner": 20,
+        "soft": 10,
+        "eye": 40,
+        "ear": 20
+      }
+    },
+    {
+      "id": "zhuoqiu",
+      "name": "桌球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "light": 10,
+        "inner": 10,
+        "eye": 60,
+        "ear": 30
+      }
+    },
+    {
+      "id": "wangqiu",
+      "name": "網球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 40,
+        "inner": 20,
+        "hard": 10,
+        "soft": 10,
+        "eye": 40,
+        "ear": 20
+      }
+    },
+    {
+      "id": "paiqiu",
+      "name": "排球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 30,
+        "inner": 20,
+        "hard": 10,
+        "eye": 40,
+        "ear": 20
+      }
+    },
+    {
+      "id": "zuqiu",
+      "name": "足球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 50,
+        "inner": 30,
+        "hard": 20,
+        "eye": 30,
+        "ear": 10
+      }
+    },
+    {
+      "id": "bangqiu",
+      "name": "棒球/壘球",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "light": 20,
+        "inner": 10,
+        "hard": 10,
+        "eye": 40,
+        "ear": 10
+      }
+    },
+    {
+      "id": "gaoerfu",
+      "name": "高爾夫",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 30,
+      "weights": {
+        "light": 10,
+        "inner": 10,
+        "eye": 50,
+        "ear": 30
+      }
+    },
+    {
+      "id": "danche-ping",
+      "name": "腳踏車(平地)",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "light": 50,
+        "inner": 40,
+        "hard": 10,
+        "eye": 10
+      }
+    },
+    {
+      "id": "danche-po",
+      "name": "腳踏車(爬坡)",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 40,
+        "inner": 40,
+        "hard": 40,
+        "eye": 10
+      }
+    },
+    {
+      "id": "huaxue-shuang",
+      "name": "滑雪(雙板)",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 30,
+        "inner": 20,
+        "hard": 30,
+        "soft": 20,
+        "eye": 30,
+        "ear": 40
+      }
+    },
+    {
+      "id": "huaxue-dan",
+      "name": "滑雪板(單板)",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 12,
+      "weights": {
+        "light": 20,
+        "inner": 20,
+        "hard": 30,
+        "soft": 30,
+        "eye": 30,
+        "ear": 50
+      }
+    },
+    {
+      "id": "liubing",
+      "name": "溜冰/直排輪",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 15,
+      "weights": {
+        "light": 40,
+        "inner": 20,
+        "hard": 20,
+        "soft": 20,
+        "eye": 20,
+        "ear": 40
+      }
+    },
+    {
+      "id": "chongci",
+      "name": "間歇衝刺",
+      "category": "distance",
+      "unitSize": 100,
+      "tierSize": 300,
+      "weights": {
+        "light": 50,
+        "inner": 30,
+        "hard": 30
+      }
+    },
+    {
+      "id": "yangwoqizuo",
+      "name": "仰臥起坐",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "hard": 3,
+        "soft": 2
+      }
+    },
+    {
+      "id": "jiaohudunetiao",
+      "name": "交互蹲跳",
+      "category": "count",
+      "unitSize": 1,
+      "tierSize": 10,
+      "weights": {
+        "light": 3,
+        "hard": 1,
+        "inner": 1
+      }
+    }
   ]
 }

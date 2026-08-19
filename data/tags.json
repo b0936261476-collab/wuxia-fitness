@@ -1,0 +1,38 @@
+{
+  "note": "標籤字典(tagRegistry,§0.7)。四標籤族:talent/sixdim/resource/martial。weight 欄位供事件/物品/場所掛標籤時標註主(1.0)副(0.5),不在此表。",
+  "families": {
+    "talent":   { "note": "天賦族:三隱藏天賦驅動。formula 依情境套不同 coef,見 §1.4。" },
+    "sixdim":   { "note": "六維族:六維等級驅動。formula 統一 sqrt(等級)×4(百分點)。" },
+    "resource": { "note": "資源族:三資源當前比例驅動。formula 依 DEBUFF 表觸發修正(§4章)。" },
+    "martial":  { "note": "武學族:武學熟練度驅動,二期系統,formula 待定。" },
+    "title":    { "note": "稱號族(§8.4):里程碑/均衡稱號的輕加成,與 sixdim 族是不同族,因此會相加而非取代。formula = 階數×0.5%。" }
+  },
+  "tagRegistry": {
+    "genggu_rel": { "family": "talent",   "source": "talent.genggu", "formula": "(v-50)*coef", "coef": { "yunqi_event": 0.01, "general_event": 0.002, "drop": 0.005, "genggu_wuxing_event": 0.01 } },
+    "wuxing_rel": { "family": "talent",   "source": "talent.wuxing", "formula": "(v-50)*coef", "coef": { "general_event": 0.002, "drop": 0.005, "genggu_wuxing_event": 0.01 } },
+    "yunqi_rel":  { "family": "talent",   "source": "talent.yunqi",  "formula": "(v-50)*coef", "coef": { "yunqi_event": 0.01, "general_event": 0.002, "drop": 0.005 } },
+
+    "qinggong": { "family": "sixdim", "source": "sixdim.light.level", "formula": "sqrt(v)*4" },
+    "neigong":  { "family": "sixdim", "source": "sixdim.inner.level", "formula": "sqrt(v)*4" },
+    "yinggong": { "family": "sixdim", "source": "sixdim.hard.level",  "formula": "sqrt(v)*4" },
+    "ruangong": { "family": "sixdim", "source": "sixdim.soft.level",  "formula": "sqrt(v)*4" },
+    "yangong":  { "family": "sixdim", "source": "sixdim.eye.level",   "formula": "sqrt(v)*4" },
+    "ergong":   { "family": "sixdim", "source": "sixdim.ear.level",   "formula": "sqrt(v)*4" },
+
+    "hp_rel":   { "family": "resource", "source": "hp.percent",      "formula": "debuffTable" },
+    "qi_rel":   { "family": "resource", "source": "qi.percent",      "formula": "debuffTable" },
+    "tili_rel": { "family": "resource", "source": "tili.percent",    "formula": "debuffTable" },
+
+    "sword": { "family": "martial", "source": "mastery.sword", "formula": "tbd" },
+    "dao":   { "family": "martial", "source": "mastery.dao",   "formula": "tbd" },
+    "quan":  { "family": "martial", "source": "mastery.quan",  "formula": "tbd" },
+
+    "title_light": { "family": "title", "source": "titleTiers.light", "formula": "tier*0.005" },
+    "title_inner": { "family": "title", "source": "titleTiers.inner", "formula": "tier*0.005" },
+    "title_hard":  { "family": "title", "source": "titleTiers.hard",  "formula": "tier*0.005" },
+    "title_soft":  { "family": "title", "source": "titleTiers.soft",  "formula": "tier*0.005" },
+    "title_eye":   { "family": "title", "source": "titleTiers.eye",   "formula": "tier*0.005" },
+    "title_ear":   { "family": "title", "source": "titleTiers.ear",   "formula": "tier*0.005" },
+    "title_balanced": { "family": "title", "source": "balancedTier", "formula": "tier*0.005" }
+  }
+}

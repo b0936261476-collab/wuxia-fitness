@@ -33,21 +33,31 @@ npm test
 
 ```
 data/
-  exercises.json   ← 26 項運動的六維權重與遞減階梯(§2)
-  events.json      ← 事件庫:20 個隨機事件 + 支線「藏鋒山門」4 階段(§4)
-  titles.json      ← 群俠錄 + 武道里程碑雙稱號表(§5)
-  items.json       ← 物品與 debuff 清單(§4.5–4.7)
+  exercises.json   ← 27 項運動的六維權重與遞減階梯(v2 §3)
+  events.json      ← 事件庫:隨機事件 + 支線「藏鋒山門」4 階段(v2 §6),check.benchmarkLevel 對接標籤引擎
+  titles.json      ← 群俠錄 + 武道里程碑雙稱號表(v2 §8;里程碑仍為經驗值門檻,待改等級門檻,見待辦)
+  items.json       ← 物品與 debuff 清單
+  tags.json        ← 標籤字典 tagRegistry(v2 §0),M2 標籤引擎的地基
+  triggers.json    ← 觸發器註冊表(v2 §9),PRIORITY_INTERRUPT/NARRATIVE_INJECT 種子資料
+  quiz.json        ← 心理測驗創角題庫種子(v2 §1.2)
+  whispers.json    ← 天賦耳語文案池種子(v2 §8.6)
+  npcs.json        ← 百強種子 + 萬人總冊生成參數(v2 §9.5/§9.7)
+  reputation.json  ← 聲望階層門檻/評價矩陣(v2 §9.6)
 src/
   engine/          ← 純邏輯計算引擎(無 DOM,Node 可直接測試)
     decay.js       ← 單日累積分階遞減
     exp.js         ← 等級門檻、里程碑
-    check.js       ← 事件成功率判定
+    tags.js        ← v2 §0.3 標籤判定引擎(唯一判定公式 + 疊加防爆三保險)
+    triggers.js    ← v2 §9 觸發器優先序、NARRATIVE_INJECT 機率/冷卻判定
+    check.js       ← ⚠️ 舊版判定公式,已被 tags.js 取代,保留供歷史對照
     game.js        ← 狀態與遊戲動作(練功、步數、事件、物品)
     storage.js     ← localStorage 存檔
   ui/              ← 介面(vanilla JS + CSS)
-tests/             ← 引擎測試
+tests/             ← 引擎測試(含 tags.test.mjs:標籤引擎與觸發器優先序)
 index.html
 ```
+
+> 完整設計依據見 [一步一江湖_設計總綱_v2.md](./一步一江湖_設計總綱_v2.md)(Claude Code 開工唯一依據文件)。
 
 數值全部放在 `data/` 資料檔,調平衡不動程式碼。
 

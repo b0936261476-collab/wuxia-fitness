@@ -1,0 +1,198 @@
+{
+  "note": "心理測驗創角題庫(§1.2)。15 題完成,配比 9強傾向/4混合/2平衡,與 §11 已定版決議紀錄相符。實際遊戲每輪從中抽 12 題;完整版 40–50 題留待二期擴充。累積-歸一化:天賦值 = raw ÷ raw總和 × 150;一致性(最高軸原始分÷總分)≥0.6 時主傾向 ×1.5。",
+  "axes": { "genggu": "身體派", "wuxing": "思考派", "yunqi": "機緣派" },
+  "openingFateLines": {
+    "_note": "開局命格文案(§1.3,顆粒度C:純意象一句定調)。26條,配比對齊§11:均衡4/根骨4/悟性4/運氣4/雙高3/極端4/單低3。key 對應 classifyFate() 回傳的 category(single_high 另拆三軸)。",
+    "balanced": [
+      "你啊……就是太普通了。普通,也好。",
+      "一身骨子啊,沒什麼特別,也沒什麼不好——湊合著,倒也齊全。",
+      "不高不低,不快不慢,老天爺這回,倒是省了心思。",
+      "你這命格啊,像碗白粥,清淡是清淡了點,喝著卻養人。"
+    ],
+    "single_high_genggu": [
+      "這骨頭,是塊好料子——可惜,得自己去鑿。",
+      "筋骨倒是天生的底子,老天爺這回花了點心思在你身上。",
+      "這孩子摔了十次跤,骨頭倒一次沒斷過——是巧,還是本就結實?",
+      "一身筋骨,像是提前打好了地基,就等哪天蓋房子。"
+    ],
+    "single_high_wuxing": [
+      "這眼神……看東西看得比別人透一分,是福是禍,難說。",
+      "教一遍就會,教兩遍就嫌煩——這孩子,腦子裡裝了點別人沒有的東西。",
+      "別人看山是山,這孩子啊,總愛多問一句『為什麼』。",
+      "悟性這東西,天生帶三分,學武是福,學壞也快——就看往哪條路走。"
+    ],
+    "single_high_yunqi": [
+      "摔進水裡撈起條魚,跌下懸崖抓著根藤——這運道,老天爺欠了他點什麼。",
+      "別人求都求不來的機緣,這孩子啊,是絆一跤就撿到的。",
+      "命裡帶著點怪福氣,說不準哪天,天上真掉餡餅。",
+      "這命格,像賭桌上壓對寶的那隻手——次數多了,由不得人不信。"
+    ],
+    "dual_high": [
+      "這孩子啊,兩頭都占了些,老天爺這回,倒捨得。",
+      "筋骨跟腦子都不差,就是心啊,得自己想清楚往哪邊使。",
+      "兩把好牌握在手裡,是贏是輸,還得看怎麼打。"
+    ],
+    "single_low": [
+      "這一項,老天爺這回,是真的沒給——但缺的地方,總得靠自己補。",
+      "別人天生就會的事,這孩子啊,得多練上幾年。",
+      "這孩子命裡缺了一角,倒也不是壞事——缺角的碗,盛的水反而穩。"
+    ],
+    "extreme": [
+      "這孩子,是老天爺捏到一半,睡著了。",
+      "不像凡人,倒像是哪本書裡漏抄的一句——多了嫌怪,少了可惜。",
+      "這命格,老天爺下筆的時候,手是不是抖了一下?",
+      "百年難遇的命,是福是禍,得看他自己怎麼過這一生。"
+    ]
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "type": "strong",
+      "text": "夜裡聽見屋外有動靜,你會?",
+      "options": [
+        { "id": "a", "text": "抄起門邊的棍子先出去看看", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "先想想是風聲還是別的", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "反正沒事,翻個身繼續睡", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q02",
+      "type": "mixed",
+      "text": "路上撿到一枚舊銅錢,你會?",
+      "options": [
+        { "id": "a", "text": "掂掂重量,像是有點來歷", "weights": { "genggu": 6, "wuxing": 5, "yunqi": 1 } },
+        { "id": "b", "text": "隨手揣進懷裡,說不定用得上", "weights": { "genggu": 1, "wuxing": 6, "yunqi": 5 } },
+        { "id": "c", "text": "順手扔了,晦氣", "weights": { "genggu": 5, "wuxing": 1, "yunqi": 6 } }
+      ]
+    },
+    {
+      "id": "q03",
+      "type": "balanced",
+      "text": "師父交代一件從沒做過的差事,你會?",
+      "options": [
+        { "id": "a", "text": "先做了再說,邊做邊學", "weights": { "genggu": 4, "wuxing": 4, "yunqi": 4 } },
+        { "id": "b", "text": "問清楚細節再動手", "weights": { "genggu": 4, "wuxing": 4, "yunqi": 4 } }
+      ]
+    },
+    {
+      "id": "q04",
+      "type": "strong",
+      "text": "江湖同伴要你三日內學會一套從沒見過的刀法,你會?",
+      "options": [
+        { "id": "a", "text": "抄起刀直接照著比劃,錯了再改", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "先把刀譜每一招的道理想透再動手", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "隨便練練,反正到時候見招拆招", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q05",
+      "type": "strong",
+      "text": "客棧裡有人挑釁,你的第一反應是?",
+      "options": [
+        { "id": "a", "text": "站起來就想動手", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "先觀察對方虛實,判斷值不值得打", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "隨他去,說不定他自己就沒事了", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q06",
+      "type": "strong",
+      "text": "走在山路上突然下起大雨,你會?",
+      "options": [
+        { "id": "a", "text": "加快腳步硬闖過去", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "找個地方避雨,順便看看地圖找近路", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "淋就淋唄,反正遲早會停", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q07",
+      "type": "strong",
+      "text": "師父交給你的銀兩在半路弄丟了,你會?",
+      "options": [
+        { "id": "a", "text": "立刻沿路往回找", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "坐下來回想剛剛經過哪些地方,推算掉在哪", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "錢財乃身外物,回去老實稟報", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q08",
+      "type": "strong",
+      "text": "遇到一條湍急的河,沒有橋,你會?",
+      "options": [
+        { "id": "a", "text": "找塊大石頭墊腳硬涉過去", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "沿岸找找看有沒有渡口或船家", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "在岸邊坐下來等,說不定有人經過能幫忙", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q09",
+      "type": "strong",
+      "text": "你撿到一本沒有署名的武功秘笈,你會?",
+      "options": [
+        { "id": "a", "text": "馬上翻開試練幾招", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "先研究這是哪一門哪一派的功夫", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "這麼巧撿到,想必是天意,收下便是", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q10",
+      "type": "strong",
+      "text": "同門師兄弟為了一件小事吵起來,你會?",
+      "options": [
+        { "id": "a", "text": "上去把兩人拉開", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "問清楚前因後果再評斷是非", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "隨他們吵,吵完自然就沒事了", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q11",
+      "type": "strong",
+      "text": "市集裡一個小孩的風箏纏在樹上,你會?",
+      "options": [
+        { "id": "a", "text": "直接爬樹上去解開", "weights": { "genggu": 10, "wuxing": 1, "yunqi": 1 } },
+        { "id": "b", "text": "找根長竹竿想辦法勾下來", "weights": { "genggu": 1, "wuxing": 10, "yunqi": 1 } },
+        { "id": "c", "text": "風箏會不會下來,看老天怎麼安排", "weights": { "genggu": 1, "wuxing": 1, "yunqi": 10 } }
+      ]
+    },
+    {
+      "id": "q12",
+      "type": "mixed",
+      "text": "深夜聽見遠處傳來打鬥聲,你會?",
+      "options": [
+        { "id": "a", "text": "提著兵器就衝過去", "weights": { "genggu": 6, "wuxing": 5, "yunqi": 1 } },
+        { "id": "b", "text": "先躲起來看清楚狀況再說", "weights": { "genggu": 1, "wuxing": 6, "yunqi": 5 } },
+        { "id": "c", "text": "假裝沒聽到,繼續趕路", "weights": { "genggu": 5, "wuxing": 1, "yunqi": 6 } }
+      ]
+    },
+    {
+      "id": "q13",
+      "type": "mixed",
+      "text": "有人向你借錢急用,你身上錢也不多,你會?",
+      "options": [
+        { "id": "a", "text": "二話不說掏出一半給他", "weights": { "genggu": 6, "wuxing": 5, "yunqi": 1 } },
+        { "id": "b", "text": "先問清楚他借錢做什麼", "weights": { "genggu": 1, "wuxing": 6, "yunqi": 5 } },
+        { "id": "c", "text": "看當下心情,順眼就借,不順眼就算了", "weights": { "genggu": 5, "wuxing": 1, "yunqi": 6 } }
+      ]
+    },
+    {
+      "id": "q14",
+      "type": "mixed",
+      "text": "荒野裡一隻受傷的野獸擋在路中間,你會?",
+      "options": [
+        { "id": "a", "text": "上前查看能不能幫牠處理傷口", "weights": { "genggu": 6, "wuxing": 5, "yunqi": 1 } },
+        { "id": "b", "text": "觀察牠的反應,判斷是不是危險", "weights": { "genggu": 1, "wuxing": 6, "yunqi": 5 } },
+        { "id": "c", "text": "繞路走,牠的傷會不會好不是你能決定的", "weights": { "genggu": 5, "wuxing": 1, "yunqi": 6 } }
+      ]
+    },
+    {
+      "id": "q15",
+      "type": "balanced",
+      "text": "一天的江湖路走下來,你最想做的事是?",
+      "options": [
+        { "id": "a", "text": "找個地方好好休息", "weights": { "genggu": 4, "wuxing": 4, "yunqi": 4 } },
+        { "id": "b", "text": "找人聊聊今天發生的事", "weights": { "genggu": 4, "wuxing": 4, "yunqi": 4 } },
+        { "id": "c", "text": "看看今天又前進了多遠", "weights": { "genggu": 4, "wuxing": 4, "yunqi": 4 } }
+      ]
+    }
+  ]
+}

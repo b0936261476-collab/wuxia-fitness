@@ -9,7 +9,7 @@ import { thresholdForLevel, levelFromExp, milestoneTitle } from "../src/engine/e
 import { successRate, weightedStatValue } from "../src/engine/check.js";
 import {
   newState, logExercise, addSteps, logSteps, pendingEventCount,
-  startNextEvent, resolveEvent, useItem, gainItem, levels,
+  startNextEvent, resolveEvent, useItem, gainItem, levels, createCharacter,
   MAX_DAILY_STEPS, WARN_DAILY_STEPS
 } from "../src/engine/game.js";
 import {
@@ -22,7 +22,9 @@ const data = {
   exercises: loadJson("data/exercises.json"),
   events: loadJson("data/events.json"),
   titles: loadJson("data/titles.json"),
-  items: loadJson("data/items.json")
+  items: loadJson("data/items.json"),
+  tags: loadJson("data/tags.json"),
+  quiz: loadJson("data/quiz.json")
 };
 
 // ---------- §3 遞減 ----------
@@ -111,15 +113,15 @@ test("距離型運動:間歇衝刺以每100公尺計權重", () => {
   assert.equal(gains.light, 150); // 300m 全在第1階 → 3單位 × 50
 });
 
-test("里程碑永久保留,扣分不會摘除稱號", () => {
+test("里程碑永久保留,扣分不會摘除稱號(§8.2:門檻改用等級)", () => {
   const s = newState();
-  s.exp.light = 4999;
-  logExercise(s, data, "tiaosheng", 10, "2026-08-14"); // 輕功 +16
+  s.exp.light = 5499; // thresholdForLevel(9)=4500 ≤ 5499 < thresholdForLevel(10)=5500,尚為Lv.9
+  logExercise(s, data, "tiaosheng", 10, "2026-08-14"); // 輕功 +16 → 5515,跨過Lv.10門檻
   assert.equal(s.milestones.light, 0); // 解鎖「掠影追風」
-  s.exp.light = 100; // 模擬大量扣分
+  s.exp.light = 100; // 模擬大量扣分,等級掉回0
   assert.equal(s.milestones.light, 0); // 稱號仍在
   const t = data.titles.milestones;
-  assert.equal(milestoneTitle(5000, t.thresholds, t.titles.light), "掠影追風");
+  assert.equal(milestoneTitle(10, t.thresholds, t.titles.light), "掠影追風"); // 現在拿等級去比,不是經驗值
 });
 
 // ---------- 計時修煉 ----------
@@ -251,7 +253,7 @@ test("debuff 影響成功率且不自動消退;療傷藥可解除", () => {
   })();
   const ev = startNextEvent(s, data, drawRng);
   assert.equal(ev.id, "duel-zuihan");
-  // Lv0 vs 難度1 → 5% 下限;debuff 再 -10% 仍夾在 5%
+  // §0.3 引擎:Lv0 vs benchmarkLevel 1 → 50%+(0-1)*3%=47%;debuff -10% → 37%;rng 0.5 未命中 → 失敗
   resolveEvent(s, data, () => 0.5, null);
   assert.equal(s.journal[0].success, false);
   assert.ok(s.debuffs.includes("dieda")); // 不會自動消退
@@ -262,10 +264,10 @@ test("debuff 影響成功率且不自動消退;療傷藥可解除", () => {
   assert.equal(s.inventory["liaoshangyao"], undefined);
 });
 
-test("懲罰扣分不會扣到負值", () => {
+test("懲罰改資源DoT後(§4.4):fortune-laoyuan 失敗扣血量150點,不會扣到負值", () => {
   const s = newState();
-  s.exp.soft = 3;
-  // fortune-laoyuan 失敗扣 soft 10,經驗池應停在 0
+  createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
+  s.resources.hp = 100; // 故意設得比傷害檔位(150)還低
   addSteps(s, 1000);
   const filtered = data.events.randomPool.filter(
     (e) => !(e.requiresFlag && !s.flags[e.requiresFlag]) && !(e.once && s.seenOnce.includes(e.id))
@@ -279,8 +281,11 @@ test("懲罰扣分不會扣到負值", () => {
     return 0.999;                                          // 判定失敗
   };
   startNextEvent(s, data, rng);
-  resolveEvent(s, data, () => 0.999, null);
-  assert.equal(s.exp.soft, 0);
+  resolveEvent(s, data, rng, null);
+  const entry = s.journal.find((j) => j.type !== "fate");
+  assert.equal(entry.success, false);
+  assert.equal(s.resources.hp, 0); // 150點傷害打在100血上,floor在0而非負值
+  assert.ok(s.rebirth); // 血量歸零觸發重生(§5.1)
 });
 
 test("一次性事件不重複出現", () => {

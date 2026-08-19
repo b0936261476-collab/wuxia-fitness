@@ -1,0 +1,27 @@
+{
+  "note": "聲望雙軌 v1 定版(§9.6)。tier 門檻與衰減速率標記待實裝期校準,evaluation 矩陣已定版可直接使用。",
+  "fameTiers": ["無名之輩", "略有耳聞", "小有薄名", "譽滿一方", "俠名遠播", "名動江湖", "威震天下"],
+  "infamyTiers": ["清白之身", "風言風語", "惡名初傳", "一方之患", "兇名在外", "惡貫滿盈", "天下公敵"],
+  "tierThresholds": {
+    "note": "TBD:實裝期依標準玩家曲線校準,先佔位等距門檻示範格式",
+    "fame": [0, 50, 150, 350, 700, 1300, 2200],
+    "infamy": [0, 50, 150, 350, 700, 1300, 2200]
+  },
+  "decayRate": {
+    "note": "TBD:實裝期校準,原則為惡名衰減比俠名慢",
+    "famePerDay": 0.5,
+    "infamyPerDay": 0.2
+  },
+  "evaluationMatrix": {
+    "note": "江湖評價矩陣(§9.6.4),f(fameTier, infamyTier) 交叉評價,全四字。",
+    "fameLow_infamyLow": "無名之輩",
+    "fameLow_infamyMid": "潑皮無賴",
+    "fameLow_infamyHigh": "一代魔頭",
+    "fameMid_infamyLow": "良善之輩",
+    "fameMid_infamyMid": "江湖中人",
+    "fameMid_infamyHigh": "兇威赫赫",
+    "fameHigh_infamyLow": "一代大俠",
+    "fameHigh_infamyMid": "毀譽參半",
+    "fameHigh_infamyHigh": "亦正亦邪"
+  }
+}

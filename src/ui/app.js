@@ -20,15 +20,15 @@ const TYPE_LABELS = {
 };
 
 async function loadData() {
-  const [exercises, events, titles, items] = await Promise.all(
-    ["exercises", "events", "titles", "items"].map((n) =>
+  const [exercises, events, titles, items, tags, quiz, npcs, reputation] = await Promise.all(
+    ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation"].map((n) =>
       fetch(`data/${n}.json`).then((r) => {
         if (!r.ok) throw new Error(`載入 data/${n}.json 失敗`);
         return r.json();
       })
     )
   );
-  Object.assign(data, { exercises, events, titles, items });
+  Object.assign(data, { exercises, events, titles, items, tags, quiz, npcs, reputation });
 }
 
 function dateWithOffset(offsetDays) {

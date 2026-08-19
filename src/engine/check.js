@@ -1,6 +1,8 @@
-// 事件判定(規格書 §4.4)
+// ⚠️ 已停用:舊版事件判定公式(v1 規格書 §4.4)。
+// v2 總綱 §0.3 已用標籤引擎公式取代(見 src/engine/tags.js 的 successRateV2),
+// game.js 不再呼叫本函式。保留 successRate 僅供歷史對照/既有測試,不要在新程式碼中使用。
+//
 // 成功率 = 50% + (相關基本功值 − 難度門檻) ÷ 難度門檻 × 50%,夾在 5%~95%。
-// 相關基本功可為單項或多項加權;判定讀取事件觸發當下的六維等級。
 
 export function successRate(statValue, difficulty, modifier = 0) {
   let rate = 0.5 + ((statValue - difficulty) / difficulty) * 0.5;
