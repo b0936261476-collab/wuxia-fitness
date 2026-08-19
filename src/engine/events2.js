@@ -11,6 +11,7 @@ import {
 } from "./resources.js";
 import { addFame, addInfamy, fameTierIndex, infamyTierIndex, hypocriteMultiplier, prodigalMultiplier } from "./reputation.js";
 import { titleTiers, balancedTier } from "./titles.js";
+import { classifyFate } from "./talent.js";
 
 /** 判定標籤 key ↔ 六維內部 key 對照(tags.json 用拼音,exp 池用英文) */
 export const TAG_TO_DIM = {
@@ -156,6 +157,15 @@ function fameTierOf(state, data) {
   return fameTierIndex(state.reputation?.fame ?? 0, data.reputation);
 }
 
+/** 序00 命格分歧軸:均衡/單低走 default,其餘取最高軸(§1.3 顆粒度C的體感分歧) */
+function fateAxisOf(state) {
+  if (!state.talents) return "default";
+  const cat = classifyFate(state.talents).category;
+  if (cat === "balanced" || cat === "single_low") return "default";
+  const axes = ["genggu", "wuxing", "yunqi"];
+  return axes.reduce((a, b) => (state.talents[a] >= state.talents[b] ? a : b));
+}
+
 function matchTierKey(variants, tier) {
   if (!variants) return null;
   for (const key of Object.keys(variants)) {
@@ -258,12 +268,23 @@ export function eligibleEvents(state, data, todayStr) {
     });
 }
 
+/** 序章序列(PRIORITY):創角完成後,前幾個事件槽依 config.intro.sequence 固定順序 */
+function nextIntroEventId(state, data) {
+  if (!state.talents) return null; // 尚未創角,序00 的命格分歧無從談起
+  const seq = cfg(data).intro?.sequence || [];
+  return seq.find((id) => !state.journal.some((j) => j.id === id)) ?? null;
+}
+
 export function drawEventV2(state, data, todayStr, rng = Math.random) {
   // 勞務結算優先插隊(PRIORITY:欠的債,先於一切閒事)
   const settlement = laborSettlement(state, data, todayStr);
   if (settlement) {
     return { id: cfg(data).labor.settlementEventId, laborOutcome: settlement };
   }
+  // 序章三部曲固定順序(PRIORITY_INTERRUPT)
+  const intro = nextIntroEventId(state, data);
+  if (intro) return { id: intro, isIntro: true };
+
   const candidates = eligibleEvents(state, data, todayStr);
   if (!candidates.length) return null;
   const total = candidates.reduce((a, c) => a + c.weight, 0);
@@ -273,6 +294,41 @@ export function drawEventV2(state, data, todayStr, rng = Math.random) {
     if (roll <= 0) return { id: c.ev.eventId };
   }
   return { id: candidates[candidates.length - 1].ev.eventId };
+}
+
+// ---------- 天賦耳語(§8.6) ----------
+
+/**
+ * 依極端天賦擲耳語。回傳一句文案或 null。
+ * 觸發條件:任一天賦 >120 或 <10;機率/冷卻/閾值全在 data/whispers.json。
+ */
+export function rollWhisper(state, data, rng = Math.random) {
+  const w = data.whispers;
+  if (!w?.pools || !state.talents) return null;
+  if (state.lastWhisperN != null && state.steps.resolved - state.lastWhisperN < w.cooldownEvents) return null;
+
+  const axisMap = { genggu: "genggu", wuxing: "wuxing", yunqi: "yunqi" };
+  const candidates = [];
+  for (const axis of Object.keys(axisMap)) {
+    const v = state.talents[axis];
+    if (v > w.highThreshold && w.pools[`high_${axis}`]?.length) candidates.push(`high_${axis}`);
+    if (v < w.lowThreshold && w.pools[`low_${axis}`]?.length) candidates.push(`low_${axis}`);
+  }
+  if (!candidates.length) return null;
+  if (rng() >= w.probability) return null;
+  const pool = w.pools[candidates[Math.floor(rng() * candidates.length)]];
+  return pool[Math.floor(rng() * pool.length)];
+}
+
+// ---------- 模板變數(§8.4〔排行相關〕) ----------
+
+/** 文案中的譜錄模板變數替換,如 {輕功譜第1名.人名} */
+function fillTemplates(text, data) {
+  if (!text || !text.includes("{")) return text;
+  const rank1 = data.npcs?.top100?.find((n) => n.rank === 1);
+  return text
+    .replaceAll("{輕功譜第1名.人名}", rank1?.name ?? "沈聽雪")
+    .replaceAll("{玩家.稱號}", "〔稱號〕");
 }
 
 // ---------- 事件生命週期:start → present → choose(→ chooseSub)→ 結算 ----------
@@ -298,8 +354,19 @@ export function startEventV2(state, data, todayStr, rng = Math.random) {
     form,
     fameTier: tier,
     laborOutcome: drawn.laborOutcome ?? null,
+    isIntro: drawn.isIntro ?? false,
     phase: "cheng"
   };
+
+  // 天賦耳語(§8.6 NARRATIVE_INJECT):序章與勞務結算豁免;機率+冷卻由 whispers.json 管
+  if (!drawn.isIntro && !drawn.laborOutcome) {
+    const whisper = rollWhisper(state, data, rng);
+    if (whisper) {
+      pending.whisper = whisper;
+      state.lastWhisperN = state.steps.resolved;
+      state.whisperSeen = true; // 命譜前保底檢查用(§8.6)
+    }
+  }
 
   // 察覺失敗 + gateEvent:整件降級為平淡版(§9.11.2④:沒看見的人拿到普通版世界)
   if (ev.perception?.gateEvent && !perception.seen && ev.unperceivedVersion) {
@@ -369,7 +436,8 @@ export function presentEventV2(state, data) {
     const fameQi = matchTierKey(ev.beats.qi.fameVariants, pending.fameTier);
     if (fameQi?.text) qi = fameQi.text;
   }
-  view.qi = qi;
+  view.qi = fillTemplates(qi, data);
+  if (pending.whisper) view.whisper = pending.whisper;
   if (pending.perception.seen) view.revealText = ev.perception?.revealText;
   if (pending.perception.crush) view.crushText = ev.perception?.crushReveal?.text;
 
@@ -427,6 +495,18 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
   const fameShort = matchTierKey(ev.variants?.fameVariant, pending.fameTier);
   if (fameShort && fameShort.text && !fameShort.qi) {
     return finalize(state, data, pending, ev, { outcome: fameShort, resultText: fameShort.text }, todayStr, rng, finalizeHooks);
+  }
+
+  // 無選項事件(序章/日常直敘):he.byFate 依命格分歧,或 he.text 直接收尾
+  if ((ev.beats.cheng.choices || []).length === 0) {
+    const he = ev.beats.he;
+    if (he.byFate) {
+      const axis = fateAxisOf(state);
+      const body = he.byFate[axis] ?? he.byFate.default;
+      const text = body + (he.epilogue ? "\n\n" + he.epilogue : "");
+      return finalize(state, data, pending, ev, { outcome: { effects: he.effects ?? {} }, resultText: text }, todayStr, rng, finalizeHooks);
+    }
+    return finalize(state, data, pending, ev, { outcome: he, resultText: he.text }, todayStr, rng, finalizeHooks);
   }
 
   const opt = (ev.beats.cheng.choices || []).find((c) => c.id === choiceId);
@@ -528,10 +608,17 @@ function applyEffects(state, data, effects, todayStr, note) {
   if (state.resources) {
     if (effects.hpDamage) state.resources.hp = applyDamage(state.resources.hp, effects.hpDamage);
     if (effects.mpDamage) state.resources.qi = applyDamage(state.resources.qi, effects.mpDamage);
+    if (effects.tiliDamage) state.resources.tili = applyDamage(state.resources.tili, effects.tiliDamage);
     const max = resourceMaxOf(state);
     if (max) {
       if (effects.hpRestore) state.resources.hp = Math.min(max.hp, state.resources.hp + max.hp * effects.hpRestore);
       if (effects.mpRestore) state.resources.qi = Math.min(max.qi, state.resources.qi + max.qi * effects.mpRestore);
+      if (effects.tiliRestore) state.resources.tili = Math.min(max.tili, state.resources.tili + max.tili * effects.tiliRestore);
+    }
+  }
+  if (effects.itemGrant) {
+    for (const [itemId, count] of Object.entries(effects.itemGrant)) {
+      state.inventory[itemId] = (state.inventory[itemId] || 0) + count;
     }
   }
   if (effects.setFlags) setFlags(state, effects.setFlags, effects.flagData, todayStr);
@@ -578,13 +665,14 @@ function finalize(state, data, pending, ev, { outcome, resultText, zhuanText, pr
     date: todayStr,
     form: pending.form,
     text: pending.gate === "unperceived" ? "" : ev.beats.qi.text,
+    whisper: pending.whisper ?? null,
     choice: pending.choiceText ?? null,
     subChoice: pending.subChoiceText ?? null,
     rate: pending.rate ?? null,
     success: pending.success ?? null,
     judgedDim: pending.judgedTag ? TAG_TO_DIM[pending.judgedTag] : null,
     zhuanText: zhuanText ?? null,
-    resultText: text
+    resultText: fillTemplates(text, data)
   };
   hooks.afterResolve?.(state, entry); // game.js 掛榜單快照/稱號等
   state.pendingEvent = null;

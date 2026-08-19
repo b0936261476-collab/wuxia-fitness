@@ -187,9 +187,17 @@ function rngForEvent(s, eventId) {
   return () => (idx + 0.5) / total;
 }
 
+/** 已創角的狀態需先跳過序章三部曲,測試才能強制抽指定事件 */
+function skipIntro(s) {
+  for (const id of data.events.config.intro.sequence) {
+    s.journal.push({ n: 0, id, date: "2026-01-01" });
+  }
+}
+
 test("事件結算:每次事件固定扣體力100點(§4.3/§6.1)", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
+  skipIntro(s);
   const before = s.resources.tili;
   addSteps(s, 1000);
   startNextEvent(s, data, "2026-01-01", rngForEvent(s, "DA-003_rain_shelter"));
@@ -210,6 +218,7 @@ test("事件結算:創角前(無資源)事件仍可正常結算,不報錯", () =
 test("事件判定:血量重傷時,六維乘數會拉低判定用等級,成功率不會頂到封頂", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
+  skipIntro(s);
   s.exp.hard = thresholdForLevel(11); // 硬功 Lv.11:對 DU-001(基準6)原本 50%+15%=65%+,但比值 11/6<2 不觸發輾壓
   damageResource(s, "hp", s.resources.hp * 0.95); // 打到剩5% → 重傷,六維×0.5
 

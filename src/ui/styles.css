@@ -266,3 +266,50 @@ select, input[type="number"], textarea {
 .form-badge { margin-left: 6px; background: var(--ink); }
 .event-text.zhuan { color: var(--ink-light); font-style: normal; border-left: 2px dashed var(--border); padding-left: 10px; }
 .event-card .event-text { line-height: 1.9; margin-bottom: 10px; }
+
+/* 耳語(NARRATIVE_INJECT) */
+.whisper-line {
+  margin: 10px 0;
+  padding: 8px 12px;
+  color: var(--ink-light);
+  font-style: normal;
+  border-left: 2px solid var(--ink-light);
+  opacity: 0.85;
+  line-height: 1.9;
+}
+
+/* 創角測驗 */
+#quiz-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 38, 32, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.quiz-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 520px;
+  width: 100%;
+}
+.quiz-card h2 {
+  color: var(--accent-dark);
+  letter-spacing: 0.3em;
+  margin-bottom: 10px;
+}
+.quiz-progress { color: var(--ink-light); font-size: 0.85rem; margin: 10px 0 4px; }
+.quiz-question { font-size: 1.05rem; line-height: 1.8; margin-bottom: 14px; }
+.quiz-opt { text-align: left; }
+.fate-reveal { text-align: center; }
+.fate-label { color: var(--ink-light); margin-bottom: 12px; }
+.fate-line {
+  font-size: 1.15rem;
+  line-height: 2;
+  color: var(--accent-dark);
+  margin-bottom: 18px;
+}

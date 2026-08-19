@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 
 import {
   newState, addSteps, startNextEvent, chooseOption, chooseSub,
-  presentEvent, logExercise, createCharacter, resourceMax
+  presentEvent, logExercise, createCharacter, resourceMax, useItem
 } from "../src/engine/game.js";
 import {
   perceptionCheck, eligibleEvents, eventById, optionSuccessRate,
@@ -27,8 +27,17 @@ const data = {
   tags: loadJson("data/tags.json"),
   quiz: loadJson("data/quiz.json"),
   npcs: loadJson("data/npcs.json"),
-  reputation: loadJson("data/reputation.json")
+  reputation: loadJson("data/reputation.json"),
+  whispers: loadJson("data/whispers.json"),
+  narratives: loadJson("data/narratives.json")
 };
+
+/** 已創角的測試狀態需先走完序章三部曲;此處直接標記為已看過 */
+function skipIntro(s) {
+  for (const id of data.events.config.intro.sequence) {
+    s.journal.push({ n: 0, id, date: "2026-08-01" });
+  }
+}
 
 const D0 = "2026-08-19", D1 = "2026-08-20", D2 = "2026-08-21", D3 = "2026-08-22";
 
@@ -128,6 +137,7 @@ test("錢袋樓梯:吞錢 → 3天後尋物告示才開門(minDaysSince)", () =>
 test("巢狀抉擇:等到天黑(A判定失敗)→ 第二層選擇,等過才拿走軟樓梯", () => {
   const s = newState();
   s.talents = { genggu: 50, wuxing: 50, yunqi: 50 }; // 際遇50%
+  skipIntro(s);
   addSteps(s, 1000);
   startNextEvent(s, data, D0, rngFor(s, "1-1_lost_purse", D0));
   const res = chooseOption(s, data, "A", D0, () => 0.9); // 0.9 > 0.5 → 沒等到
@@ -158,6 +168,7 @@ test("1-2 帶愧疚變體的起段(flag 變體)與察覺加聽段", () => {
 
 function startEarningBack(s) {
   s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
   s.flags.purse_pocketed = true;
   s.flagDates = { purse_pocketed: "2026-08-10" };
   s.journal.push({ n: 1, id: "1-1_lost_purse", date: "2026-08-10" });
@@ -285,6 +296,7 @@ test("fameVariants:譽滿一方以上,見死不救有人看見(偽君子引信)"
 test("判定失敗扣資源(絕對值檔位),事件不發六維經驗", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q01", optionId: "a" }], data);
+  skipIntro(s);
   const expBefore = { ...s.exp };
   const maxHp = resourceMax(s).hp;
   addSteps(s, 1000);
@@ -311,7 +323,7 @@ test("冷卻:同事件在 cooldown 事件數內不再出現", () => {
 // ---------- 資料自檢(生產規格書第八節,可自動化部分) ----------
 
 test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", () => {
-  const legalEffects = new Set(["fame", "infamy", "hpDamage", "mpDamage", "hpRestore", "mpRestore", "setFlags", "clearFlags", "flagData"]);
+  const legalEffects = new Set(["fame", "infamy", "hpDamage", "mpDamage", "tiliDamage", "hpRestore", "mpRestore", "tiliRestore", "itemGrant", "setFlags", "clearFlags", "flagData"]);
   const collectOutcomes = (node, out = []) => {
     if (!node || typeof node !== "object") return out;
     if (node.effects) out.push(node);
@@ -340,16 +352,18 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
         assert.ok(legalEffects.has(key), `${ev.eventId} 有非法 effects 欄位 ${key}`);
       }
     }
-    // 對決必寫 crush 變體(規格書第四節)
-    if (ev.eventType === "duel") {
+    // 對決必寫 crush 變體(規格書第四節;教學事件豁免——一次性且基準極低)
+    if (ev.eventType === "duel" && !ev.tagBlock.event.includes("教學")) {
       assert.ok(ev.variants?.crush, `${ev.eventId} 是對決但沒寫 crush 變體`);
     }
   }
 });
 
-test("自檢:14 件正式庫事件全數入庫,編號一致", () => {
+test("自檢:正式庫 14 件 + 序章教學 7 件全數入庫,編號一致", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
+    "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
+    "TU-003_bridge_dog", "TU-004_peddler_pouch", "TU-005_temple_night", "TU-006_notice_board",
     "1-1_lost_purse", "1-2_purse_notice", "1-3_purse_earned", "1-4_dock_boy",
     "DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer",
     "CH-001_cheat_scale", "CH-002_street_duel",
@@ -358,6 +372,131 @@ test("自檢:14 件正式庫事件全數入庫,編號一致", () => {
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
+});
+
+// ---------- 序章三部曲 + 教學(M7 內容灌裝) ----------
+
+test("序章:創角後前三個事件槽固定順序,命格分歧正確落點", () => {
+  const s = newState();
+  s.talents = { genggu: 132, wuxing: 9, yunqi: 9 }; // 極端根骨命格
+  addSteps(s, 5000);
+
+  const ev1 = startNextEvent(s, data, D0, () => 0.5);
+  assert.equal(ev1.id, "TU-000_setting_out");
+  const r1 = chooseOption(s, data, null, D0);
+  assert.ok(r1.done);
+  assert.match(r1.entry.resultText, /給右肩也曬曬太陽/); // 高根骨轉段
+  assert.match(r1.entry.resultText, /沒人聽過的名字/);   // 共用合段
+
+  const ev2 = startNextEvent(s, data, D0, () => 0.5);
+  assert.equal(ev2.id, "TU-001_leaving_village");
+  chooseOption(s, data, null, D0);
+  assert.ok(s.flags.heard_sitianjian);
+
+  const ev3 = startNextEvent(s, data, D0, () => 0.5);
+  assert.equal(ev3.id, "TU-002_forked_road");
+  chooseOption(s, data, "C", D0);
+  assert.ok(s.flags.road_mountain);
+
+  // 第四個事件槽起開放隨機池
+  const ev4 = startNextEvent(s, data, D0, () => 0.99);
+  assert.notEqual(ev4.id, "TU-000_setting_out");
+});
+
+test("序00:均衡命格走 default 轉段", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, () => 0.5);
+  const { entry } = chooseOption(s, data, null, D0);
+  assert.match(entry.resultText, /就是走/);
+});
+
+test("教學04:物品發放與使用(金創藥恢復血量、酸梅恢復體力)", () => {
+  const s = newState();
+  createCharacter(s, [{ questionId: "q01", optionId: "a" }], data);
+  skipIntro(s);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "TU-004_peddler_pouch", D0));
+  chooseOption(s, data, "B", D0);
+  assert.equal(s.inventory.jinchuangyao, 1);
+  assert.equal(s.inventory.suanmei, 1);
+
+  s.resources.hp -= 500;
+  s.resources.tili -= 150;
+  const r1 = useItem(s, data, "jinchuangyao");
+  assert.equal(r1.restore.hp, 400);
+  const r2 = useItem(s, data, "suanmei");
+  assert.equal(r2.restore.tili, 100);
+  assert.equal(s.inventory.jinchuangyao, undefined);
+});
+
+test("教學06:榜文模板變數填入群俠錄第一名", () => {
+  const s = newState();
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "TU-006_notice_board", D0));
+  const { entry } = chooseOption(s, data, null, D0);
+  assert.match(entry.resultText, /沈聽雪/);
+  assert.doesNotMatch(entry.resultText, /\{輕功譜/);
+});
+
+// ---------- 天賦耳語(§8.6) ----------
+
+test("耳語:23 句全數入庫,極端命格才觸發、序章豁免、冷卻生效", () => {
+  const total = Object.values(data.whispers.pools).reduce((a, p) => a + p.length, 0);
+  assert.equal(total, 23);
+
+  const s = newState();
+  s.talents = { genggu: 132, wuxing: 9, yunqi: 9 };
+  s.steps = { total: 90000, resolved: 10, byDate: {} };
+  skipIntro(s);
+
+  // rng:抽事件用大值,耳語機率擲 0(必中)
+  let calls = 0;
+  const rng = () => { calls++; return calls <= 1 ? 0.99 : 0.0001; };
+  startNextEvent(s, data, D0, rng);
+  assert.ok(s.pendingEvent.whisper, "極端命格+機率命中應注入耳語");
+  assert.ok(s.whisperSeen);
+  const firstWhisperN = s.lastWhisperN;
+  chooseOption(s, data, presentEvent(s, data).choices[0]?.id ?? null, D0, () => 0.5);
+
+  // 冷卻 5 事件內不再注入
+  let calls2 = 0;
+  const rng2 = () => { calls2++; return calls2 <= 1 ? 0.99 : 0.0001; };
+  startNextEvent(s, data, D0, rng2);
+  assert.equal(s.pendingEvent.whisper, undefined);
+  assert.equal(s.lastWhisperN, firstWhisperN);
+
+  // 普通命格永不觸發
+  const s2 = newState();
+  s2.talents = { genggu: 60, wuxing: 50, yunqi: 40 };
+  s2.steps = { total: 9000, resolved: 0, byDate: {} };
+  skipIntro(s2);
+  let calls3 = 0;
+  const rng3 = () => { calls3++; return calls3 <= 1 ? 0.99 : 0.0001; };
+  startNextEvent(s2, data, D0, rng3);
+  assert.equal(s2.pendingEvent.whisper, undefined);
+});
+
+// ---------- 敘事池資料完整性 ----------
+
+test("narratives.json:6 種狀態敘事四段俱全、頒號六維各一段", () => {
+  const st = data.narratives.states;
+  assert.deepEqual(Object.keys(st).sort(), ["hp_heavy", "hp_light", "qi_heavy", "qi_light", "tili_heavy", "tili_light"]);
+  for (const [key, v] of Object.entries(st)) {
+    for (const beat of ["jue", "cha", "xing", "bian"]) {
+      assert.ok(v[beat]?.length > 10, `${key} 缺 ${beat} 段`);
+    }
+  }
+  const tb = data.narratives.titleBestow;
+  assert.deepEqual(Object.keys(tb).sort(), ["ear", "eye", "hard", "inner", "light", "soft"]);
+  const expectedTitles = { light: "掠影追風", inner: "氣貫長虹", hard: "鐵骨錚錚", soft: "綿裡藏針", eye: "明察秋毫", ear: "耳聽八方" };
+  for (const [dim, v] of Object.entries(tb)) {
+    assert.equal(v.title, expectedTitles[dim]);
+    for (const beat of ["qi", "cheng", "zhuan", "he"]) {
+      assert.ok(v[beat]?.length > 10, `${dim} 頒號缺 ${beat} 段`);
+    }
+  }
 });
 
 test("FO-001 需要順口溜鑰匙;FO-002 空穗環需另過眼功察覺", () => {

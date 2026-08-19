@@ -22,9 +22,214 @@
       "deadlineDays": 3,
       "abandonZeroDays": 7,
       "settlementEventId": "1-3_purse_earned"
+    },
+    "intro": {
+      "note": "序章三部曲(§10.5 M7/開局事件樹):創角完成後前三個事件槽固定順序(PRIORITY_INTERRUPT),之後開放隨機池。",
+      "sequence": ["TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road"]
     }
   },
   "pool": [
+    {
+      "eventId": "TU-000_setting_out",
+      "title": "上路",
+      "eventType": "daily",
+      "benchmarkLevel": null,
+      "triggerOnly": true,
+      "tagBlock": {
+        "ability": [],
+        "event": ["序章", "自我認知"],
+        "character": [],
+        "region": ["村莊", "官道"],
+        "item": []
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "天沒亮透,你把包袱甩上肩。這個生你養你的村子,在身後縮成了一團灰影。" },
+        "cheng": { "choices": [] },
+        "zhuan": {},
+        "he": {
+          "byFate": {
+            "genggu": "包袱裡塞了二十斤的乾糧和鐵器,你娘怕你扛不動。走出十里,你把包袱從左肩換到右肩——不是累,是想給右肩也曬曬太陽。",
+            "wuxing": "出村的路有兩條,你走了東邊那條。沒什麼道理,只是昨夜聽人說西邊在修橋——修橋,就有工錢;有工錢,路上就有劫道的。",
+            "yunqi": "走出村口沒半里,一輛送菜的牛車恰好同路。車把式招呼你上車,一文錢不要:「順路,搭個伴!」",
+            "default": "路很長,你一步一步走。沒有牛車,沒有近路,也沒有劫道的——就是走。"
+          },
+          "epilogue": "日頭升起來的時候,你回頭望了最後一眼。從今天起,江湖上多了一個沒人聽過的名字。"
+        }
+      }
+    },
+    {
+      "eventId": "TU-001_leaving_village",
+      "title": "出村",
+      "eventType": "daily",
+      "benchmarkLevel": null,
+      "triggerOnly": true,
+      "tagBlock": {
+        "ability": [],
+        "event": ["序章", "世界觀"],
+        "character": ["挑柴老漢"],
+        "region": ["官道", "界碑"],
+        "item": []
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "官道邊的界碑爬滿了苔,字跡快認不出了。一個挑柴的老漢在碑旁歇腳,見你打量石碑,咧嘴一笑。" },
+        "cheng": { "choices": [] },
+        "zhuan": {},
+        "he": {
+          "text": "「後生,第一次出遠門?」他也不等你答,「三句話送你:銀子縫在裡衣,睡覺背對著門,還有——」他壓低聲音,「路上少打聽司天監的事。」你想問第三句是什麼意思,老漢已挑起柴走遠了,哼著一支不成調的小曲。界碑上,你終於認出了兩個字:「江湖」。",
+          "effects": { "setFlags": ["heard_sitianjian"] }
+        }
+      }
+    },
+    {
+      "eventId": "TU-002_forked_road",
+      "title": "三岔口",
+      "eventType": "choice",
+      "benchmarkLevel": null,
+      "triggerOnly": true,
+      "tagBlock": {
+        "ability": [],
+        "event": ["序章", "路向抉擇"],
+        "character": [],
+        "region": ["官道", "三岔口"],
+        "item": []
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "官道在此分成三股。路牌很老實:東,平川鎮,商路;南,雲來渡,水路;西,青石山道,山路。" },
+        "cheng": { "choices": [
+          { "id": "A", "text": "走東,人多的地方機會多。", "judge": false, "setFlags": ["road_town"] },
+          { "id": "B", "text": "走南,坐船看看大江大河。", "judge": false, "setFlags": ["road_river"] },
+          { "id": "C", "text": "走西,山裡才有江湖。", "judge": false, "setFlags": ["road_mountain"] }
+        ]},
+        "zhuan": {},
+        "he": { "byChoice": {
+          "A": { "text": "你站在路牌下想了想。其實想什麼呢——腳往哪邊,哪邊就是路。你選了一個方向。多年以後你會明白,今天這一步沒有對錯:江湖的意思就是,條條路上都有故事,而你只能活其中一條。", "effects": {} },
+          "B": { "text": "你站在路牌下想了想。其實想什麼呢——腳往哪邊,哪邊就是路。你選了一個方向。多年以後你會明白,今天這一步沒有對錯:江湖的意思就是,條條路上都有故事,而你只能活其中一條。", "effects": {} },
+          "C": { "text": "你站在路牌下想了想。其實想什麼呢——腳往哪邊,哪邊就是路。你選了一個方向。多年以後你會明白,今天這一步沒有對錯:江湖的意思就是,條條路上都有故事,而你只能活其中一條。", "effects": {} }
+        }}
+      }
+    },
+    {
+      "eventId": "TU-003_bridge_dog",
+      "title": "野橋守狗",
+      "eventType": "duel",
+      "benchmarkLevel": 3,
+      "tagBlock": {
+        "ability": ["qinggong"],
+        "event": ["教學", "首次判定"],
+        "character": ["土狗"],
+        "region": ["野橋"],
+        "item": []
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "一座獨木橋,橋頭趴著一條土狗。牠不叫,也不讓,就這麼看著你——用一種收過路費的眼神。" },
+        "cheng": { "choices": [
+          { "id": "A", "text": "「助跑,從牠頭上跳過去!」", "tags": ["qinggong"], "judge": true, "failType": "loss" },
+          { "id": "B", "text": "「出門在外,和氣生財……」把乾糧分牠一塊。", "judge": false },
+          { "id": "C", "text": "「不跟你計較。」繞下游淺灘涉水過河。", "judge": false }
+        ]},
+        "zhuan": { "textByChoice": {
+          "A": "你退後七八步,起跑。土狗的耳朵動了一下,眼神從「收費」變成了「有趣」。"
+        } },
+        "he": { "byChoice": {
+          "A": {
+            "success": { "text": "你一躍而過,落地回頭——土狗歪著頭看你,搖了搖尾巴,好像在說:可以,免費。", "effects": {} },
+            "fail": { "text": "起跳的瞬間你踩到一塊松動的橋板。撲通。你從水裡爬起來時,土狗已經走到岸邊,居高臨下地看著你,尾巴搖得很歡。你發誓牠在笑。", "effects": { "hpDamage": 50, "setFlags": ["dog_bridge"] } }
+          },
+          "B": { "text": "土狗嗅了嗅乾糧,叼起來,慢條斯理地讓出半邊橋面。過橋時你們對看了一眼——這是一筆公平的買賣,誰也不欠誰。", "effects": {} },
+          "C": { "text": "淺灘的水比看起來深,泥比看起來黏。你深一腳淺一腳蹚過河,回頭望去,土狗還趴在橋頭,連眼皮都沒抬一下。多走的路,就當是給自己的腿加練了。", "effects": { "tiliDamage": 100 } }
+        }}
+      }
+    },
+    {
+      "eventId": "TU-004_peddler_pouch",
+      "title": "貨郎的藥囊",
+      "eventType": "choice",
+      "benchmarkLevel": null,
+      "tagBlock": {
+        "ability": [],
+        "event": ["教學", "物品"],
+        "character": ["貨郎"],
+        "region": ["官道"],
+        "item": ["金創藥", "酸梅"]
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "挑擔的貨郎迎面走來,老遠就開始吆喝:「金創藥!祖傳金創藥!不靈不要錢——」看見你,他眼睛一亮,「小哥,行走江湖,身上能不備藥嗎?」" },
+        "cheng": { "choices": [
+          { "id": "A", "text": "「行走江湖,是該備著。」買一瓶。", "judge": false },
+          { "id": "B", "text": "「祖傳?你今年貴庚?」", "judge": false }
+        ]},
+        "zhuan": { "textByChoice": {
+          "B": "貨郎臉不紅氣不喘:「我家的祖,傳到我這是第一代!小哥,萬事都有頭一遭嘛。」"
+        } },
+        "he": { "byChoice": {
+          "A": { "text": "你掏錢買下一瓶。貨郎用油紙仔細包好,還多叮囑一句:「省著點用,也盼你用不上。」", "effects": { "itemGrant": { "jinchuangyao": 1 } } },
+          "B": { "text": "你被他逗笑了,終究還是掏了錢。他找零時多塞給你一顆酸梅:「開張大吉,送的。」", "effects": { "itemGrant": { "jinchuangyao": 1, "suanmei": 1 } } }
+        }}
+      }
+    },
+    {
+      "eventId": "TU-005_temple_night",
+      "title": "破廟過夜",
+      "eventType": "choice",
+      "benchmarkLevel": null,
+      "tagBlock": {
+        "ability": [],
+        "event": ["教學", "休息"],
+        "character": [],
+        "region": ["山神廟"],
+        "item": []
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "天黑得比預想快。前不著村後不著店,只有一座塌了半邊的山神廟。神像的臉風化了,看不出是在笑還是在哭。" },
+        "cheng": { "choices": [
+          { "id": "A", "text": "「將就一晚吧。」生火,靠著神像睡。", "judge": false },
+          { "id": "B", "text": "「正好清靜。」打坐調息到天亮。", "judge": false }
+        ]},
+        "zhuan": { "textByChoice": {
+          "A": "火堆劈啪作響。半夢半醒間,你彷彿聽見廟外有腳步聲,很輕,停在門口——又走了。"
+        } },
+        "he": { "byChoice": {
+          "A": { "text": "天亮了。廟門口的泥地上有半個腳印,很新。你收拾包袱上路,沒跟任何人提起這件事。", "effects": { "hpRestore": 0.5, "tiliRestore": 0.5, "setFlags": ["temple_footprint"] } },
+          "B": { "text": "一夜吐納,晨光透進破廟時,你緩緩收功。丹田溫熱,神清氣爽——只是腿,坐麻了。你扶著神像站了半天。", "effects": { "mpRestore": 0.5, "tiliRestore": 0.25 } }
+        }}
+      }
+    },
+    {
+      "eventId": "TU-006_notice_board",
+      "title": "官道告示",
+      "eventType": "daily",
+      "benchmarkLevel": null,
+      "tagBlock": {
+        "ability": [],
+        "event": ["教學", "排行相關"],
+        "character": ["司天監(遠觀)"],
+        "region": ["官道", "告示牆"],
+        "item": []
+      },
+      "conditions": {},
+      "cooldown": 999,
+      "beats": {
+        "qi": { "text": "官道旁的告示牆前圍了一圈人。你湊過去——不是官府文書,是一張素白的榜文,紙角壓著一枚風紋火漆。" },
+        "cheng": { "choices": [] },
+        "zhuan": {},
+        "he": {
+          "text": "「《群俠錄》季更,」有人念出聲,「輕功譜頭名,{輕功譜第1名.人名};內功譜頭名……」人群裡有嚮往,有不服,還有人冷笑:「司天監憑什麼給天下人排座次?」沒人接話。冷笑的人自己也沒再說第二句。你盯著榜文看了很久。上面沒有你的名字——廢話,怎麼會有。你摸了摸自己的胳膊,忽然覺得,今天的路可以走快一點。",
+          "effects": { "setFlags": ["saw_qunxialu"] }
+        }
+      }
+    },
     {
       "eventId": "1-1_lost_purse",
       "title": "官道拾金",

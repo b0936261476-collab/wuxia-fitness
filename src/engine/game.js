@@ -328,17 +328,42 @@ export function gainItem(state, data, itemId) {
   if (item.flagOnGain) state.flags[item.flagOnGain] = true;
 }
 
-/** 使用消耗品(療傷藥等)。回傳解除的 debuff id,或 null(無可解除則不消耗) */
+/**
+ * 使用消耗品。兩類:
+ * cures 類(舊版療傷藥)→ 回傳解除的 debuff id;無可解除則不消耗,回 null。
+ * restore 類(金創藥/酸梅,§4 恢復)→ 回傳 {restore: {hp?, tili?, qi?}} 實際恢復量;創角前無資源,回 null。
+ */
 export function useItem(state, data, itemId) {
   const item = data.items.items.find((i) => i.id === itemId);
   if (!item || item.type !== "consumable") return null;
   if (!(state.inventory[itemId] > 0)) return null;
-  const target = state.debuffs.find((d) => item.cures.includes(d));
-  if (!target) return null;
-  state.debuffs = state.debuffs.filter((d) => d !== target);
+
+  if (item.cures) {
+    const target = state.debuffs.find((d) => item.cures.includes(d));
+    if (!target) return null;
+    state.debuffs = state.debuffs.filter((d) => d !== target);
+    consumeOne(state, itemId);
+    return target;
+  }
+
+  if (item.restore) {
+    if (!state.resources) return null;
+    const max = resourceMax(state);
+    const restored = {};
+    for (const [key, amount] of Object.entries(item.restore)) {
+      const before = state.resources[key];
+      state.resources[key] = Math.min(max[key], before + amount);
+      restored[key] = state.resources[key] - before;
+    }
+    consumeOne(state, itemId);
+    return { restore: restored };
+  }
+  return null;
+}
+
+function consumeOne(state, itemId) {
   state.inventory[itemId] -= 1;
   if (state.inventory[itemId] === 0) delete state.inventory[itemId];
-  return target;
 }
 
 // ---------- 小工具 ----------

@@ -2,7 +2,7 @@
 
 import {
   logExercise, logSteps, pendingEventCount, startNextEvent, presentEvent,
-  chooseOption, chooseSub, useItem, levels, MAX_DAILY_STEPS
+  chooseOption, chooseSub, useItem, levels, createCharacter, MAX_DAILY_STEPS
 } from "../engine/game.js";
 import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
 import { currentCoefficient } from "../engine/decay.js";
@@ -20,15 +20,16 @@ const TYPE_LABELS = {
 const FORM_LABELS = { crush: "輾壓", awe: "險境" };
 
 async function loadData() {
-  const [exercises, events, titles, items, tags, quiz, npcs, reputation] = await Promise.all(
-    ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation"].map((n) =>
+  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives"];
+  const loaded = await Promise.all(
+    names.map((n) =>
       fetch(`data/${n}.json`).then((r) => {
         if (!r.ok) throw new Error(`載入 data/${n}.json 失敗`);
         return r.json();
       })
     )
   );
-  Object.assign(data, { exercises, events, titles, items, tags, quiz, npcs, reputation });
+  names.forEach((n, i) => { data[n] = loaded[i]; });
 }
 
 function dateWithOffset(offsetDays) {
@@ -224,6 +225,8 @@ function renderEventArea(lastEntry = null) {
       return;
     }
 
+    const whisper = view.whisper
+      ? `<p class="whisper-line">${view.whisper}</p>` : "";
     const reveal = view.revealText
       ? `<div class="perception-box"><span class="perception-tag">察覺</span>${paragraphs(view.revealText, "event-text")}</div>` : "";
     const crush = view.crushText
@@ -237,6 +240,7 @@ function renderEventArea(lastEntry = null) {
       <span class="event-type">${typeLabel}</span>${formBadge}
       <h3>${view.title}</h3>
       ${paragraphs(view.qi, "event-text")}
+      ${whisper}
       ${reveal}${crush}
       ${controls}
     </div>`;
@@ -301,12 +305,18 @@ function renderBag() {
     }).join("");
     inv.querySelectorAll("[data-use]").forEach((btn) =>
       btn.addEventListener("click", () => {
-        const cured = useItem(state, data, btn.dataset.use);
-        if (cured) {
-          const d = data.items.debuffs.find((x) => x.id === cured);
-          alert(`用藥之後,「${d?.name ?? cured}」痊癒了。`);
+        const result = useItem(state, data, btn.dataset.use);
+        if (typeof result === "string") {
+          const d = data.items.debuffs.find((x) => x.id === result);
+          alert(`用藥之後,「${d?.name ?? result}」痊癒了。`);
+        } else if (result?.restore) {
+          const names = { hp: "血量", qi: "內力", tili: "體力" };
+          const text = Object.entries(result.restore)
+            .map(([k, v]) => `${names[k] ?? k} +${Math.round(v)}`)
+            .join("、");
+          alert(`服下之後,${text}。`);
         } else {
-          alert("目前沒有這味藥能治的傷。留著吧,江湖路長。");
+          alert("現在用不上這個。留著吧,江湖路長。");
         }
         save();
         renderAll();
@@ -506,6 +516,61 @@ function handleStepsParam() {
   document.querySelector('[data-tab="road"]').click();
 }
 
+// ---------- 創角:心理測驗(§1.2,12 題自 15 題庫隨機抽) ----------
+
+const QUIZ_DRAW_COUNT = 12;
+let quizState = null;
+
+function startQuiz() {
+  const pool = [...data.quiz.questions];
+  // 洗牌抽 12 題
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  quizState = { questions: pool.slice(0, QUIZ_DRAW_COUNT), index: 0, answers: [] };
+  $("#quiz-overlay").hidden = false;
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const q = quizState.questions[quizState.index];
+  $("#quiz-progress").textContent = `${quizState.index + 1} / ${quizState.questions.length}`;
+  $("#quiz-question").textContent = q.text;
+  $("#quiz-options").innerHTML = q.options
+    .map((o) => `<button class="btn quiz-opt" data-opt="${o.id}">${o.text}</button>`)
+    .join("");
+  $("#quiz-options").querySelectorAll("[data-opt]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      quizState.answers.push({ questionId: q.id, optionId: btn.dataset.opt });
+      quizState.index += 1;
+      if (quizState.index < quizState.questions.length) {
+        renderQuizQuestion();
+      } else {
+        finishQuiz();
+      }
+    })
+  );
+}
+
+function finishQuiz() {
+  const { fate } = createCharacter(state, quizState.answers, data);
+  save();
+  quizState = null;
+  $("#quiz-progress").textContent = "";
+  $("#quiz-question").textContent = "";
+  $("#quiz-options").innerHTML = `
+    <div class="fate-reveal">
+      <p class="fate-label">村口的算命先生瞇眼看了你半天,只說了一句——</p>
+      <p class="fate-line">「${fate.line}」</p>
+      <button class="btn primary" id="quiz-done">上 路</button>
+    </div>`;
+  $("#quiz-done").addEventListener("click", () => {
+    $("#quiz-overlay").hidden = true;
+    renderAll();
+  });
+}
+
 // ---------- 啟動 ----------
 
 (async function main() {
@@ -519,4 +584,5 @@ function handleStepsParam() {
   bindEvents();
   handleStepsParam();
   renderAll();
+  if (!state.talents) startQuiz(); // 未創角:先做心理測驗(§1.2),測完才上路
 })();

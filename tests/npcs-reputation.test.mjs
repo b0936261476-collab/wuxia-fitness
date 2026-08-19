@@ -222,6 +222,9 @@ test("updateRanking:data.npcs不存在時優雅跳過(向後相容,不報錯)", 
 test("事件結算:超越具名NPC時獲得俠名獎勵+記flag,且同一NPC只觸發一次", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
+  for (const id of data.events.config.intro.sequence) {
+    s.journal.push({ n: 0, id, date: "2026-08-01" }); // 跳過序章,直接抽隨機池
+  }
 
   // 第一次結算:六維皆0,建立排名基準線(lastKnownRank≈9000+);首次呼叫不算「超越」
   addSteps(s, 3000);

@@ -1,5 +1,20 @@
 {
+  "note": "物品清單。restore 類消耗品:使用後恢復資源(絕對值,對照 §4.1 傷害檔位)。舊 v1 物品(療傷藥/清心散/地圖/秘笈/木牌)保留供舊存檔相容,v2 事件已不再發放。",
   "items": [
+    {
+      "id": "jinchuangyao",
+      "name": "金創藥",
+      "type": "consumable",
+      "description": "貨郎的「祖傳」金創藥——祖傳到他這是第一代。不靈不要錢,倒是真的靈。",
+      "restore": { "hp": 400 }
+    },
+    {
+      "id": "suanmei",
+      "name": "酸梅",
+      "type": "consumable",
+      "description": "開張大吉,送的。酸得人一個激靈,趕路的乏勁全散了。",
+      "restore": { "tili": 100 }
+    },
     {
       "id": "liaoshangyao",
       "name": "療傷藥",

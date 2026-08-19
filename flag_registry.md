@@ -70,3 +70,13 @@
 | flag | 來源 | 說明 |
 |---|---|---|
 | surpassed_{rank} | game.js updateRanking | 超越具名 NPC(§9.9),一次性快報+俠名獎勵 |
+
+## 序章/教學(TU-000 ~ TU-006,2026-08-19 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| heard_sitianjian | TU-001 出村 | 暗線 | 司天監首次入耳(「路上少打聽」) |
+| road_town / road_river / road_mountain | TU-002 三岔口 | 暗線 | 路向權重:日後量產事件掛路向加權(三選一,互斥) |
+| dog_bridge | TU-003 A失敗 | 沉線 | 教科書式沉線——也許某天土狗會再出現,也許不會 |
+| temple_footprint | TU-005 A | 暗線 | 黑衣人線索之一(廟外半個腳印) |
+| saw_qunxialu | TU-006 | 暗線 | 已見過群俠錄榜文 |

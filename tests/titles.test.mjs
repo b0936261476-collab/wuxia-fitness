@@ -147,9 +147,17 @@ function drawArmWrestle(state) {
   return () => (idx + 0.5) / total;
 }
 
+/** 已創角的狀態需先跳過序章三部曲 */
+function skipIntro(s) {
+  for (const id of data.events.config.intro.sequence) {
+    s.journal.push({ n: 0, id, date: "2026-08-01" });
+  }
+}
+
 test("事件結算後 entry.equippedTitle 反映當下自動配戴的稱號", () => {
   const s = newState();
   createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
+  skipIntro(s);
   addExp(s, { hard: 5500 }, data); // 硬功 Lv.10,解鎖「鐵骨錚錚」
   addSteps(s, 1000);
   startNextEvent(s, data, "2026-08-19", drawArmWrestle(s));
@@ -160,6 +168,7 @@ test("事件結算後 entry.equippedTitle 反映當下自動配戴的稱號", ()
 test("里程碑輕加成確實提高判定成功率", () => {
   const withoutTitle = newState();
   createCharacter(withoutTitle, [{ questionId: "q03", optionId: "a" }], data);
+  skipIntro(withoutTitle);
   withoutTitle.exp.hard = 100;
   addSteps(withoutTitle, 1000);
   startNextEvent(withoutTitle, data, "2026-08-19", drawArmWrestle(withoutTitle));
@@ -167,6 +176,7 @@ test("里程碑輕加成確實提高判定成功率", () => {
 
   const withTitle = newState();
   createCharacter(withTitle, [{ questionId: "q03", optionId: "a" }], data);
+  skipIntro(withTitle);
   withTitle.exp.hard = 100;
   addExp(withTitle, { hard: 5400 }, data); // 補到解鎖「鐵骨錚錚」
   addSteps(withTitle, 1000);
