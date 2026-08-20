@@ -399,7 +399,22 @@ function renderEventArea(lastEntry = null) {
     ${e.zhuanText ? paragraphs(e.zhuanText, "event-text zhuan") : ""}
     <div class="event-result ${cls}">${paragraphs(e.resultText, "event-text")}</div>
     ${rateLine}
+    ${narrativeQueue.length
+      ? `<div class="event-options"><button class="btn primary" id="after-event-btn">${afterEventLabel()}</button></div>`
+      : ""}
   </div>`;
+  // 有東西等著播,就等玩家自己按——別把結果文字蓋掉(事件讀到一半跳出榜文很怪)
+  $("#after-event-btn")?.addEventListener("click", showNextNarrative);
+}
+
+/** 結果卡底下那顆鈕的字:先預告等著的是什麼,免得按下去被浮層嚇一跳 */
+function afterEventLabel() {
+  const next = narrativeQueue[0];
+  if (!next) return "繼 續";
+  if (next.kind === "board" || next.kind === "surpass") return "看 榜 文";
+  if (next.kind === "bestow") return "那 人 開 口 了";
+  if (next.kind === "state") return "喘 口 氣";
+  return "繼 續";
 }
 
 function renderJournal() {
@@ -659,7 +674,11 @@ function queueItems(pending) {
 function showNextNarrative() {
   const overlay = $("#narrative-overlay");
   const item = narrativeQueue.shift();
-  if (!item) { overlay.hidden = true; return; }
+  if (!item) {
+    overlay.hidden = true;
+    $("#after-event-btn")?.remove(); // 播完了,結果卡上那顆鈕就沒用了
+    return;
+  }
   const labels = NARRATIVE_BEAT_LABELS[item.kind] ?? [];
   const beats = item.beats.filter(Boolean);
   $("#narrative-kind").textContent = NARRATIVE_KIND_LABELS[item.kind] ?? "";
@@ -698,14 +717,15 @@ function onChoose(choiceId, isSub) {
     if (result.entry.success === true) playSfx("judgeSuccess");
     else if (result.entry.success === false) playSfx("judgeFail");
     playBgm({ tab: "road" }); // 事件結束,回到分頁曲
-    const hasNarrative = queueItems([
+    queueItems([
       ...collectNarratives(state, data, resourcePercents(state)),
       ...broadcastsFromRankingResult(result.entry.ranking)
     ]);
     save();
     renderAll();
+    // 敘事不自動彈:結果卡會自己長出一顆鈕,玩家讀完再按。
+    // (事件進行到一半突然跳出榜文很怪——設計者回報 2026-08-21)
     renderEventArea(result.entry); // 須排在 renderAll 之後,否則結果卡會被蓋掉
-    if (hasNarrative) showNextNarrative();
   } else {
     renderEventArea(); // 進入巢狀抉擇,重新渲染第二層選項
   }
@@ -824,6 +844,7 @@ function bindEvents() {
 
   // 前行
   $("#walk-btn").addEventListener("click", () => {
+    if (narrativeQueue.length) { showNextNarrative(); return; } // 還有沒看的,先看完再上路
     if (state.rebirth) {
       const flash = $("#road-flash");
       flash.hidden = false;
