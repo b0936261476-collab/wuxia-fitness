@@ -111,13 +111,19 @@ export function namedNpcAtRank(rank, npcsData) {
 
 /**
  * 萬人區(#101後)整數關口播報:每熔過 step(預設500)名一則(§9.9)。
+ *
+ * 「跨過」的定義是 prevRank > m 且 newRank <= m ——名次剛好停在關口上也算跨過,
+ * 因為 §9.9 的播報詞就是「群俠錄第 4,500 位——你的名字往前挪了」,說的是你現在站在哪。
+ * (先前寫成嚴格 m > newRank,結果剛好停在關口上的那一次不播,而下一次算 highest 時
+ *  又已經把這道關口跳過去了,等於整道關口永遠不會播報。)
+ *
  * @returns {number[]} 由高到低排序,本次跨越的所有整數關口(可能一次跨多個)
  */
 export function integerMilestonesCrossed(prevRank, newRank, step = 500) {
   if (newRank >= prevRank) return [];
   const milestones = [];
-  const highest = Math.floor((prevRank - 1) / step) * step;
-  for (let m = highest; m > newRank && m >= step; m -= step) {
+  const highest = Math.floor((prevRank - 1) / step) * step; // 小於 prevRank 的最大關口
+  for (let m = highest; m >= newRank && m >= step; m -= step) {
     milestones.push(m);
   }
   return milestones;
@@ -127,6 +133,24 @@ export function integerMilestonesCrossed(prevRank, newRank, step = 500) {
 export function surpassedNpcs(prevRank, newRank, npcsData) {
   if (newRank >= prevRank) return [];
   return npcsData.top100.filter((npc) => npc.rank >= newRank && npc.rank < prevRank);
+}
+
+/**
+ * 你上頭最近的一位具名對手(第 rank-1 名)。
+ * 已是天下第一、或還沒擠進百強時回 null(百強外沒有具名對手,那一段看整數關口)。
+ */
+export function nextNamedNpcAbove(rank, npcsData) {
+  if (rank <= 1) return null;
+  return namedNpcAtRank(rank - 1, npcsData);
+}
+
+/**
+ * 萬人區下一個整數關口(§9.9,每 step 名一道坎)。
+ * 已經在第一道坎之內(rank <= step)時回 null——那時候該看的是百強,不是關口。
+ */
+export function nextIntegerMilestone(rank, step = 500) {
+  if (rank <= step) return null;
+  return Math.floor((rank - 1) / step) * step;
 }
 
 /** 超越檔位分類(§9.9三檔):十強走深度互動、⚠存疑者走特殊檔、其餘普通檔 */

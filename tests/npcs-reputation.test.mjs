@@ -125,7 +125,12 @@ test("namedNpcAtRank:100名內回傳資料,100名外回null(萬人總冊無名�
 
 test("integerMilestonesCrossed:排名進步時,回傳跨越的所有500整數關口", () => {
   assert.deepEqual(integerMilestonesCrossed(9000, 8400), [8500]);
-  assert.deepEqual(integerMilestonesCrossed(5000, 3000), [4500, 4000, 3500]);
+  assert.deepEqual(integerMilestonesCrossed(5000, 3000), [4500, 4000, 3500, 3000]);
+});
+
+test("integerMilestonesCrossed:名次剛好停在關口上也算跨過(否則那道關口永遠不播)", () => {
+  assert.deepEqual(integerMilestonesCrossed(9000, 8500), [8500]);
+  assert.deepEqual(integerMilestonesCrossed(8500, 8499), []); // 8500 已在上一次報過
 });
 
 test("integerMilestonesCrossed:排名退步或不變時回空陣列", () => {

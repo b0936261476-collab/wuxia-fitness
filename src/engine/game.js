@@ -168,6 +168,11 @@ function levelSum(state) {
   return Object.values(levels(state)).reduce((a, b) => a + b, 0);
 }
 
+/** 六維等級總和,群俠錄名次就是拿這個數字去萬人總冊裡比(§9.7.1) */
+export function playerLevelSum(state) {
+  return levelSum(state);
+}
+
 /**
  * 更新排名快照;若名次提升,偵測本次跨越的整數關口(§9.9萬人區)與超越的具名NPC(§9.9),
  * 超越NPC首次觸發時發俠名獎勵並記flag(供敘事引用)。

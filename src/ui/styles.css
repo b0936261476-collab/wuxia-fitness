@@ -445,3 +445,58 @@ select, input[type="number"], textarea {
 .narrative-card .btn { width: 100%; margin-top: 6px; }
 .journal-entry.bestow .j-head { color: var(--gold); }
 .journal-entry.state .j-head { color: var(--accent); }
+
+/* ===== 群俠錄(§9.7 名次 / §9.6 聲望) ===== */
+.rank-figure {
+  text-align: center;
+  color: var(--accent-dark);
+  margin: 6px 0 4px;
+}
+.rank-hash { font-size: 0.95rem; letter-spacing: 0.2em; }
+.rank-number {
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin: 0 6px;
+  font-variant-numeric: tabular-nums;
+}
+.rank-title {
+  text-align: center;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  margin-bottom: 10px;
+}
+.target-card { text-align: center; }
+.target-rank { color: var(--ink-light); font-size: 0.85rem; letter-spacing: 0.2em; }
+.target-name {
+  font-size: 1.3rem;
+  color: var(--accent-dark);
+  letter-spacing: 0.15em;
+  margin: 6px 0;
+}
+.target-lore { line-height: 1.9; margin-bottom: 8px; }
+.evaluation {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.35em;
+  color: var(--accent-dark);
+  margin: 4px 0 16px;
+}
+.rep-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+}
+.rep-name { width: 3em; color: var(--ink-light); font-size: 0.9rem; }
+.rep-tier { flex: 1; color: var(--gold); letter-spacing: 0.15em; }
+.rep-tier.infamy { color: var(--accent); }
+.rep-num { color: var(--ink-light); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.surpassed-row {
+  display: flex;
+  gap: 12px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+}
+.s-rank { color: var(--gold); font-variant-numeric: tabular-nums; width: 3.5em; }
+.journal-entry.surpass .j-head { color: var(--gold); }
