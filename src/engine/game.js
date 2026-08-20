@@ -39,7 +39,7 @@ export function newState() {
     rankSeen: null,            // 上次得知名次的時機 {date, source:"榜文"|"監使"},供 UI 說明數字有多舊
     daily: { date: null, byExercise: {} }, // 當天各項目累積原始量(隔日歸零)
     records: [],               // 練功紀錄
-    steps: { total: 0, resolved: 0, byDate: {} }, // resolved = 已觸發事件數;byDate = 各日已登記步數
+    steps: { total: 0, resolved: 0, byDate: {}, fromWalking: 0, fromExercise: 0 }, // resolved = 已觸發事件數;byDate = 各日已登記步數;兩個 from* 是行動力來源分帳
     inventory: {},             // {itemId: count}
     debuffs: [],               // 目前身上的 debuff id(M4殘留,§4.4 後不再有事件發放)
     flags: {},                 // 抉擇紀錄(Flag 三命運 §6.6),影響後續事件
@@ -237,6 +237,14 @@ export function logExercise(state, data, exerciseId, amount, date) {
   }
   addExp(state, gains, data);
 
+  // 運動換行動力(設計者定調 2026-08-21):遞減後的有效量 × 六維權重和 × 匯率。
+  // 用有效量而非申報量,狂練同一項會吃到遞減,灌不出行動力。
+  const actionSteps = exerciseStepEquivalent(ex, eff, data);
+  if (actionSteps > 0) {
+    state.steps.total += actionSteps;
+    state.steps.fromExercise = (state.steps.fromExercise ?? 0) + actionSteps;
+  }
+
   // §9.11.4 勞務折銀:湊錢中,當日有效經驗總量計入工錢(滿日=掙一兩)
   laborOnExercise(state, data, date, Object.values(gains).reduce((a, b) => a + b, 0));
 
@@ -252,7 +260,22 @@ export function logExercise(state, data, exerciseId, amount, date) {
     effective: round2(eff),
     gains: mapValues(gains, round2)
   });
-  return { effective: eff, gains };
+  return { effective: eff, gains, actionSteps };
+}
+
+/** 匯率預設值(data/exercises.json 沒填時的後備;數值以資料檔為準) */
+export const DEFAULT_STEPS_PER_WEIGHT_POINT = 1.25;
+export const DEFAULT_WALK_EXP_PER_STEP = 0.001;
+
+/**
+ * 一筆運動折合多少「步」的行動力(§行動力,2026-08-21 定調)。
+ * @param {object} ex   運動定義(data/exercises.json 的一項)
+ * @param {number} eff  遞減後的有效量
+ */
+export function exerciseStepEquivalent(ex, eff, data) {
+  const rate = data.exercises?.actionPoints?.stepsPerWeightPoint ?? DEFAULT_STEPS_PER_WEIGHT_POINT;
+  const weightSum = Object.values(ex.weights).reduce((a, b) => a + b, 0);
+  return Math.round((eff / ex.unitSize) * weightSum * rate);
 }
 
 function rolloverDaily(state, date) {
@@ -302,14 +325,32 @@ export const WARN_DAILY_STEPS = 20000;  // 達此門檻標記提示
  * 「只能記今天或昨天」由 UI 決定傳入的 date。
  * 回傳 {applied, capped, warned};該日已記過則丟錯。
  */
-export function logSteps(state, amount, date) {
+export function logSteps(state, data, amount, date) {
   if (!(amount > 0)) throw new Error("步數必須大於 0");
   if (!state.steps.byDate) state.steps.byDate = {}; // 舊存檔相容
   if (state.steps.byDate[date] != null) throw new Error("這一天已經記過步數");
   const applied = Math.min(Math.floor(amount), MAX_DAILY_STEPS);
   state.steps.byDate[date] = applied;
   state.steps.total += applied;
-  return { applied, capped: Math.floor(amount) > applied, warned: applied >= WARN_DAILY_STEPS };
+  state.steps.fromWalking = (state.steps.fromWalking ?? 0) + applied;
+
+  // 走路也練基本功(設計者定調 2026-08-21):每一步六維各 +0.001。
+  // 算的是採計後的步數,超過單日上限的部分不給經驗也不給行動力。
+  const perStep = data?.exercises?.walking?.expPerStepPerDimension ?? DEFAULT_WALK_EXP_PER_STEP;
+  const perDim = applied * perStep;
+  let gains = null;
+  if (perDim > 0 && data?.titles) {
+    gains = {};
+    for (const d of DIMENSIONS) gains[d] = perDim;
+    addExp(state, gains, data);
+  }
+
+  return {
+    applied,
+    capped: Math.floor(amount) > applied,
+    warned: applied >= WARN_DAILY_STEPS,
+    gains
+  };
 }
 
 /** 尚未觸發的事件數 */

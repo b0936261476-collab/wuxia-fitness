@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 import { effectiveAmount, currentCoefficient } from "../src/engine/decay.js";
-import { thresholdForLevel, levelFromExp, milestoneTitle } from "../src/engine/exp.js";
+import { thresholdForLevel, levelFromExp, milestoneTitle, DIMENSIONS } from "../src/engine/exp.js";
 import { successRate, weightedStatValue } from "../src/engine/check.js";
 import {
   newState, logExercise, addSteps, logSteps, pendingEventCount,
@@ -166,21 +166,41 @@ test("計時修煉:單次以 maxSessionMinutes 封頂", () => {
 
 test("logSteps:每日一次、單日封頂、兩萬步標記", () => {
   const s = newState();
-  const r1 = logSteps(s, 8000, "2026-08-14");
-  assert.deepEqual(r1, { applied: 8000, capped: false, warned: false });
-  assert.throws(() => logSteps(s, 100, "2026-08-14")); // 同日重複擋下
-  const r2 = logSteps(s, 99999, "2026-08-13");         // 封頂
+  const r1 = logSteps(s, data, 8000, "2026-08-14");
+  assert.equal(r1.applied, 8000);
+  assert.equal(r1.capped, false);
+  assert.equal(r1.warned, false);
+  assert.throws(() => logSteps(s, data, 100, "2026-08-14")); // 同日重複擋下
+  const r2 = logSteps(s, data, 99999, "2026-08-13");         // 封頂
   assert.equal(r2.applied, MAX_DAILY_STEPS);
   assert.ok(r2.capped && r2.warned);
-  const r3 = logSteps(s, WARN_DAILY_STEPS, "2026-08-12");
+  const r3 = logSteps(s, data, WARN_DAILY_STEPS, "2026-08-12");
   assert.ok(r3.warned && !r3.capped);
   assert.equal(s.steps.total, 8000 + MAX_DAILY_STEPS + WARN_DAILY_STEPS);
+});
+
+test("logSteps:走路也長六維——每步每維 +0.001(2026-08-21 定調)", () => {
+  const s = newState();
+  const perStep = data.exercises.walking.expPerStepPerDimension;
+  const r = logSteps(s, data, 10000, "2026-08-14");
+  for (const d of DIMENSIONS) {
+    assert.ok(Math.abs(s.exp[d] - 10000 * perStep) < 1e-9, `${d}=${s.exp[d]}`);
+    assert.ok(Math.abs(r.gains[d] - 10000 * perStep) < 1e-9);
+  }
+});
+
+test("logSteps:超過單日上限的部分不給經驗,也不給行動力", () => {
+  const s = newState();
+  const perStep = data.exercises.walking.expPerStepPerDimension;
+  logSteps(s, data, 99999, "2026-08-14");
+  assert.equal(s.steps.total, MAX_DAILY_STEPS);
+  assert.ok(Math.abs(s.exp.light - MAX_DAILY_STEPS * perStep) < 1e-9);
 });
 
 test("logSteps:舊存檔沒有 byDate 也能登記", () => {
   const s = newState();
   delete s.steps.byDate;
-  logSteps(s, 5000, "2026-08-14");
+  logSteps(s, data, 5000, "2026-08-14");
   assert.equal(s.steps.byDate["2026-08-14"], 5000);
   assert.equal(s.steps.total, 5000);
 });

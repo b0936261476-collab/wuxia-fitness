@@ -30,8 +30,8 @@ export function stopTraining(state, data, date, now) {
   const minutes = Math.min(max, Math.floor(trainingElapsedMs(state, now) / 60000));
   state.training = null;
   if (minutes < 1) return null;
-  const { effective, gains } = logExercise(state, data, exerciseId, minutes, date);
-  return { exerciseId, minutes, effective, gains };
+  const { effective, gains, actionSteps } = logExercise(state, data, exerciseId, minutes, date);
+  return { exerciseId, minutes, effective, gains, actionSteps };
 }
 
 /** 放棄本次計時,不登記任何量 */

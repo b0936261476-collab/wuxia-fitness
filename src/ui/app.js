@@ -754,14 +754,15 @@ function bindEvents() {
     if (selectedExercise()?.category === "minute") return; // 按分鐘一律走計時
     const amount = Number($("#exercise-amount").value);
     if (!(amount > 0)) return;
-    const { effective, gains } = logExercise(state, data, id, amount, today());
+    const { effective, gains, actionSteps } = logExercise(state, data, id, amount, today());
     save();
     const gainText = Object.entries(gains)
       .map(([d, v]) => `${dimName(d)} +${Math.round(v)}`)
       .join("、");
     const flash = $("#train-result");
     flash.hidden = false;
-    flash.textContent = `登記成功!有效量 ${Math.round(effective * 100) / 100},六維收穫:${gainText}`;
+    flash.textContent = `登記成功!有效量 ${Math.round(effective * 100) / 100},六維收穫:${gainText}。` +
+      `這趟折算 ${actionSteps.toLocaleString()} 步行動力,江湖路上又能多走幾里。`;
     $("#exercise-amount").value = "";
     afterAction();
   });
@@ -783,7 +784,8 @@ function bindEvents() {
       const gainText = Object.entries(res.gains)
         .map(([d, v]) => `${dimName(d)} +${Math.round(v)}`)
         .join("、");
-      flash.textContent = `收功!實練 ${res.minutes} 分鐘,有效量 ${Math.round(res.effective * 100) / 100},六維收穫:${gainText}`;
+      flash.textContent = `收功!實練 ${res.minutes} 分鐘,有效量 ${Math.round(res.effective * 100) / 100},` +
+        `六維收穫:${gainText}。這趟折算 ${res.actionSteps.toLocaleString()} 步行動力。`;
     }
     afterAction();
   });
@@ -803,7 +805,7 @@ function bindEvents() {
     const dayLabel = offset === 0 ? "今天" : "昨天";
     let res;
     try {
-      res = logSteps(state, amount, dateWithOffset(offset));
+      res = logSteps(state, data, amount, dateWithOffset(offset));
     } catch {
       alert(`${dayLabel}已經記過步數了。一日一記,莫要重複。`);
       return;
@@ -814,9 +816,10 @@ function bindEvents() {
     flash.hidden = false;
     let msg = `${dayLabel}記上了 ${res.applied.toLocaleString()} 步。`;
     if (res.capped) msg += `(單日最多採計 ${MAX_DAILY_STEPS.toLocaleString()} 步,超出不計)`;
+    if (res.gains) msg += ` 路也是功——六維各 +${Math.round(res.gains.light * 100) / 100}。`;
     if (res.warned) msg += " 日行兩萬步,俠士當真健步如飛!";
     flash.textContent = msg;
-    renderAll();
+    afterAction();
   });
 
   // 前行
@@ -948,7 +951,7 @@ function handleStepsParam() {
   const flash = $("#road-flash");
   flash.hidden = false;
   try {
-    const res = logSteps(state, raw, dateWithOffset(offset));
+    const res = logSteps(state, data, raw, dateWithOffset(offset));
     save();
     let msg = `健康 App 回報:${dayLabel}記上了 ${res.applied.toLocaleString()} 步。`;
     if (res.capped) msg += `(單日最多採計 ${MAX_DAILY_STEPS.toLocaleString()} 步,超出不計)`;
