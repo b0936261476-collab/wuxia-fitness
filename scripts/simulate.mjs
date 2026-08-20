@@ -73,7 +73,9 @@ function simulateOne(talents) {
     tickResourceRecovery(s, 24, date); // 隔夜自然恢復
     if (s.rebirth) { m.rebirths++; grindRebirth(s, date); continue; } // 重生日:專心試煉
     trainDaily(s, date);
-    try { logSteps(s, 8000, date); } catch { /* 不會發生:每日一次 */ }
+    // 每日一次,不會重複;真出錯要炸出來,不能吞——2026-08-21 就是被吞掉的
+    // 例外讓整個模擬悄悄少算了三十天的步數,報表卻照樣印得漂漂亮亮。
+    logSteps(s, data, 8000, date);
 
     let guard = 0;
     while (pendingEventCount(s) > 0 && !s.rebirth && guard++ < 20) {
