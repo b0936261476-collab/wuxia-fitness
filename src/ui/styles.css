@@ -290,6 +290,9 @@ select, input[type="number"], textarea {
   overflow-y: auto; /* 內容比螢幕高時(手機)可捲動,按鈕不會被切在畫面外 */
   -webkit-overflow-scrolling: touch;
 }
+#quiz-overlay[hidden] {
+  display: none; /* 關鍵:display:flex 會蓋過 hidden 屬性,必須明確關閉,否則視窗永遠擋在畫面上 */
+}
 .quiz-card {
   background: var(--card);
   border: 2px solid var(--border);
