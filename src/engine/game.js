@@ -265,7 +265,7 @@ export function logExercise(state, data, exerciseId, amount, date) {
 
 /** 匯率預設值(data/exercises.json 沒填時的後備;數值以資料檔為準) */
 export const DEFAULT_STEPS_PER_WEIGHT_POINT = 1.25;
-export const DEFAULT_WALK_EXP_PER_STEP = 0.001;
+export const DEFAULT_WALK_EXP_PER_STEP = 0.01;
 
 /**
  * 一筆運動折合多少「步」的行動力(§行動力,2026-08-21 定調)。
@@ -334,7 +334,7 @@ export function logSteps(state, data, amount, date) {
   state.steps.total += applied;
   state.steps.fromWalking = (state.steps.fromWalking ?? 0) + applied;
 
-  // 走路也練基本功(設計者定調 2026-08-21):每一步六維各 +0.001。
+  // 走路也練基本功(設計者定調 2026-08-21):每一步六維各 +0.01。
   // 算的是採計後的步數,超過單日上限的部分不給經驗也不給行動力。
   const perStep = data?.exercises?.walking?.expPerStepPerDimension ?? DEFAULT_WALK_EXP_PER_STEP;
   const perDim = applied * perStep;

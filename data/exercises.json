@@ -11,8 +11,8 @@
     "stepsPerWeightPoint": 1.25
   },
   "walking": {
-    "note": "走路也練基本功(設計者定調 2026-08-21):每走一步,六維各 +0.001 經驗。算的是當日採計後的步數,超過單日上限的部分不給。",
-    "expPerStepPerDimension": 0.001
+    "note": "走路也練基本功(設計者定調 2026-08-21):每走一步,六維各 +0.01 經驗(2026-08-21 設計者上調,原 0.001 差運動兩個數量級太不划算)。算的是當日採計後的步數,超過單日上限的部分不給。",
+    "expPerStepPerDimension": 0.01
   },
   "maxSessionMinutes": 180,
   "dimensions": [
