@@ -497,7 +497,7 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
     return finalize(state, data, pending, ev, { outcome: fameShort, resultText: fameShort.text }, todayStr, rng, finalizeHooks);
   }
 
-  // 無選項事件(序章/日常直敘):he.byFate 依命格分歧,或 he.text 直接收尾
+  // 無選項事件(序章/日常直敘):he.byFate 依命格分歧、he.byFlag 依抉擇紀錄分版本(L1回聲),或 he.text 直接收尾
   if ((ev.beats.cheng.choices || []).length === 0) {
     const he = ev.beats.he;
     if (he.byFate) {
@@ -505,6 +505,11 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
       const body = he.byFate[axis] ?? he.byFate.default;
       const text = body + (he.epilogue ? "\n\n" + he.epilogue : "");
       return finalize(state, data, pending, ev, { outcome: { effects: he.effects ?? {} }, resultText: text }, todayStr, rng, finalizeHooks);
+    }
+    if (he.byFlag) {
+      // 依序比對:第一個命中的 flag 版本;都沒中用 default(§9.11 L1 回聲——世界記得你做過的事)
+      const hit = he.byFlag.find((v) => v.flags.split("|").some((f) => state.flags[f])) ?? he.default;
+      return finalize(state, data, pending, ev, { outcome: hit, resultText: hit.text }, todayStr, rng, finalizeHooks);
     }
     return finalize(state, data, pending, ev, { outcome: he, resultText: he.text }, todayStr, rng, finalizeHooks);
   }

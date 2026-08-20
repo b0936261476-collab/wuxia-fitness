@@ -359,7 +359,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 件 + 序章教學 7 件全數入庫,編號一致", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 全數入庫,編號一致", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -368,10 +368,74 @@ test("自檢:正式庫 14 件 + 序章教學 7 件全數入庫,編號一致", ()
     "DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer",
     "CH-001_cheat_scale", "CH-002_street_duel",
     "DU-001_arm_wrestle_dock", "DU-002_wandering_staff",
-    "FO-001_cliff_herb", "FO-002_night_flute"
+    "FO-001_cliff_herb", "FO-002_night_flute",
+    "DA-005_teatime_gossip", "DA-006_woodsman_night", "DA-007_tightrope_walker",
+    "CH-003_drunkard_stall", "CH-004_overloaded_ferry", "CH-005_landslide",
+    "DU-003_river_diving", "DU-004_hunter_archery",
+    "FO-003_mist_lantern", "FO-004_night_fishfire"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
+});
+
+// ---------- B2 批次:回聲與路向 ----------
+
+test("DA-005 茶餘飯後:依秦大嫂線 flag 播對應版本(L1 回聲)", () => {
+  const mk = (flags) => {
+    const s = newState();
+    for (const f of flags) { s.flags[f] = true; }
+    s.flagDates = Object.fromEntries(flags.map((f) => [f, "2026-08-10"]));
+    s.journal.push({ n: 1, id: "1-1_lost_purse", date: "2026-08-10" });
+    s.steps = { total: 9000, resolved: 1, byDate: {} };
+    return s;
+  };
+
+  // 認錯版
+  const s1 = mk(["purse_confessed"]);
+  startNextEvent(s1, data, D0, rngFor(s1, "DA-005_teatime_gossip", D0));
+  const r1 = chooseOption(s1, data, null, D0);
+  assert.match(r1.entry.resultText, /肯回頭認帳/);
+
+  // 吞錢未還 → default 版(罵的人就坐在這裡)
+  const s2 = mk(["purse_pocketed"]);
+  startNextEvent(s2, data, D0, rngFor(s2, "DA-005_teatime_gossip", D0));
+  const r2 = chooseOption(s2, data, null, D0);
+  assert.match(r2.entry.resultText, /就坐在這裡/);
+
+  // 沒有任何秦大嫂線 flag → 事件根本不出現
+  const s3 = newState();
+  s3.steps = { total: 9000, resolved: 0, byDate: {} };
+  assert.ok(!eligibleEvents(s3, data, D0).some((c) => c.ev.eventId === "DA-005_teatime_gossip"));
+});
+
+test("B2 路向加權:選了走山路,山線事件權重提高", () => {
+  const s = newState();
+  s.flags.road_mountain = true;
+  s.steps = { total: 9000, resolved: 0, byDate: {} };
+  const candidates = eligibleEvents(s, data, D0);
+  const mountain = candidates.find((c) => c.ev.eventId === "DU-004_hunter_archery");
+  const town = candidates.find((c) => c.ev.eventId === "CH-003_drunkard_stall");
+  assert.equal(mountain.weight, 3); // 1 + road_mountain 2
+  assert.equal(town.weight, 1);     // road_town 未持有
+});
+
+test("FO-001 仰望版:低輕功玩家拿到險境文案,失敗懲罰加重", () => {
+  const s = newState();
+  s.flags.herb_rhyme_heard = true;
+  s.flagDates = { herb_rhyme_heard: D0 };
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  setLevel(s, "light", 2); // 2/12 < 0.5 → 仰望
+  s.steps = { total: 9000, resolved: 0, byDate: {} };
+  const max = { hp: 999999, qi: 999999, tili: 999999 };
+  s.resources = { ...max };
+  startNextEvent(s, data, D0, rngFor(s, "FO-001_cliff_herb", D0));
+  assert.equal(s.pendingEvent.form, "awe");
+  const view = presentEvent(s, data);
+  assert.match(view.qi, /閻王的帳/);
+  const res = chooseOption(s, data, "A", D0, () => 0.999); // 必失敗
+  assert.match(res.entry.resultText, /配不上它/);
+  assert.equal(s.resources.hp, 999999 - 1200); // 仰望失敗:重傷檔
 });
 
 // ---------- 序章三部曲 + 教學(M7 內容灌裝) ----------

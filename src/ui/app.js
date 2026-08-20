@@ -23,7 +23,7 @@ const TYPE_LABELS = {
 };
 const FORM_LABELS = { crush: "輾壓", awe: "險境" };
 
-const DATA_VERSION = "m7-4"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "b2-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media"];

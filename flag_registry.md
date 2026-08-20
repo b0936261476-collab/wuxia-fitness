@@ -80,3 +80,27 @@
 | dog_bridge | TU-003 A失敗 | 沉線 | 教科書式沉線——也許某天土狗會再出現,也許不會 |
 | temple_footprint | TU-005 A | 暗線 | 黑衣人線索之一(廟外半個腳印) |
 | saw_qunxialu | TU-006 | 暗線 | 已見過群俠錄榜文 |
+
+## B2 批次(DA-005 ~ FO-004,2026-08-20 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| heard_mountain_saying | DA-006 | 沉線 | 山裡行話「迷路找水」 |
+| woodsman_bow_seen | DA-006 察覺 | 暗線(睡眠) | 樵夫替誰養的弓?獵戶/黑衣線可認領 |
+| tightrope_kindness | DA-007 輾壓級 | 暗線 | 走索人的人情——被看見了還替他收著 |
+| drunkard_subdued | CH-003 A成功 | 暗線 | 醉漢=碼頭苦力,碼頭事件人情回聲候補 |
+| wonton_walked_by | CH-003 C | 沉線 | 糖葫蘆沒平時甜 |
+| gave_seat_medicine | CH-004 A | 暗線 | 抱藥婦人的人情,醫館/藥線可回收 |
+| ferryman_grudge | CH-004 C | 暗線(睡眠) | 被砸了買賣的艄公——那不是感激的眼神 |
+| caravan_friend | CH-005 A成功 | 暗線 | 商隊人脈(「考慮走鏢嗎?」) |
+| landslide_manmade | CH-005 B成功+察覺(深25) | **暗線(睡眠)** | 塌方是人為的——劫道線候補 |
+| river_respect | DU-003 A成功 | 暗線 | 渡口人脈,「水爺」回聲 |
+| river_prodigy_seen | DU-003 C | 暗線 | 江心蓑衣師父(留白)——水線人物候補 |
+| hunter_respect | DU-004 A/C成功 | 暗線 | 山線人脈;與 DA-006 樵夫的弓可互文 |
+| lantern_tune | FO-003 A成功 | 暗線 | 燈籠老人哼的老調——與「燈」意象同源留白 |
+| lantern_man_met | FO-003 C | **暗線(睡眠・高規格)** | 「有些霧,散不掉喔」——主線外圍,認領需設計者定奪 |
+| fisher_met | FO-004 A成功 | 暗線 | 老漁夫,聽水辨魚汛 |
+| fisher_song_heard | FO-004 B | 沉線 | 夢裡聽不懂的詞 |
+| river_rite_seen | FO-004 C | 暗線 | 江上法事為誰超度?水線懸案候補 |
+| cliff_conquered_weak | FO-001 仰望成功 | 暗線 | 以弱摘藥——採藥人都得敬三分 |
+| flute_membrane | FO-002 仰望成功 | 暗線 | 窗台上的斷笛膜——被注意到了 |
