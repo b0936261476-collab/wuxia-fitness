@@ -645,6 +645,13 @@ function onChoose(choiceId, isSub) {
   }
 }
 
+/** 存檔卡的提示列:用 alert 打斷玩家不划算,訊息留在畫面上比較好讀 */
+function saveFlash(message) {
+  const flash = $("#save-flash");
+  flash.hidden = false;
+  flash.textContent = message;
+}
+
 function bindEvents() {
   $("#narrative-next").addEventListener("click", showNextNarrative);
 
@@ -771,17 +778,48 @@ function bindEvents() {
 
   // 存檔
   $("#export-btn").addEventListener("click", () => {
-    $("#save-io").value = exportSave(state);
+    const box = $("#save-io");
+    box.value = exportSave(state);
+    box.focus();
+    box.select(); // 整段選起來,按 Ctrl+C 就走
+    $("#copy-btn").hidden = false;
+    saveFlash("進度已經匯出成下面這段文字。整段複製起來,收在記事本或傳給自己都行。");
   });
-  $("#import-btn").addEventListener("click", () => {
+
+  $("#copy-btn").addEventListener("click", async () => {
+    const text = $("#save-io").value;
+    if (!text) return;
     try {
-      state = importSave($("#save-io").value);
-      save();
-      renderAll();
-      alert("匯入成功。");
-    } catch (err) {
-      alert(`匯入失敗:${err.message}`);
+      await navigator.clipboard.writeText(text);
+      saveFlash("複製好了,貼到安全的地方收著。");
+    } catch {
+      // 瀏覽器不給複製(權限或非安全連線)就退回讓玩家自己按 Ctrl+C
+      $("#save-io").select();
+      saveFlash("這個瀏覽器不讓網頁自己複製。文字已經幫你選起來了,按 Ctrl+C(手機長按→複製)。");
     }
+  });
+
+  $("#import-btn").addEventListener("click", () => {
+    const text = $("#save-io").value.trim();
+    if (!text) {
+      saveFlash("方框是空的。要還原進度,先把之前匯出的那段文字貼進下面的方框,再按「匯入存檔」。" +
+        "如果你只是想備份,按的是左邊的「匯出存檔」。");
+      return;
+    }
+    if (!confirm("匯入會用這段存檔覆蓋掉目前的進度,而且救不回來。確定要匯入嗎?")) return;
+    let imported;
+    try {
+      imported = importSave(text);
+    } catch {
+      // JSON.parse 的原文是英文技術訊息,對玩家沒有意義,一律換成人話
+      saveFlash("這段文字不是有效的存檔——可能是貼漏了一段,或貼到了別的東西。" +
+        "請把匯出時那一整段(從頭到尾,含最前面的 { 和最後面的 })完整貼進來。");
+      return;
+    }
+    state = imported;
+    save();
+    renderAll();
+    saveFlash("匯入成功,進度已經換成這份存檔了。");
   });
   $("#reset-btn").addEventListener("click", () => {
     if (confirm("確定要重新開始?所有進度將清空,無法復原。")) {

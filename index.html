@@ -129,12 +129,16 @@
       </div>
       <div class="card">
         <h2>存檔</h2>
+        <p class="hint">進度平常就存在這台裝置的瀏覽器裡,不用手動存。下面這組是「搬家」用的:
+          換手機、換電腦、或怕瀏覽器資料被清掉時,先匯出收好,到新裝置再貼回去匯入。</p>
         <div class="save-actions">
           <button id="export-btn" class="btn">匯出存檔</button>
+          <button id="copy-btn" class="btn" hidden>複製</button>
           <button id="import-btn" class="btn">匯入存檔</button>
           <button id="reset-btn" class="btn danger">重新開始</button>
         </div>
-        <textarea id="save-io" rows="4" placeholder="匯出的存檔會顯示在這裡;匯入時把存檔貼進來再按「匯入存檔」"></textarea>
+        <div id="save-flash" class="flash" hidden></div>
+        <textarea id="save-io" rows="4" placeholder="按「匯出存檔」,你的進度會變成一長串文字出現在這裡,整段複製收好。&#10;要還原時,把那段文字貼回這個方框,再按「匯入存檔」。"></textarea>
       </div>
     </section>
   </main>
