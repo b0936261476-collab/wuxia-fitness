@@ -24,6 +24,7 @@
   <main>
     <!-- 俠客 -->
     <section id="tab-hero" class="panel active">
+      <div id="resource-box" class="card resource-box" hidden></div>
       <div id="stats-grid" class="stats-grid"></div>
       <div class="card muted-card">
         <p>累積步數:<strong id="hero-steps">0</strong> 步</p>
@@ -83,6 +84,7 @@
         <p>行動力:每 1000 步觸發一次事件。待觸發事件:<strong id="pending-count">0</strong></p>
         <button id="walk-btn" class="btn walk" disabled>前 行</button>
       </div>
+      <div id="rebirth-box" class="card rebirth-box" hidden></div>
       <div id="event-area"></div>
       <div class="card">
         <h2>江湖路歷程</h2>
@@ -124,6 +126,16 @@
       <p id="quiz-progress" class="quiz-progress"></p>
       <p id="quiz-question" class="quiz-question"></p>
       <div id="quiz-options" class="event-options"></div>
+    </div>
+  </div>
+
+  <!-- 狀態敘事(§4)與監使頒號(§8.7):文案在 data/narratives.json,由 app.js 排隊播放 -->
+  <div id="narrative-overlay" hidden translate="no" class="notranslate">
+    <div class="narrative-card">
+      <p id="narrative-kind" class="narrative-kind"></p>
+      <h2 id="narrative-title"></h2>
+      <div id="narrative-beats"></div>
+      <button type="button" class="btn primary" id="narrative-next">繼 續</button>
     </div>
   </div>
 

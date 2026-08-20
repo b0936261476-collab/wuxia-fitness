@@ -8,6 +8,7 @@ import { startEventV2, presentEventV2, chooseOptionV2, chooseSubV2, laborOnExerc
 import {
   allMax, applyDamage, recover, RECOVERY_RATE, TILI_EXERCISE_RECOVERY_MULTIPLIER
 } from "./resources.js";
+import { newNarrativeRecord } from "./narratives.js";
 import {
   newTrialProgress, recordTrialProgress, isTrialComplete,
   recoveredAttemptLevel, attemptBreakthrough
@@ -43,6 +44,8 @@ export function newState() {
     labor: null,               // 勞務折銀狀態(§9.11.4){active, startDate, dayPoints, fullDates, lastExerciseDate}
     pendingEvent: null,        // 進行中、待結算的事件(events2.js 生命週期)
     training: null,            // 計時修煉 {exerciseId, startedAt} 或 null
+    narrative: newNarrativeRecord(), // 敘事播放紀錄(§4 狀態四段式 / §8.7 監使頒號),避免重播
+    lastTickAt: null,          // 上次結算自然恢復的時戳(ms);離線期間的恢復靠它補算
     journal: []                // 江湖路歷程
   };
 }
@@ -107,6 +110,23 @@ export function tickResourceRecovery(state, hours, today) {
     state.resources.tili, max.tili, RECOVERY_RATE.tili, hours,
     exercisedToday ? TILI_EXERCISE_RECOVERY_MULTIPLIER : 1
   );
+}
+
+/**
+ * 補算離線期間的自然恢復。UI 只要在載入與定時器裡呼叫這一支,
+ * 三資源就會隨真實時間回血,不再是只降不升的單行道。
+ * @param {number} nowMs  現在時戳(Date.now())
+ * @param {string} today  今天日期字串(判斷「當日是否有運動」的體力加成)
+ * @returns {number} 這次補算了幾小時
+ */
+export function catchUpRecovery(state, nowMs, today) {
+  if (!state.resources) return 0;
+  if (state.lastTickAt == null) { state.lastTickAt = nowMs; return 0; }
+  const hours = (nowMs - state.lastTickAt) / 3600000;
+  if (!(hours > 0)) return 0;          // 時鐘被往回調就原地不動,不倒扣
+  tickResourceRecovery(state, hours, today);
+  state.lastTickAt = nowMs;
+  return hours;
 }
 
 // ---------- 重生(§5.1/§5.2) ----------

@@ -1,6 +1,7 @@
 // localStorage 存檔(僅瀏覽器使用)
 
-import { newState } from "./game.js";
+import { newState, resourcePercents } from "./game.js";
+import { primeNarrativeState } from "./narratives.js";
 
 const KEY = "wuxia-fitness-save-v1";
 
@@ -9,18 +10,25 @@ export function loadState() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return newState();
     const saved = JSON.parse(raw);
-    return migrate({ ...newState(), ...saved }); // 新欄位向下相容
+    return migrate({ ...newState(), ...saved }, saved); // 新欄位向下相容
   } catch {
     return newState();
   }
 }
 
-/** 事件庫 v2 遷移:舊格式的進行中事件已無法結算,退回該步讓玩家重抽 */
-function migrate(state) {
+/**
+ * 舊存檔遷移。
+ * ① 事件庫 v2:舊格式的進行中事件已無法結算,退回該步讓玩家重抽。
+ * ② 敘事播放紀錄:沒有這個欄位的存檔,把當下狀態當成「已播過」,
+ *    否則一載入就會把過去該播而未播的狀態/頒號敘事一次全倒出來。
+ * @param {object} saved 合併前的原始存檔,用來分辨欄位是「本來就有」還是 newState 補上的
+ */
+function migrate(state, saved) {
   if (state.pendingEvent && !state.pendingEvent.v2) {
     state.pendingEvent = null;
     state.steps.resolved = Math.max(0, state.steps.resolved - 1);
   }
+  if (!saved?.narrative) primeNarrativeState(state, resourcePercents(state));
   return state;
 }
 
@@ -35,7 +43,7 @@ export function exportSave(state) {
 export function importSave(json) {
   const parsed = JSON.parse(json);
   if (typeof parsed !== "object" || !parsed.exp) throw new Error("不是有效的存檔");
-  return migrate({ ...newState(), ...parsed });
+  return migrate({ ...newState(), ...parsed }, parsed);
 }
 
 export function resetSave() {

@@ -2,8 +2,11 @@
 
 import {
   logExercise, logSteps, pendingEventCount, startNextEvent, presentEvent,
-  chooseOption, chooseSub, useItem, levels, createCharacter, MAX_DAILY_STEPS
+  chooseOption, chooseSub, useItem, levels, createCharacter, MAX_DAILY_STEPS,
+  resourcePercents, resourceMax, catchUpRecovery, attemptRebirthCompletion
 } from "../engine/game.js";
+import { collectNarratives } from "../engine/narratives.js";
+import { SIX_TRIALS, isTrialComplete } from "../engine/rebirth.js";
 import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
 import { currentCoefficient } from "../engine/decay.js";
 import { startTraining, stopTraining, cancelTraining, trainingElapsedMs } from "../engine/training.js";
@@ -22,6 +25,18 @@ const TYPE_LABELS = {
   daily: "日常見聞", choice: "抉擇分支", duel: "對決切磋", fortune: "機緣奇遇"
 };
 const FORM_LABELS = { crush: "輾壓", awe: "險境" };
+
+const RESOURCE_META = [
+  { key: "hp",   name: "血量", hint: "受傷會掉,隨時間自然回復" },
+  { key: "qi",   name: "內力", hint: "運功會耗,恢復最快" },
+  { key: "tili", name: "體力", hint: "每場事件固定耗 100,當日有練功回復加快" }
+];
+// §4:一律「低於」(嚴格 <),與 resources.js 同一組門檻
+const TIER_LABEL = { light: "輕", heavy: "重" };
+const NARRATIVE_BEAT_LABELS = {
+  state:  ["覺", "察", "省", "變"],
+  bestow: ["起", "承", "轉", "合"]
+};
 
 const DATA_VERSION = "b2-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
@@ -60,10 +75,32 @@ function save() {
 
 function renderAll() {
   renderTitleLine();
+  renderResources();
   renderHero();
   renderTrain();
   renderRoad();
   renderBag();
+}
+
+/** 三資源條(§4)。創角前沒有 resources,整塊收起來。 */
+function renderResources() {
+  const box = $("#resource-box");
+  const percents = resourcePercents(state);
+  if (!percents) { box.hidden = true; return; }
+  box.hidden = false;
+  const max = resourceMax(state);
+  box.innerHTML = RESOURCE_META.map(({ key, name, hint }) => {
+    const pct = Math.max(0, Math.min(1, percents[key]));
+    const tier = pct < 0.10 ? "heavy" : pct < 0.30 ? "light" : null;
+    const badge = tier
+      ? `<span class="res-badge ${tier}">${TIER_LABEL[tier]}</span>` : "";
+    return `<div class="res-row">
+      <div class="res-head"><span class="res-name">${name}${badge}</span>
+        <span class="res-num">${Math.round(state.resources[key])} / ${Math.round(max[key])}</span></div>
+      <div class="bar"><div class="bar-fill res-${key} ${tier ?? ""}" style="width:${pct * 100}%"></div></div>
+      <div class="res-hint">${hint}</div>
+    </div>`;
+  }).join("");
 }
 
 function renderTitleLine() {
@@ -186,14 +223,50 @@ function renderTodayLog() {
 function renderRoad() {
   const pending = pendingEventCount(state);
   $("#pending-count").textContent = pending;
-  $("#walk-btn").disabled = pending <= 0 && !state.pendingEvent;
+  $("#walk-btn").disabled = !!state.rebirth || (pending <= 0 && !state.pendingEvent);
   const bd = state.steps.byDate || {};
   const t = bd[today()], y = bd[dateWithOffset(-1)];
   $("#steps-status").textContent =
     `今天:${t != null ? `已記 ${t.toLocaleString()} 步` : "未記"}|昨天:${y != null ? `已記 ${y.toLocaleString()} 步` : "未記"}` +
     `(每日一次,單日最多採計 ${MAX_DAILY_STEPS.toLocaleString()} 步)`;
+  renderRebirth();
   renderEventArea();
   renderJournal();
+}
+
+/** 重生(§5.1):血量歸零後擋住江湖路,練完六大試煉才起得來 */
+function renderRebirth() {
+  const box = $("#rebirth-box");
+  if (!state.rebirth) { box.hidden = true; return; }
+  box.hidden = false;
+  const prog = state.rebirth.progress;
+  const done = isTrialComplete(prog);
+  const rows = SIX_TRIALS.map((t) => {
+    const raw = prog[t.exerciseId] ?? 0;
+    const ok = raw >= t.target;
+    return `<div class="trial-row ${ok ? "done" : ""}">
+      <span>${ok ? "✔" : "・"} ${t.label}</span>
+      <span>${Math.floor(Math.min(raw, t.target))} / ${t.target}</span>
+    </div>`;
+  }).join("");
+  box.innerHTML = `<h2>倒下之後</h2>
+    <p class="rebirth-text">血流盡了,人卻還沒散。你被拖回一間破屋,躺了不知多久。要重新站上江湖路,
+      得先讓這副身子認得自己——六大試煉,一項一項練回來。</p>
+    <div class="trial-list">${rows}</div>
+    <p class="hint">試煉算的是你實際登記的原始運動量(不扣遞減),可以分很多次累積。練功照常記就是了。</p>
+    ${done
+      ? `<button type="button" class="btn primary" id="rebirth-btn">起 身</button>`
+      : `<p class="hint">六項全滿才起得來。這段期間走再多路,江湖也不會有事找上你。</p>`}`;
+  if (done) {
+    $("#rebirth-btn").addEventListener("click", () => {
+      const res = attemptRebirthCompletion(state, today());
+      if (!res) return;
+      alert(res.success
+        ? "你撐著牆站起來,才發現這副筋骨比倒下之前更耐折騰。這一趟疼,沒有白疼。"
+        : "傷是好了,人還是那個人。你拍拍身上的土,推門出去——外頭天正亮著。");
+      afterAction();
+    });
+  }
 }
 
 function paragraphs(text, cls) {
@@ -297,6 +370,12 @@ function renderJournal() {
     if (e.type === "fate") {
       return `<div class="journal-entry"><div class="j-head">命格</div><div class="j-result">${e.text}</div></div>`;
     }
+    if (e.type === "state" || e.type === "bestow") {
+      const head = e.type === "bestow" ? "司天監 ‧ 頒號" : "身上的狀況";
+      return `<div class="journal-entry ${e.type}"><div class="j-head">${head}</div>
+        <div><strong>${e.title}</strong></div>
+        <div class="j-result">${(e.resultText || "").split("\n")[0]}</div></div>`;
+    }
     const tag = TYPE_LABELS[e.type] ?? e.type;
     const outcome = e.success === true ? "(成功)" : e.success === false ? "(失敗)" : "";
     return `<div class="journal-entry">
@@ -339,8 +418,7 @@ function renderBag() {
         } else {
           alert("現在用不上這個。留著吧,江湖路長。");
         }
-        save();
-        renderAll();
+        afterAction();
       })
     );
   }
@@ -369,6 +447,50 @@ function renderBag() {
   }
 }
 
+// ---------- 敘事播放(§4 狀態四段式 / §8.7 監使頒號) ----------
+
+let narrativeQueue = [];
+
+/** 把此刻該播的敘事收進隊列,同時寫一筆歷程供事後回看。回傳有沒有東西要播。 */
+function queueNarratives() {
+  const pending = collectNarratives(state, data, resourcePercents(state));
+  if (!pending.length) return false;
+  for (const item of pending) {
+    state.journal.push({
+      n: state.steps.resolved,
+      type: item.kind === "bestow" ? "bestow" : "state",
+      title: item.name,
+      resultText: item.beats.filter(Boolean).join("\n")
+    });
+  }
+  narrativeQueue.push(...pending);
+  return true;
+}
+
+function showNextNarrative() {
+  const overlay = $("#narrative-overlay");
+  const item = narrativeQueue.shift();
+  if (!item) { overlay.hidden = true; return; }
+  const labels = NARRATIVE_BEAT_LABELS[item.kind];
+  $("#narrative-kind").textContent = item.kind === "bestow" ? "司天監 ‧ 頒號" : "身上的狀況";
+  $("#narrative-title").textContent = item.name;
+  $("#narrative-beats").innerHTML = item.beats.filter(Boolean).map((t, i) =>
+    `<p class="narrative-beat${i === labels.length - 1 ? " last" : ""}">
+       <span class="beat-label">${labels[i] ?? ""}</span>${t}</p>`
+  ).join("");
+  $("#narrative-next").textContent = narrativeQueue.length ? "繼 續" : "知道了";
+  overlay.hidden = false;
+  playSfx(item.kind === "bestow" ? "judgeSuccess" : "judgeFail");
+}
+
+/** 動過資源或經驗的操作,收尾都走這裡:排敘事 → 存檔 → 重畫 → 播 */
+function afterAction() {
+  const has = queueNarratives();
+  save();
+  renderAll();
+  if (has) showNextNarrative();
+}
+
 // ---------- 操作 ----------
 
 function onChoose(choiceId, isSub) {
@@ -381,14 +503,19 @@ function onChoose(choiceId, isSub) {
     if (result.entry.success === true) playSfx("judgeSuccess");
     else if (result.entry.success === false) playSfx("judgeFail");
     playBgm({ tab: "road" }); // 事件結束,回到分頁曲
+    const hasNarrative = queueNarratives();
+    save();
     renderAll();
-    renderEventArea(result.entry);
+    renderEventArea(result.entry); // 須排在 renderAll 之後,否則結果卡會被蓋掉
+    if (hasNarrative) showNextNarrative();
   } else {
     renderEventArea(); // 進入巢狀抉擇,重新渲染第二層選項
   }
 }
 
 function bindEvents() {
+  $("#narrative-next").addEventListener("click", showNextNarrative);
+
   // 分頁
   $("#tabs").addEventListener("click", (e) => {
     const btn = e.target.closest(".tab");
@@ -431,7 +558,7 @@ function bindEvents() {
     flash.hidden = false;
     flash.textContent = `登記成功!有效量 ${Math.round(effective * 100) / 100},六維收穫:${gainText}`;
     $("#exercise-amount").value = "";
-    renderAll();
+    afterAction();
   });
 
   // 計時修煉
@@ -453,7 +580,7 @@ function bindEvents() {
         .join("、");
       flash.textContent = `收功!實練 ${res.minutes} 分鐘,有效量 ${Math.round(res.effective * 100) / 100},六維收穫:${gainText}`;
     }
-    renderAll();
+    afterAction();
   });
   $("#timer-cancel").addEventListener("click", () => {
     if (!confirm("確定放棄本次修煉?計時將不會登記。")) return;
@@ -489,6 +616,12 @@ function bindEvents() {
 
   // 前行
   $("#walk-btn").addEventListener("click", () => {
+    if (state.rebirth) {
+      const flash = $("#road-flash");
+      flash.hidden = false;
+      flash.textContent = "這副身子還躺著呢。六大試煉練完再說。";
+      return;
+    }
     if (state.pendingEvent) {
       renderEventArea();
       return;
@@ -639,6 +772,8 @@ function finishQuiz() {
     return;
   }
   state = loadState();
+  catchUpRecovery(state, Date.now(), today()); // 關掉網頁的這段時間,傷該好的就好了(§4)
+  saveState(state);
   initMedia(data.media); // 音樂/畫面掛載(media.json 全空 = 靜默停用)
   const headerBg = headerImage();
   if (headerBg) {
@@ -652,4 +787,9 @@ function finishQuiz() {
   renderAll();
   playBgm({ tab: "hero" });
   if (!state.talents) startQuiz(); // 未創角:先做心理測驗(§1.2),測完才上路
+
+  // 開著網頁不動也會慢慢回復:每分鐘結算一次,只重畫資源條
+  setInterval(() => {
+    if (catchUpRecovery(state, Date.now(), today()) > 0) { save(); renderResources(); }
+  }, 60000);
 })();
