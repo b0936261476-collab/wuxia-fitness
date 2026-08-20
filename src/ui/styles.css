@@ -500,3 +500,21 @@ select, input[type="number"], textarea {
 }
 .s-rank { color: var(--gold); font-variant-numeric: tabular-nums; width: 3.5em; }
 .journal-entry.surpass .j-head { color: var(--gold); }
+
+/* ===== 存檔卡 ===== */
+.save-advanced {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.save-advanced summary {
+  cursor: pointer;
+  color: var(--ink-light);
+  font-size: 0.88rem;
+  margin-bottom: 10px;
+}
+.save-actions.danger-row {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}

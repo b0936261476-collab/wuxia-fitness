@@ -777,6 +777,44 @@ function bindEvents() {
   });
 
   // 存檔
+  // 存成檔案:最省事的搬家方式,不必自己複製一長串文字
+  $("#download-btn").addEventListener("click", () => {
+    const blob = new Blob([exportSave(state)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `一步一江湖-存檔-${today()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    saveFlash(`存檔已經下載成檔案「${a.download}」,通常會在「下載」資料夾裡。` +
+      "把它丟到雲端硬碟或傳給自己,換裝置時用「讀取存檔檔案」讀回來就好。");
+  });
+
+  $("#load-btn").addEventListener("click", () => $("#load-file").click());
+
+  $("#load-file").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // 清掉才能連續選同一個檔案
+    if (!file) return;
+    let imported;
+    try {
+      imported = importSave(await file.text());
+    } catch {
+      saveFlash(`「${file.name}」讀不出進度——可能不是這個遊戲的存檔,或檔案在傳送途中壞了。`);
+      return;
+    }
+    if (!confirm(`要用「${file.name}」覆蓋目前的進度嗎?蓋掉之後救不回來。`)) {
+      saveFlash("已取消,目前的進度沒有被動到。");
+      return;
+    }
+    state = imported;
+    save();
+    renderAll();
+    saveFlash(`已經讀入「${file.name}」,進度換成這份存檔了。`);
+  });
+
   $("#export-btn").addEventListener("click", () => {
     const box = $("#save-io");
     box.value = exportSave(state);
