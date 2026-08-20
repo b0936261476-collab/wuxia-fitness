@@ -37,7 +37,7 @@ export function newState() {
     reputation: newReputation(), // 俠名/惡名雙軌(§9.6),不依賴創角,從第一步就可累積
     lastKnownRank: null,       // 上次「得知」的群俠錄名次(§9.7/§9.9);沒看過榜文就是 null
     rankSeen: null,            // 上次得知名次的時機 {date, source:"榜文"|"監使"},供 UI 說明數字有多舊
-    daily: { date: null, byExercise: {} }, // 當天各項目累積原始量(隔日歸零)
+    daily: { date: null, byExercise: {}, exp: 0, weightSteps: 0, actionSteps: 0 }, // 當天各項目累積原始量、有效經驗、行動力折算(隔日歸零)
     records: [],               // 練功紀錄
     steps: { total: 0, resolved: 0, byDate: {}, fromWalking: 0, fromExercise: 0 }, // resolved = 已觸發事件數;byDate = 各日已登記步數;兩個 from* 是行動力來源分帳
     inventory: {},             // {itemId: count}
@@ -237,10 +237,14 @@ export function logExercise(state, data, exerciseId, amount, date) {
   }
   addExp(state, gains, data);
 
-  // 運動換行動力(設計者定調 2026-08-21):遞減後的有效量 × 六維權重和 × 匯率。
-  // 用有效量而非申報量,狂練同一項會吃到遞減,灌不出行動力。
-  const actionSteps = exerciseStepEquivalent(ex, eff, data);
+  // 運動換行動力(設計者定調 2026-08-21)。以「當日」為單位重算應得總量,再補差額。
+  const gainSum = Object.values(gains).reduce((a, b) => a + b, 0);
+  state.daily.exp = (state.daily.exp ?? 0) + gainSum;
+  state.daily.weightSteps = (state.daily.weightSteps ?? 0) + exerciseStepEquivalent(ex, eff, data);
+  const entitled = dailyActionStepEntitlement(state, data);
+  const actionSteps = Math.max(0, entitled - (state.daily.actionSteps ?? 0));
   if (actionSteps > 0) {
+    state.daily.actionSteps = entitled;
     state.steps.total += actionSteps;
     state.steps.fromExercise = (state.steps.fromExercise ?? 0) + actionSteps;
   }
@@ -278,9 +282,28 @@ export function exerciseStepEquivalent(ex, eff, data) {
   return Math.round((eff / ex.unitSize) * weightSum * rate);
 }
 
+/**
+ * 當日運動總共該換到多少行動力(設計者定調 2026-08-21「認真練功保底」)。
+ *
+ * 取兩者的較大者:
+ *   ① 權重折算 —— 當日各筆 exerciseStepEquivalent 的累加
+ *   ② 認真練功保底 —— floor.steps × min(1, 當日有效經驗 ÷ 門檻)
+ *
+ * ② 按比例給而非一刀切,是為了不出現「差一點點就完全沒有」的斷崖;
+ * 而因為分子是遞減後的有效經驗,「隨便動兩下」也領不到多少。
+ * 重訓、瑜珈這類六維權重天生就低的運動靠 ② 補足;本來就換得多的有氧走 ①,不受影響。
+ */
+export function dailyActionStepEntitlement(state, data) {
+  const weightSteps = state.daily?.weightSteps ?? 0;
+  const floor = data.exercises?.actionPoints?.dailyFloor;
+  if (!floor?.steps || !(floor.effectiveExpThreshold > 0)) return Math.round(weightSteps);
+  const ratio = Math.min(1, (state.daily?.exp ?? 0) / floor.effectiveExpThreshold);
+  return Math.round(Math.max(weightSteps, floor.steps * ratio));
+}
+
 function rolloverDaily(state, date) {
   if (state.daily.date !== date) {
-    state.daily = { date, byExercise: {} };
+    state.daily = { date, byExercise: {}, exp: 0, weightSteps: 0, actionSteps: 0 };
   }
 }
 
