@@ -76,12 +76,13 @@ test("npcs.json:#11-100皆有surpassReaction(十強走真容事件,不用此表)
 // ---------- §9.7 levelSum 生成 ----------
 
 test("bandLevelSum:排名帶內線性插值,數字小(靠前)levelSum高", () => {
-  assert.equal(bandLevelSum(1, data.npcs.rankBandLevelSum), 1200);
-  const v2 = bandLevelSum(2, data.npcs.rankBandLevelSum); // "2-3":[1050,1100]
+  const [lo23, hi23] = data.npcs.rankBandLevelSum["2-3"];
+  assert.equal(bandLevelSum(1, data.npcs.rankBandLevelSum), data.npcs.rankBandLevelSum["1"][0]);
+  const v2 = bandLevelSum(2, data.npcs.rankBandLevelSum);
   const v3 = bandLevelSum(3, data.npcs.rankBandLevelSum);
   assert.ok(v2 > v3);
-  assert.ok(Math.abs(v2 - 1100) < 1e-9);
-  assert.ok(Math.abs(v3 - 1050) < 1e-9);
+  assert.ok(Math.abs(v2 - hi23) < 1e-9);
+  assert.ok(Math.abs(v3 - lo23) < 1e-9);
 });
 
 test("jitteredLevelSum:±3%範圍內", () => {
@@ -100,7 +101,7 @@ test("generateNpcLevelSum:組合帶內插值+抖動", () => {
 // ---------- §9.7.1 萬人總冊排名估算 ----------
 
 test("estimateRankForLevelSum:levelSum在百強帶內時精確對到該排名", () => {
-  assert.equal(estimateRankForLevelSum(1200, data.npcs.rankBandLevelSum), 1);
+  assert.equal(estimateRankForLevelSum(data.npcs.rankBandLevelSum["1"][0], data.npcs.rankBandLevelSum), 1);
 });
 
 test("estimateRankForLevelSum:levelSum=0(創角剛開始)落在總冊尾端(§9.7.1 #900,000 開外)", () => {
@@ -126,14 +127,20 @@ test("中段最擠:levelSum 從 96 到 138,名次推進遠快過從 0 到 40", (
   assert.ok((r(96) - r(138)) > (r(0) - r(40)) * 100, "S 型分布的中段就是要擠");
 });
 
-test("摸到百強門檻(levelSum 150)才進得了前 100", () => {
-  assert.ok(estimateRankForLevelSum(149, data.npcs.rankBandLevelSum) > 100);
-  assert.ok(estimateRankForLevelSum(150, data.npcs.rankBandLevelSum) <= 100);
+test("差一點就是差一點:沒摸到百強門檻就進不了前 100", () => {
+  const top100 = data.npcs.rankBandLevelSum["91-100"][0];
+  assert.ok(estimateRankForLevelSum(top100 - 1, data.npcs.rankBandLevelSum) > 100);
+  assert.ok(estimateRankForLevelSum(top100, data.npcs.rankBandLevelSum) <= 100);
 });
 
-test("estimateRankForLevelSum:百強門檻(levelSum 165)仍然對到第 100 名附近——放大總冊不動百強", () => {
-  const rank = estimateRankForLevelSum(165, data.npcs.rankBandLevelSum);
-  assert.ok(rank <= 100 && rank >= 90, `rank=${rank}`);
+test("estimateRankForLevelSum:摸到百強門檻就進得了前 100", () => {
+  const top100 = data.npcs.rankBandLevelSum["91-100"][0];
+  const rank = estimateRankForLevelSum(top100, data.npcs.rankBandLevelSum);
+  assert.ok(rank <= 100, `rank=${rank}`);
+});
+
+test("天下第一的門檻:兩年份的苦練(§9.7.3 2026-08-21 校準)", () => {
+  assert.equal(estimateRankForLevelSum(data.npcs.rankBandLevelSum["1"][0], data.npcs.rankBandLevelSum), 1);
 });
 
 test("percentileForRank:第1名百分位最高,最後一名接近0", () => {

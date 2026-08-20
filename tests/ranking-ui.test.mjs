@@ -85,7 +85,7 @@ test("revealRanking:超越具名百強 → flag 落地、俠名入帳、只算�
   const state = newState();
   revealRanking(state, data); // 第一次看榜只是對時,不視為跨越
   const gains = {};
-  for (const d of DIMENSIONS) gains[d] = thresholdForLevel(30);
+  for (const d of DIMENSIONS) gains[d] = thresholdForLevel(50); // 六維各 Lv.50 → levelSum 300,已在百強帶內
   addExp(state, gains, data);
 
   const result = revealRanking(state, data);
