@@ -205,6 +205,54 @@
       }
     },
     {
+      "id": "shenzhan",
+      "name": "伸展拉筋",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 30,
+      "weights": {
+        "inner": 10,
+        "soft": 30
+      }
+    },
+    {
+      "id": "taiji",
+      "name": "太極",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 30,
+      "weights": {
+        "light": 5,
+        "inner": 30,
+        "soft": 25
+      }
+    },
+    {
+      "id": "pilates",
+      "name": "皮拉提斯",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "inner": 15,
+        "hard": 25,
+        "soft": 25
+      }
+    },
+    {
+      "id": "wudao",
+      "name": "舞蹈",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "light": 30,
+        "inner": 20,
+        "soft": 30,
+        "ear": 20
+      }
+    },
+    {
       "id": "lanqiu",
       "name": "籃球",
       "category": "minute",
