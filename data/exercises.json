@@ -195,6 +195,19 @@
       }
     },
     {
+      "id": "quanfa",
+      "name": "拳法練習",
+      "category": "minute",
+      "unitSize": 1,
+      "tierSize": 20,
+      "weights": {
+        "light": 25,
+        "inner": 25,
+        "hard": 20,
+        "eye": 30
+      }
+    },
+    {
       "id": "yujia",
       "name": "瑜珈",
       "category": "minute",
