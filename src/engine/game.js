@@ -14,7 +14,9 @@ import {
   recoveredAttemptLevel, attemptBreakthrough
 } from "./rebirth.js";
 import { equippedTitle } from "./titles.js";
-import { playerRankSnapshot, integerMilestonesCrossed, surpassedNpcs, surpassFameReward } from "./npcs.js";
+import {
+  playerRankSnapshot, integerMilestonesCrossed, surpassedNpcs, surpassFameReward, revealsRanking
+} from "./npcs.js";
 import { newReputation, addFame } from "./reputation.js";
 
 export const STEPS_PER_EVENT = 1000;
@@ -33,7 +35,8 @@ export function newState() {
     milestones: {},            // 已解鎖里程碑索引(永久,不隨扣分消失){dim: maxIndex}
     balancedMilestone: -1,     // 已解鎖均衡里程碑索引(§8.3,永久,-1=尚未解鎖)
     reputation: newReputation(), // 俠名/惡名雙軌(§9.6),不依賴創角,從第一步就可累積
-    lastKnownRank: null,       // 上次快照的群俠錄排名(§9.7/§9.9,用於偵測跨越整數關口/超越NPC)
+    lastKnownRank: null,       // 上次「得知」的群俠錄名次(§9.7/§9.9);沒看過榜文就是 null
+    rankSeen: null,            // 上次得知名次的時機 {date, source:"榜文"|"監使"},供 UI 說明數字有多舊
     daily: { date: null, byExercise: {} }, // 當天各項目累積原始量(隔日歸零)
     records: [],               // 練功紀錄
     steps: { total: 0, resolved: 0, byDate: {} }, // resolved = 已觸發事件數;byDate = 各日已登記步數
@@ -174,14 +177,24 @@ export function playerLevelSum(state) {
 }
 
 /**
- * 更新排名快照;若名次提升,偵測本次跨越的整數關口(§9.9萬人區)與超越的具名NPC(§9.9),
- * 超越NPC首次觸發時發俠名獎勵並記flag(供敘事引用)。
+ * 得知名次(§9.7/§9.9)。
+ *
+ * 設計者定調(2026-08-21):名次不是隨時可查的資料——玩家得在城裡看到榜文、
+ * 或遇上司天監的人,才會知道自己排第幾。這一支就是「那一刻」:它把真實名次
+ * 寫進 state.lastKnownRank,並結算從上次得知到現在跨越的整數關口與超越的具名 NPC。
+ *
+ * 俠名也在這一刻才入帳,而不是在超越發生的當下——這正是 §9.6.1 的見證原則:
+ * 聲望只在有人知道時變動。你壓過了誰,得等榜文貼出來,江湖才算數。
+ *
  * 需要 data.npcs(data/npcs.json);data.npcs 不存在時直接跳過(維持向後相容,不報錯)。
+ * @param {string} [todayStr] 得知的日期
+ * @param {"榜文"|"監使"} [source] 得知管道
  */
-export function updateRanking(state, data) {
+export function revealRanking(state, data, todayStr = null, source = null) {
   if (!data.npcs) return null;
   const snapshot = playerRankSnapshot(levelSum(state), data.npcs);
-  const prevRank = state.lastKnownRank ?? snapshot.rank; // 首次呼叫視為無跨越
+  const firstTime = state.lastKnownRank == null;
+  const prevRank = state.lastKnownRank ?? snapshot.rank; // 第一次看榜:只是知道自己在哪,沒有「跨越」
   const milestonesCrossed = integerMilestonesCrossed(prevRank, snapshot.rank);
   const surpassed = surpassedNpcs(prevRank, snapshot.rank, data.npcs);
   const newlySurpassed = [];
@@ -194,7 +207,14 @@ export function updateRanking(state, data) {
     }
   }
   state.lastKnownRank = snapshot.rank;
-  return { ...snapshot, milestonesCrossed, surpassed: newlySurpassed };
+  if (todayStr) state.rankSeen = { date: todayStr, source: source ?? "榜文" };
+  return { ...snapshot, prevRank, firstTime, milestonesCrossed, surpassed: newlySurpassed };
+}
+
+/** 這個事件會不會讓玩家看到榜文/遇到監使;回傳得知管道或 null */
+export function rankingRevealOf(entry, data) {
+  const ev = data.events?.pool?.find((e) => e.eventId === entry.id);
+  return revealsRanking(ev?.tagBlock);
 }
 
 // ---------- 練功 ----------
@@ -324,7 +344,11 @@ function finalizeHooks(state, data) {
       // §8.5 自動配戴:有判定維度→配該維里程碑稱號;否則配群俠錄/均衡
       const checkStats = entry.judgedDim ? { [entry.judgedDim]: 1 } : undefined;
       entry.equippedTitle = equippedTitle(s, data, checkStats).title;
-      entry.ranking = updateRanking(s, data);
+      // 名次只在「看得到榜」的事件裡揭曉(§9.9 得知管道);其餘事件一律不動名次,
+      // 玩家頁面上的數字就停在上次看榜的那一刻。
+      const via = rankingRevealOf(entry, data);
+      entry.rankingRevealedBy = via;
+      entry.ranking = via ? revealRanking(s, data, entry.date, via) : null;
     },
     onDeath: (s) => {
       if (!s.rebirth) s.rebirth = { progress: newTrialProgress() };

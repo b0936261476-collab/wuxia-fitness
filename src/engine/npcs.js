@@ -2,6 +2,35 @@
 // 純邏輯、無 DOM。百強具名資料在 data/npcs.json(內容權威來源見該檔 note),
 // 本檔案負責:①依排名帶生成 levelSum(§9.7.3/§9.7.7) ②玩家排名/百分位估算(§9.7.1/§8.1)。
 
+/** 天下總冊人數(§9.7.1)。有名有姓的只有前 100 名,其餘是背景人海。 */
+export const LEDGER_SIZE = 1000000;
+
+/** 總冊區整數關口級距(§9.9)。與總冊人數同比例:百萬冊每五萬名一道坎。 */
+export const MILESTONE_STEP = 50000;
+
+/**
+ * 城鎮類地域——榜文張貼在這些地方(設計者定調 2026-08-21:
+ * 名次不是隨時可查的資料,得進城看到榜文、或遇上司天監的人才會知道)。
+ */
+export const TOWN_REGIONS = [
+  "中原小鎮", "鎮口", "夜市", "廟會", "告示牆", "米行", "官道茶棚", "茶攤"
+];
+
+/**
+ * 這個事件會不會讓玩家「得知自己的名次」,回傳得知管道或 null。
+ *   監使 —— 事件裡有司天監的人(含遠觀)
+ *   榜文 —— 掛〔排行相關〕標籤,或發生在張貼榜文的城鎮地域
+ * @param {object} tagBlock 事件的 tagBlock
+ * @returns {"監使"|"榜文"|null}
+ */
+export function revealsRanking(tagBlock) {
+  if (!tagBlock) return null;
+  if ((tagBlock.character ?? []).some((c) => c.includes("司天監"))) return "監使";
+  if ((tagBlock.event ?? []).includes("排行相關")) return "榜文";
+  if ((tagBlock.region ?? []).some((r) => TOWN_REGIONS.includes(r))) return "榜文";
+  return null;
+}
+
 /**
  * 依 rankBandLevelSum(data/npcs.json)算出某排名的基準 levelSum,
  * 帶內線性插值(排名帶內數字較小=排名較後=levelSum較低)。
@@ -49,13 +78,13 @@ export function generateNpcLevelSum(rank, bands, rng = Math.random) {
  */
 const TAIL_ANCHORS = [
   { rank: 100, levelSum: 165 },
-  { rank: 1000, levelSum: 60 },
-  { rank: 9000, levelSum: 0.5 },
-  { rank: 10000, levelSum: 0 }
+  { rank: 100000, levelSum: 60 },
+  { rank: 900000, levelSum: 0.5 },
+  { rank: 950000, levelSum: 0 }   // levelSum 0 的人是一大群並列,排在這群人中間;不會「全天下最後一名」
 ];
 
 /** 依萬人總冊錨點,反推「levelSum → 約略排名」(用於玩家排名估算,非精確值)。 */
-export function estimateRankForLevelSum(levelSum, bands, ledgerSize = 10000) {
+export function estimateRankForLevelSum(levelSum, bands, ledgerSize = LEDGER_SIZE) {
   if (levelSum >= bandLevelSum(1, bands)) return 1;
   for (let rank = 1; rank <= 100; rank++) {
     if (levelSum >= bandLevelSum(rank, bands)) return rank;
@@ -73,7 +102,7 @@ export function estimateRankForLevelSum(levelSum, bands, ledgerSize = 10000) {
 }
 
 /** 依排名算百分位(贏過多少比例的人,0~1),§8.1 群俠錄用 */
-export function percentileForRank(rank, ledgerSize = 10000) {
+export function percentileForRank(rank, ledgerSize = LEDGER_SIZE) {
   return 1 - (rank - 1) / ledgerSize;
 }
 
@@ -95,7 +124,7 @@ export function rankingTierIndexForPercentile(percentile, isRank1 = false) {
  * @returns {{rank:number, percentile:number, tierIndex:number}}
  */
 export function playerRankSnapshot(playerLevelSum, npcsData) {
-  const ledgerSize = npcsData.totalLedger?.size ?? 10000;
+  const ledgerSize = npcsData.totalLedger?.size ?? LEDGER_SIZE;
   const rank = estimateRankForLevelSum(playerLevelSum, npcsData.rankBandLevelSum, ledgerSize);
   const percentile = percentileForRank(rank, ledgerSize);
   const tierIndex = rankingTierIndexForPercentile(percentile, rank === 1);
@@ -119,7 +148,7 @@ export function namedNpcAtRank(rank, npcsData) {
  *
  * @returns {number[]} 由高到低排序,本次跨越的所有整數關口(可能一次跨多個)
  */
-export function integerMilestonesCrossed(prevRank, newRank, step = 500) {
+export function integerMilestonesCrossed(prevRank, newRank, step = MILESTONE_STEP) {
   if (newRank >= prevRank) return [];
   const milestones = [];
   const highest = Math.floor((prevRank - 1) / step) * step; // 小於 prevRank 的最大關口
@@ -148,7 +177,7 @@ export function nextNamedNpcAbove(rank, npcsData) {
  * 萬人區下一個整數關口(§9.9,每 step 名一道坎)。
  * 已經在第一道坎之內(rank <= step)時回 null——那時候該看的是百強,不是關口。
  */
-export function nextIntegerMilestone(rank, step = 500) {
+export function nextIntegerMilestone(rank, step = MILESTONE_STEP) {
   if (rank <= step) return null;
   return Math.floor((rank - 1) / step) * step;
 }

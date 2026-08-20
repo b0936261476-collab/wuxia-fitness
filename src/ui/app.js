@@ -4,12 +4,12 @@ import {
   logExercise, logSteps, pendingEventCount, startNextEvent, presentEvent,
   chooseOption, chooseSub, useItem, levels, createCharacter, MAX_DAILY_STEPS,
   resourcePercents, resourceMax, catchUpRecovery, attemptRebirthCompletion,
-  playerLevelSum, updateRanking
+  playerLevelSum, revealRanking
 } from "../engine/game.js";
 import { collectNarratives } from "../engine/narratives.js";
 import {
-  playerRankSnapshot, namedNpcAtRank, nextNamedNpcAbove, nextIntegerMilestone,
-  surpassTier, surpassFameReward
+  namedNpcAtRank, nextNamedNpcAbove, nextIntegerMilestone,
+  surpassTier, surpassFameReward, percentileForRank
 } from "../engine/npcs.js";
 import { reputationSnapshot } from "../engine/reputation.js";
 import { rankingTitleForPercentile } from "../engine/titles.js";
@@ -48,9 +48,10 @@ const NARRATIVE_BEAT_LABELS = {
 const NARRATIVE_KIND_LABELS = {
   state:   "身上的狀況",
   bestow:  "司天監 ‧ 頒號",
+  board:   "群俠錄 ‧ 榜文",
   surpass: "群俠錄 ‧ 名次變動"
 };
-const LEDGER_SIZE_FALLBACK = 10000;
+const LEDGER_SIZE_FALLBACK = 1000000;
 
 const DATA_VERSION = "b2-2"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
@@ -97,9 +98,19 @@ function renderAll() {
   renderBag();
 }
 
-/** 目前名次快照(唯讀,不動 state.lastKnownRank——那是 updateRanking 的事) */
-function rankSnapshot() {
-  return playerRankSnapshot(playerLevelSum(state), data.npcs);
+/**
+ * 玩家「知道」的名次——也就是上次看榜文/遇監使時的數字,不是即時真值。
+ * 名次不隨練功即時跳動,是設計者定調的:得進城看榜才知道自己在哪(2026-08-21)。
+ * 還沒看過榜就回 null。
+ */
+function knownRank() {
+  return state.lastKnownRank ?? null;
+}
+
+/** 名次對應的百分位與稱號(拿已知名次去換算,不偷看真值) */
+function knownRankTitle(rank) {
+  const percentile = percentileForRank(rank, ledgerSize());
+  return rankingTitleForPercentile(percentile, data, { isRank1: rank === 1 });
 }
 
 function ledgerSize() {
@@ -133,9 +144,10 @@ function renderResources() {
 
 function renderTitleLine() {
   const { titles } = data.titles.milestones;
-  const snap = rankSnapshot();
-  const rankTitle = rankingTitleForPercentile(snap.percentile, data, { isRank1: snap.rank === 1 });
-  const parts = [`群俠錄第 ${snap.rank.toLocaleString()} 位 ‧ ${rankTitle}`];
+  const rank = knownRank();
+  const parts = [rank == null
+    ? "群俠錄:還沒見過榜文"
+    : `群俠錄第 ${rank.toLocaleString()} 位 ‧ ${knownRankTitle(rank)}`];
   for (const d of DIMENSIONS) {
     const idx = state.milestones[d];
     if (idx != null && idx >= 0) parts.push(`${dimName(d)}:${titles[d][idx]}`);
@@ -480,22 +492,37 @@ function renderBag() {
 // ---------- 群俠錄(§9.7 名次 / §8.1 稱號 / §9.6 聲望) ----------
 
 function renderFame() {
-  const snap = rankSnapshot();
   const size = ledgerSize();
-  const beaten = size - snap.rank;
+  const rank = knownRank();
+  const box = $("#rank-target");
 
+  if (rank == null) {
+    $("#rank-box").innerHTML = `
+      <p class="empty">你還不知道自己排第幾。</p>
+      <p class="hint">《群俠錄》是司天監編的天下總冊,共 ${size.toLocaleString()} 人。
+        榜文張貼在城鎮的告示牆上——進了城,或遇上監裡的人,你才會知道自己在哪一位。</p>`;
+    box.innerHTML = `<p class="empty">連自己排第幾都還不知道,談什麼追前頭的人。</p>`;
+    renderReputation();
+    renderSurpassed();
+    return;
+  }
+
+  const seen = state.rankSeen;
   $("#rank-box").innerHTML = `
     <div class="rank-figure">
-      <span class="rank-hash">第</span><span class="rank-number">${snap.rank.toLocaleString()}</span><span class="rank-hash">位</span>
+      <span class="rank-hash">第</span><span class="rank-number">${rank.toLocaleString()}</span><span class="rank-hash">位</span>
     </div>
-    <p class="rank-title">${rankingTitleForPercentile(snap.percentile, data, { isRank1: snap.rank === 1 })}</p>
-    <p class="hint">總冊共 ${size.toLocaleString()} 人,你前頭還有 ${(snap.rank - 1).toLocaleString()} 個,
-      身後是 ${beaten.toLocaleString()} 個。名次照六維等級總和換算,練功就會動。</p>`;
+    <p class="rank-title">${knownRankTitle(rank)}</p>
+    <p class="hint">天下總冊共 ${size.toLocaleString()} 人,你前頭還有 ${(rank - 1).toLocaleString()} 個,
+      身後是 ${(size - rank).toLocaleString()} 個。</p>
+    <p class="hint rank-stale">${seen
+      ? `這是 ${seen.date} 你在${seen.source === "監使" ? "監使口中聽來的" : "榜文上看到的"}數字。
+         之後練的功還沒登榜——榜只有你進城看見時才會更新。`
+      : "這個數字有點舊了,下次進城看榜就會更新。"}</p>`;
 
-  // 前頭那個人:百強內看具名對手,萬人區看整數關口(§9.9)
-  const box = $("#rank-target");
-  const namedAbove = nextNamedNpcAbove(snap.rank, data.npcs);
-  const milestone = nextIntegerMilestone(snap.rank);
+  // 前頭那個人:百強內看具名對手,總冊區看整數關口(§9.9)
+  const namedAbove = nextNamedNpcAbove(rank, data.npcs);
+  const milestone = nextIntegerMilestone(rank);
   if (namedAbove) {
     const tier = surpassTier(namedAbove);
     box.innerHTML = `<div class="target-card">
@@ -512,13 +539,18 @@ function renderFame() {
       <p class="target-name">下一道坎</p>
       <p class="hint">萬人區不逐名計較,每五百名才算一道坎。跨過去,總冊上你的名字就往前挪一格。</p>
     </div>`;
-  } else if (snap.rank === 1) {
+  } else if (rank === 1) {
     box.innerHTML = `<p class="empty">前頭沒有人了。</p>`;
   } else {
     box.innerHTML = `<p class="empty">百強在望。再往前,就是有名有姓的人了。</p>`;
   }
 
-  // 江湖評價(§9.6.4 矩陣)
+  renderReputation();
+  renderSurpassed();
+}
+
+/** 江湖評價(§9.6.4 矩陣) */
+function renderReputation() {
   const rep = reputationSnapshot(state.reputation, data.reputation);
   $("#reputation-box").innerHTML = `
     <p class="evaluation">${rep.evaluation}</p>
@@ -528,7 +560,10 @@ function renderFame() {
       <span class="rep-tier infamy">${rep.infamyTierLabel}</span><span class="rep-num">${Math.round(rep.infamy)}</span></div>
     <p class="hint">兩條路各走各的,不互相抵銷。做過的好事不會洗掉做過的壞事,反過來也一樣。</p>`;
 
-  // 已超越的具名百強(靠 surpassed_{rank} flag 落地)
+}
+
+/** 已超越的具名百強(靠 surpassed_{rank} flag 落地) */
+function renderSurpassed() {
   const sbox = $("#surpassed-box");
   const ranks = Object.keys(state.flags)
     .map((k) => /^surpassed_(\d+)$/.exec(k))
@@ -552,10 +587,34 @@ function renderFame() {
 function broadcastsFromRankingResult(result) {
   if (!result) return [];
   const out = [];
+  const rank = result.rank.toLocaleString();
+
+  // 榜文本身:第一次看到、或名次跟上次不同時才開口;沒動就不囉嗦
+  if (result.firstTime) {
+    out.push({
+      kind: "board",
+      name: `第 ${rank} 位`,
+      beats: [`榜文貼在牆上,密密麻麻,一整面。你從後頭往前數,終於在第 ${rank} 位上找到自己的名字——` +
+              `寫得很小,墨也淡。但它在上面。`]
+    });
+  } else if (result.rank < result.prevRank) {
+    out.push({
+      kind: "board",
+      name: `第 ${rank} 位`,
+      beats: [`榜文換過了。你的名字從第 ${result.prevRank.toLocaleString()} 位,挪到了第 ${rank} 位。`]
+    });
+  } else if (result.rank > result.prevRank) {
+    out.push({
+      kind: "board",
+      name: `第 ${rank} 位`,
+      beats: [`榜文換過了。你的名字退到第 ${rank} 位——這些日子在用功的,不只你一個。`]
+    });
+  }
+
   for (const npc of result.surpassed) {
     const reward = surpassFameReward(npc.rank);
     const beats = [
-      `《群俠錄》萬人總冊,你的名字挪到了第 ${result.rank.toLocaleString()} 位——壓過了第 ${npc.rank} 名,${npcLabel(npc)}。`
+      `榜上這一行,你壓過了第 ${npc.rank} 名,${npcLabel(npc)}。`
     ];
     // #11–#100 的被超越反應詞(90 條);#1–#10 依 §9.7.5 走深度互動,Phase 1 先用人設引言頂著
     if (npc.surpassReaction) beats.push(npc.surpassReaction);
@@ -573,9 +632,9 @@ function broadcastsFromRankingResult(result) {
   return out;
 }
 
-/** 非事件路徑(練功、用藥、起身)用:自己重算名次再翻成快報 */
-function collectRankingBroadcasts() {
-  return broadcastsFromRankingResult(updateRanking(state, data));
+/** 遇上司天監的人(監使頒號)也算得知名次的管道之一(§9.9) */
+function revealByEnvoy() {
+  return broadcastsFromRankingResult(revealRanking(state, data, today(), "監使"));
 }
 
 // ---------- 敘事播放(§4 狀態四段式 / §8.7 監使頒號 / §9.9 名次快報) ----------
@@ -583,8 +642,7 @@ function collectRankingBroadcasts() {
 let narrativeQueue = [];
 
 /** 把此刻該播的敘事收進隊列,同時寫一筆歷程供事後回看。回傳有沒有東西要播。 */
-function queueNarratives(extra = []) {
-  const pending = [...collectNarratives(state, data, resourcePercents(state)), ...extra];
+function queueItems(pending) {
   if (!pending.length) return false;
   for (const item of pending) {
     state.journal.push({
@@ -615,9 +673,14 @@ function showNextNarrative() {
   playSfx(item.kind === "state" ? "judgeFail" : "judgeSuccess");
 }
 
-/** 動過資源或經驗的操作,收尾都走這裡:排敘事 → 存檔 → 重畫 → 播 */
+/**
+ * 動過資源或經驗的操作,收尾都走這裡:排敘事 → 存檔 → 重畫 → 播。
+ * 練功本身不會讓你知道自己排第幾——除非監使找上門頒號,那才算遇上了司天監的人。
+ */
 function afterAction() {
-  const has = queueNarratives(collectRankingBroadcasts());
+  const items = collectNarratives(state, data, resourcePercents(state));
+  if (items.some((n) => n.kind === "bestow")) items.push(...revealByEnvoy());
+  const has = queueItems(items);
   save();
   renderAll();
   if (has) showNextNarrative();
@@ -635,7 +698,10 @@ function onChoose(choiceId, isSub) {
     if (result.entry.success === true) playSfx("judgeSuccess");
     else if (result.entry.success === false) playSfx("judgeFail");
     playBgm({ tab: "road" }); // 事件結束,回到分頁曲
-    const hasNarrative = queueNarratives(broadcastsFromRankingResult(result.entry.ranking));
+    const hasNarrative = queueItems([
+      ...collectNarratives(state, data, resourcePercents(state)),
+      ...broadcastsFromRankingResult(result.entry.ranking)
+    ]);
     save();
     renderAll();
     renderEventArea(result.entry); // 須排在 renderAll 之後,否則結果卡會被蓋掉
@@ -994,17 +1060,8 @@ function finishQuiz() {
   handleStepsParam();
   renderAll();
 
-  // 開場對一次名次:新存檔在這裡定下基準(否則第一次練功會被當成「首次呼叫」而不播報),
-  // 舊存檔若有還沒結算的超越,也在這裡補上,不會憑空消失。
-  if (state.talents) {
-    const bootBroadcasts = collectRankingBroadcasts();
-    save(); // 名次基準一定要落盤,否則每次開頁都得重新對時
-    if (queueNarratives(bootBroadcasts)) {
-      save();
-      renderAll();
-      showNextNarrative();
-    }
-  }
+  // 開場不對名次:沒看過榜文就是不知道自己排第幾,這是設計者定調的規則。
+  // 基準線由第一次「得知」自己建立(revealRanking 的 firstTime 分支)。
   playBgm({ tab: "hero" });
   if (!state.talents) startQuiz(); // 未創角:先做心理測驗(§1.2),測完才上路
 

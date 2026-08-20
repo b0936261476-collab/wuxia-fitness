@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 
 import {
   bandLevelSum, jitteredLevelSum, generateNpcLevelSum,
-  estimateRankForLevelSum, percentileForRank, rankingTierIndexForPercentile,
+  estimateRankForLevelSum, percentileForRank, rankingTierIndexForPercentile, revealsRanking,
   playerRankSnapshot, namedNpcAtRank,
   integerMilestonesCrossed, surpassedNpcs, surpassTier, surpassFameReward
 } from "../src/engine/npcs.js";
@@ -14,12 +14,24 @@ import {
   newReputation, addFame, addInfamy, tierIndexFor, bucketOf,
   evaluationText, reputationSnapshot, hypocriteMultiplier, prodigalMultiplier
 } from "../src/engine/reputation.js";
-import { newState, createCharacter, addExp, chooseOption, startNextEvent, addSteps } from "../src/engine/game.js";
+import {
+  newState, createCharacter, addExp, chooseOption, startNextEvent, addSteps, revealRanking
+} from "../src/engine/game.js";
 import { eligibleEvents } from "../src/engine/events2.js";
 
 /** 結算一個「B選項無任何效果」的日常事件,輪換避開冷卻 */
 const NEUTRAL_EVENTS = ["DA-003_rain_shelter", "DA-001_teahouse_storyteller", "DA-002_sugar_figurine"];
 let neutralIdx = 0;
+/** 指定事件 id 結算一次(閘門測試要能挑到特定地域的事件) */
+function resolveOne(s, useData, id) {
+  const candidates = eligibleEvents(s, useData, "2026-08-19");
+  const idx = candidates.findIndex((c) => c.ev.eventId === id);
+  if (idx < 0) throw new Error(`事件 ${id} 這一刻抽不到`);
+  const total = candidates.reduce((a, c) => a + c.weight, 0);
+  startNextEvent(s, useData, "2026-08-19", () => (idx + 0.5) / total);
+  return chooseOption(s, useData, "B", "2026-08-19").entry;
+}
+
 function resolveOneNeutral(s, useData) {
   const id = NEUTRAL_EVENTS[neutralIdx++ % NEUTRAL_EVENTS.length];
   const candidates = eligibleEvents(s, useData, "2026-08-19");
@@ -91,19 +103,24 @@ test("estimateRankForLevelSum:levelSum在百強帶內時精確對到該排名", 
   assert.equal(estimateRankForLevelSum(1200, data.npcs.rankBandLevelSum), 1);
 });
 
-test("estimateRankForLevelSum:levelSum=0(創角剛開始)落在萬人區尾端", () => {
+test("estimateRankForLevelSum:levelSum=0(創角剛開始)落在總冊尾端(§9.7.1 #900,000 開外)", () => {
   const rank = estimateRankForLevelSum(0, data.npcs.rankBandLevelSum);
-  assert.ok(rank >= 9000);
+  assert.ok(rank >= 900000, `rank=${rank}`);
 });
 
-test("estimateRankForLevelSum:levelSum=60(§9.7.1「九成人<60」的分界)約落在第1000名附近", () => {
+test("estimateRankForLevelSum:levelSum=60(§9.7.1「九成人<60」的分界)落在總冊的一成處", () => {
   const rank = estimateRankForLevelSum(60, data.npcs.rankBandLevelSum);
-  assert.ok(Math.abs(rank - 1000) < 50);
+  assert.ok(Math.abs(rank - 100000) < 5000, `rank=${rank}`);
 });
 
-test("percentileForRank:第1名百分位最高,第10000名接近0", () => {
-  assert.equal(percentileForRank(1, 10000), 1);
-  assert.ok(percentileForRank(10000, 10000) < 0.001);
+test("estimateRankForLevelSum:百強門檻(levelSum 165)仍然對到第 100 名附近——放大總冊不動百強", () => {
+  const rank = estimateRankForLevelSum(165, data.npcs.rankBandLevelSum);
+  assert.ok(rank <= 100 && rank >= 90, `rank=${rank}`);
+});
+
+test("percentileForRank:第1名百分位最高,最後一名接近0", () => {
+  assert.equal(percentileForRank(1, 1000000), 1);
+  assert.ok(percentileForRank(1000000, 1000000) < 0.001);
 });
 
 test("rankingTierIndexForPercentile:對齊§8.1八階", () => {
@@ -123,19 +140,19 @@ test("namedNpcAtRank:100名內回傳資料,100名外回null(萬人總冊無名�
 
 // ---------- §9.9 排位互動系統 ----------
 
-test("integerMilestonesCrossed:排名進步時,回傳跨越的所有500整數關口", () => {
-  assert.deepEqual(integerMilestonesCrossed(9000, 8400), [8500]);
-  assert.deepEqual(integerMilestonesCrossed(5000, 3000), [4500, 4000, 3500, 3000]);
+test("integerMilestonesCrossed:排名進步時,回傳跨越的所有五萬整數關口", () => {
+  assert.deepEqual(integerMilestonesCrossed(900000, 840000), [850000]);
+  assert.deepEqual(integerMilestonesCrossed(500000, 300000), [450000, 400000, 350000, 300000]);
 });
 
 test("integerMilestonesCrossed:名次剛好停在關口上也算跨過(否則那道關口永遠不播)", () => {
-  assert.deepEqual(integerMilestonesCrossed(9000, 8500), [8500]);
-  assert.deepEqual(integerMilestonesCrossed(8500, 8499), []); // 8500 已在上一次報過
+  assert.deepEqual(integerMilestonesCrossed(900000, 850000), [850000]);
+  assert.deepEqual(integerMilestonesCrossed(850000, 849999), []); // 850,000 已在上一次報過
 });
 
 test("integerMilestonesCrossed:排名退步或不變時回空陣列", () => {
-  assert.deepEqual(integerMilestonesCrossed(5000, 5000), []);
-  assert.deepEqual(integerMilestonesCrossed(5000, 5200), []);
+  assert.deepEqual(integerMilestonesCrossed(500000, 500000), []);
+  assert.deepEqual(integerMilestonesCrossed(500000, 520000), []);
 });
 
 test("surpassedNpcs:排名進步時抓出區間內被超越的具名NPC", () => {
@@ -216,40 +233,81 @@ test("prodigalMultiplier:浪子回頭,惡名階越高俠名漲越快", () => {
 
 // ---------- game.js 整合 ----------
 
-test("updateRanking:data.npcs不存在時優雅跳過(向後相容,不報錯)", () => {
+test("revealRanking:data.npcs不存在時優雅跳過(向後相容,不報錯)", () => {
   const s = newState();
-  const dataWithoutNpcs = { ...data, npcs: undefined };
-  addSteps(s, 1000);
-  const entry = resolveOneNeutral(s, dataWithoutNpcs);
-  assert.equal(entry.ranking, null);
+  assert.equal(revealRanking(s, { ...data, npcs: undefined }), null);
 });
 
-test("事件結算:超越具名NPC時獲得俠名獎勵+記flag,且同一NPC只觸發一次", () => {
+test("revealRanking:第一次看榜只是知道自己在哪,不算超越任何人", () => {
   const s = newState();
-  createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
-  for (const id of data.events.config.intro.sequence) {
-    s.journal.push({ n: 0, id, date: "2026-08-01" }); // 跳過序章,直接抽隨機池
+  for (const dim of ["light", "inner", "hard", "soft", "eye", "ear"]) {
+    addExp(s, { [dim]: 100000 }, data); // 直接練到百強水準
   }
+  const first = revealRanking(s, data, "2026-08-19", "榜文");
+  assert.equal(first.firstTime, true);
+  assert.equal(first.surpassed.length, 0);
+  assert.equal(s.reputation.fame, 0, "沒看過榜之前的名次變動不發俠名(§9.6.1 見證原則)");
+  assert.deepEqual(s.rankSeen, { date: "2026-08-19", source: "榜文" });
+});
 
-  // 第一次結算:六維皆0,建立排名基準線(lastKnownRank≈9000+);首次呼叫不算「超越」
-  addSteps(s, 3000);
-  resolveOneNeutral(s, data);
+test("revealRanking:看榜時結算超越——發俠名、記flag,同一人只算一次", () => {
+  const s = newState();
+  revealRanking(s, data, "2026-08-19", "榜文"); // 六維皆0,先立基準
   assert.equal(s.reputation.fame, 0);
 
-  // 練到 levelSum 遠超過第100名門檻(約165),確保下次結算會偵測到大量超越
   for (const dim of ["light", "inner", "hard", "soft", "eye", "ear"]) {
     addExp(s, { [dim]: 100000 }, data);
   }
-  const entry = resolveOneNeutral(s, data);
+  assert.equal(s.reputation.fame, 0, "練功當下不會憑空長俠名,得等下次看榜");
 
-  assert.ok(entry.ranking);
-  assert.ok(entry.ranking.surpassed.length > 0);
+  const result = revealRanking(s, data, "2026-08-20", "榜文");
+  assert.ok(result.surpassed.length > 0);
   assert.ok(s.reputation.fame > 0);
-  const someNpc = entry.ranking.surpassed[0];
-  assert.ok(s.flags[`surpassed_${someNpc.rank}`]);
+  assert.ok(s.flags[`surpassed_${result.surpassed[0].rank}`]);
 
-  // 再結算一次事件,排名沒再變動,不應該對同一批NPC重複發獎勵
   const fameAfterFirst = s.reputation.fame;
-  resolveOneNeutral(s, data);
-  assert.equal(s.reputation.fame, fameAfterFirst);
+  revealRanking(s, data, "2026-08-21", "榜文");
+  assert.equal(s.reputation.fame, fameAfterFirst, "名次沒再動,不重複發獎");
+});
+
+// ---------- 得知管道的閘門(§9.9) ----------
+
+test("revealsRanking:城鎮地域看得到榜文", () => {
+  assert.equal(revealsRanking({ region: ["中原小鎮"] }), "榜文");
+  assert.equal(revealsRanking({ region: ["夜市"] }), "榜文");
+  assert.equal(revealsRanking({ region: ["官道茶棚"] }), "榜文");
+});
+
+test("revealsRanking:遇上司天監的人也算得知(含遠觀)", () => {
+  assert.equal(revealsRanking({ character: ["司天監(遠觀)"] }), "監使");
+});
+
+test("revealsRanking:〔排行相關〕標籤一律算榜文", () => {
+  assert.equal(revealsRanking({ event: ["排行相關"] }), "榜文");
+});
+
+test("revealsRanking:荒郊野外看不到榜", () => {
+  assert.equal(revealsRanking({ region: ["官道", "屋簷"], character: ["蓑衣漢子(留白)"] }), null);
+  assert.equal(revealsRanking({ region: ["山道", "斷崖"] }), null);
+  assert.equal(revealsRanking(null), null);
+});
+
+test("事件結算:荒郊事件不動名次,城鎮事件才揭曉", () => {
+  const s = newState();
+  createCharacter(s, [{ questionId: "q03", optionId: "a" }], data);
+  for (const id of data.events.config.intro.sequence) {
+    s.journal.push({ n: 0, id, date: "2026-08-01" });
+  }
+  addSteps(s, 5000);
+
+  const wild = resolveOne(s, data, "DA-003_rain_shelter"); // 官道/屋簷
+  assert.equal(wild.rankingRevealedBy, null);
+  assert.equal(wild.ranking, null);
+  assert.equal(s.lastKnownRank, null, "沒看到榜,就是不知道自己排第幾");
+
+  const town = resolveOne(s, data, "DA-001_teahouse_storyteller"); // 官道茶棚
+  assert.equal(town.rankingRevealedBy, "榜文");
+  assert.ok(town.ranking);
+  assert.ok(s.lastKnownRank > 0);
+  assert.equal(s.rankSeen.source, "榜文");
 });
