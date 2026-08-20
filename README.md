@@ -43,6 +43,8 @@ data/
   whispers.json    ← 天賦耳語文案池(⚠️ 僅 3 句種子,完整 23 句待從設計對話補入)
   npcs.json        ← 百強名冊(含 90 條被超越反應詞)+ 萬人總冊生成參數(v2 §9.5/§9.7/§9.9)
   reputation.json  ← 聲望階層門檻/評價矩陣(v2 §9.6)
+  media.json       ← 音樂/畫面掛載表(BGM/音效/事件插圖/背景;填路徑即生效,見 assets/README)
+assets/            ← 音樂與圖片素材(audio/ img/;掛載方式見 assets/README.md)
 src/
   engine/          ← 純邏輯計算引擎(無 DOM,Node 可直接測試)
     decay.js       ← 單日累積分階遞減

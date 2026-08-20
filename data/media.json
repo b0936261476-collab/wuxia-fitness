@@ -1,0 +1,42 @@
+{
+  "note": "音樂與畫面掛載表(M7 預留,資產二期灌裝)。檔案放進 assets/audio、assets/img,把路徑填進對應欄位即生效——全部欄位可為 null(= 該處無音樂/圖,介面自動隱藏)。解析順序:指定 > 類型備援 > 預設。音量 0~1。",
+  "bgm": {
+    "_note": "背景音樂。quiz=創角測驗;byTab=各分頁(hero俠客/train練功/road江湖路/bag行囊);byEventType=事件進行中依類型切換(蓋過分頁曲);default=以上皆無時的墊底曲。建議用 .mp3 或 .ogg,循環播放。",
+    "default": null,
+    "quiz": null,
+    "byTab": {
+      "hero": null,
+      "train": null,
+      "road": null,
+      "bag": null
+    },
+    "byEventType": {
+      "daily": null,
+      "choice": null,
+      "duel": null,
+      "fortune": null
+    },
+    "volume": 0.5
+  },
+  "sfx": {
+    "_note": "音效。judgeSuccess/judgeFail=判定成敗;choice=按下選項;levelup=升級(接口保留,尚未接線)。",
+    "judgeSuccess": null,
+    "judgeFail": null,
+    "choice": null,
+    "levelup": null,
+    "volume": 0.7
+  },
+  "images": {
+    "_note": "畫面。header=頁首橫幅背景;quiz=創角測驗背景;events=指定事件的插圖(eventId → 路徑);byEventType=類型備援插圖;byRegion=地域備援插圖(對 tagBlock.region 第一項,地圖 Phase 2 預埋)。事件插圖解析順序:events[id] > byRegion > byEventType。",
+    "header": null,
+    "quiz": null,
+    "events": {},
+    "byEventType": {
+      "daily": null,
+      "choice": null,
+      "duel": null,
+      "fortune": null
+    },
+    "byRegion": {}
+  }
+}

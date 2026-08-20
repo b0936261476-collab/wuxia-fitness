@@ -8,6 +8,10 @@ import { levelProgress, milestoneTitle, DIMENSIONS } from "../engine/exp.js";
 import { currentCoefficient } from "../engine/decay.js";
 import { startTraining, stopTraining, cancelTraining, trainingElapsedMs } from "../engine/training.js";
 import { loadState, saveState, exportSave, importSave, resetSave } from "../engine/storage.js";
+import {
+  initMedia, playBgm, playSfx, eventImage, headerImage, quizImage,
+  hasAnyBgm, isMuted, toggleMute
+} from "./media.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -19,10 +23,10 @@ const TYPE_LABELS = {
 };
 const FORM_LABELS = { crush: "輾壓", awe: "險境" };
 
-const DATA_VERSION = "m7-2"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "m7-3"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
-  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives"];
+  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media"];
   const loaded = await Promise.all(
     names.map((n) =>
       fetch(`data/${n}.json?v=${DATA_VERSION}`).then((r) => {
@@ -198,6 +202,14 @@ function paragraphs(text, cls) {
     .map((t) => `<p class="${cls}">${t}</p>`).join("");
 }
 
+/** 事件插圖掛載點:media.json 有登記才顯示 */
+function eventArtHtml(eventId, eventType) {
+  const evDef = data.events.pool.find((e) => e.eventId === eventId);
+  const region = evDef?.tagBlock?.region?.[0];
+  const src = eventImage(eventId, eventType, region);
+  return src ? `<div class="event-art"><img src="${src}" alt="" loading="lazy"></div>` : "";
+}
+
 function renderEventArea(lastEntry = null) {
   const area = $("#event-area");
   const view = presentEvent(state, data);
@@ -238,7 +250,9 @@ function renderEventArea(lastEntry = null) {
       : `<div class="event-options">${view.choices
           .map((o) => `<button class="btn" data-choice="${o.id}">${o.text}</button>`).join("")}</div>`;
 
+    playBgm({ eventType: view.eventType }); // 事件中依類型切曲(media.json 沒填則維持原曲/靜音)
     area.innerHTML = `<div class="event-card">
+      ${eventArtHtml(view.id, view.eventType)}
       <span class="event-type">${typeLabel}</span>${formBadge}
       <h3>${view.title}</h3>
       ${paragraphs(view.qi, "event-text")}
@@ -258,6 +272,7 @@ function renderEventArea(lastEntry = null) {
   const rateLine = e.rate != null
     ? `<p class="event-rate">判定成功率 ${Math.round(e.rate * 100)}% — ${e.success ? "成功" : "失敗"}</p>` : "";
   area.innerHTML = `<div class="event-card">
+    ${eventArtHtml(e.id, e.type)}
     <span class="event-type">${TYPE_LABELS[e.type] ?? e.type}</span>
     <h3>${e.title}</h3>
     ${e.choice ? `<p class="event-rate">你的選擇:${e.choice}</p>` : ""}
@@ -353,11 +368,15 @@ function renderBag() {
 // ---------- 操作 ----------
 
 function onChoose(choiceId, isSub) {
+  playSfx("choice");
   const result = isSub
     ? chooseSub(state, data, choiceId, today())
     : chooseOption(state, data, choiceId, today());
   save();
   if (result.done) {
+    if (result.entry.success === true) playSfx("judgeSuccess");
+    else if (result.entry.success === false) playSfx("judgeFail");
+    playBgm({ tab: "road" }); // 事件結束,回到分頁曲
     renderAll();
     renderEventArea(result.entry);
   } else {
@@ -374,7 +393,18 @@ function bindEvents() {
     document.querySelectorAll(".panel").forEach((p) =>
       p.classList.toggle("active", p.id === `tab-${btn.dataset.tab}`)
     );
+    playBgm({ tab: btn.dataset.tab }); // 分頁背景曲(media.json 沒填則無事發生)
   });
+
+  // 音樂開關(media.json 有登記任何 BGM 才顯示)
+  const mediaBtn = $("#media-toggle");
+  if (mediaBtn) {
+    mediaBtn.hidden = !hasAnyBgm();
+    mediaBtn.textContent = isMuted() ? "🔇" : "🎵";
+    mediaBtn.addEventListener("click", () => {
+      mediaBtn.textContent = toggleMute() ? "🔇" : "🎵";
+    });
+  }
 
   // 練功
   $("#exercise-select").addEventListener("change", () => {
@@ -540,6 +570,9 @@ function startQuiz() {
   }
   quizState = { questions: pool.slice(0, QUIZ_DRAW_COUNT), index: 0, answers: [] };
   bindQuizOnce();
+  const quizBg = quizImage();
+  if (quizBg) $(".quiz-card").style.backgroundImage = `linear-gradient(rgba(251,246,234,0.92), rgba(251,246,234,0.92)), url("${quizBg}")`;
+  playBgm({ quiz: true });
   $("#quiz-overlay").hidden = false;
   renderQuizQuestion();
 }
@@ -601,8 +634,17 @@ function finishQuiz() {
     return;
   }
   state = loadState();
+  initMedia(data.media); // 音樂/畫面掛載(media.json 全空 = 靜默停用)
+  const headerBg = headerImage();
+  if (headerBg) {
+    const h = document.querySelector(".site-header");
+    h.style.backgroundImage = `linear-gradient(rgba(244,236,220,0.82), rgba(244,236,220,0.82)), url("${headerBg}")`;
+    h.style.backgroundSize = "cover";
+    h.style.backgroundPosition = "center";
+  }
   bindEvents();
   handleStepsParam();
   renderAll();
+  playBgm({ tab: "hero" });
   if (!state.talents) startQuiz(); // 未創角:先做心理測驗(§1.2),測完才上路
 })();

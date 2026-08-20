@@ -319,3 +319,29 @@ select, input[type="number"], textarea {
   color: var(--accent-dark);
   margin-bottom: 18px;
 }
+
+/* 音樂與畫面掛載點(data/media.json 有登記才會出現) */
+.site-header { position: relative; }
+.media-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 1.2rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.event-art {
+  margin: -18px -18px 12px; /* 滿版貼齊卡片邊緣 */
+  overflow: hidden;
+  border-radius: 4px 4px 0 0;
+}
+.event-art img {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+}
