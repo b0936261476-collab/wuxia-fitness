@@ -133,7 +133,8 @@
       "weights": {
         "light": 3,
         "inner": 2,
-        "hard": 5
+        "hard": 5,
+        "soft": 2
       }
     },
     {
@@ -262,6 +263,7 @@
         "light": 40,
         "inner": 20,
         "hard": 20,
+        "soft": 10,
         "eye": 30,
         "ear": 10
       }
@@ -318,6 +320,7 @@
         "light": 30,
         "inner": 20,
         "hard": 10,
+        "soft": 10,
         "eye": 40,
         "ear": 20
       }
@@ -332,6 +335,7 @@
         "light": 50,
         "inner": 30,
         "hard": 20,
+        "soft": 10,
         "eye": 30,
         "ear": 10
       }
@@ -465,8 +469,9 @@
       "tierSize": 10,
       "weights": {
         "light": 3,
+        "inner": 1,
         "hard": 1,
-        "inner": 1
+        "soft": 1
       }
     }
   ]
