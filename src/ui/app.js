@@ -9,8 +9,8 @@ import { currentCoefficient } from "../engine/decay.js";
 import { startTraining, stopTraining, cancelTraining, trainingElapsedMs } from "../engine/training.js";
 import { loadState, saveState, exportSave, importSave, resetSave } from "../engine/storage.js";
 import {
-  initMedia, playBgm, playSfx, eventImage, headerImage, quizImage,
-  hasAnyBgm, isMuted, toggleMute
+  initMedia, playBgm, playSfx, playAmbience, stopAmbience,
+  eventImage, headerImage, quizImage, hasAnyBgm, isMuted, toggleMute
 } from "./media.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -23,7 +23,7 @@ const TYPE_LABELS = {
 };
 const FORM_LABELS = { crush: "輾壓", awe: "險境" };
 
-const DATA_VERSION = "m7-3"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "m7-4"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media"];
@@ -202,11 +202,13 @@ function paragraphs(text, cls) {
     .map((t) => `<p class="${cls}">${t}</p>`).join("");
 }
 
+function regionsOf(eventId) {
+  return data.events.pool.find((e) => e.eventId === eventId)?.tagBlock?.region ?? [];
+}
+
 /** 事件插圖掛載點:media.json 有登記才顯示 */
 function eventArtHtml(eventId, eventType) {
-  const evDef = data.events.pool.find((e) => e.eventId === eventId);
-  const region = evDef?.tagBlock?.region?.[0];
-  const src = eventImage(eventId, eventType, region);
+  const src = eventImage(eventId, eventType, regionsOf(eventId)[0]);
   return src ? `<div class="event-art"><img src="${src}" alt="" loading="lazy"></div>` : "";
 }
 
@@ -216,6 +218,7 @@ function renderEventArea(lastEntry = null) {
 
   if (!view && !lastEntry) {
     area.innerHTML = "";
+    stopAmbience(); // 沒有事件在場,環境音收掉
     return;
   }
 
@@ -251,6 +254,7 @@ function renderEventArea(lastEntry = null) {
           .map((o) => `<button class="btn" data-choice="${o.id}">${o.text}</button>`).join("")}</div>`;
 
     playBgm({ eventType: view.eventType }); // 事件中依類型切曲(media.json 沒填則維持原曲/靜音)
+    playAmbience(view.id, regionsOf(view.id)); // 環境音:山有鳥鳴、水有濤聲、市有人聲
     area.innerHTML = `<div class="event-card">
       ${eventArtHtml(view.id, view.eventType)}
       <span class="event-type">${typeLabel}</span>${formBadge}
@@ -394,6 +398,7 @@ function bindEvents() {
       p.classList.toggle("active", p.id === `tab-${btn.dataset.tab}`)
     );
     playBgm({ tab: btn.dataset.tab }); // 分頁背景曲(media.json 沒填則無事發生)
+    if (btn.dataset.tab !== "road") stopAmbience(); // 離開江湖路,場景環境音收掉
   });
 
   // 音樂開關(media.json 有登記任何 BGM 才顯示)

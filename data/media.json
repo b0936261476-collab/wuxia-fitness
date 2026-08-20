@@ -18,6 +18,32 @@
     },
     "volume": 0.5
   },
+  "ambience": {
+    "_note": "環境音(疊在 BGM 之上的第二音軌,循環播放)。事件進行中依 tagBlock.region 自動掛載:byRegion 列出目前事件庫用到的全部地域(照事件的地域標籤第一項比對,比對不到再逐一看其餘標籤);byEventId 可對單一事件指定專屬環境音(優先於地域)。事件離場即停。範例:山道=鳥鳴、碼頭=水聲與號子、夜市=人群喧鬧。",
+    "byEventId": {},
+    "byRegion": {
+      "村莊": null,
+      "官道": null,
+      "界碑": null,
+      "三岔口": null,
+      "野橋": null,
+      "山神廟": null,
+      "告示牆": null,
+      "中原小鎮": null,
+      "碼頭": null,
+      "官道茶棚": null,
+      "夜市": null,
+      "屋簷": null,
+      "米行": null,
+      "鎮口": null,
+      "破亭": null,
+      "山道": null,
+      "斷崖": null,
+      "荒村": null,
+      "山野": null
+    },
+    "volume": 0.4
+  },
   "sfx": {
     "_note": "音效。judgeSuccess/judgeFail=判定成敗;choice=按下選項;levelup=升級(接口保留,尚未接線)。",
     "judgeSuccess": null,

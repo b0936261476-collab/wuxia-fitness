@@ -19,6 +19,19 @@ assets/
 
 3. 存檔、`git push`,線上就有音樂了(玩家可用右上角 🎵 開關)
 
+## 範例:掛環境音(山上鳥叫、河邊水聲、鬧市人聲)
+
+環境音是疊在背景音樂之上的第二音軌,跟著**事件的地域**自動切換、事件結束自動停。
+`media.json` 的 `ambience.byRegion` 已列好目前事件庫用到的全部地域,填路徑即可:
+
+```json
+"山道": "assets/audio/amb-birds.mp3",
+"碼頭": "assets/audio/amb-river.mp3",
+"夜市": "assets/audio/amb-crowd.mp3"
+```
+
+也可用 `ambience.byEventId` 給單一事件指定專屬環境音(優先於地域)。
+
 ## 範例:給「夜半笛聲」掛一張插圖
 
 1. 把 `night-flute.jpg` 放進 `assets/img/`
