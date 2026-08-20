@@ -108,9 +108,27 @@ test("estimateRankForLevelSum:levelSum=0(創角剛開始)落在總冊尾端(§9.
   assert.ok(rank >= 900000, `rank=${rank}`);
 });
 
-test("estimateRankForLevelSum:levelSum=60(§9.7.1「九成人<60」的分界)落在總冊的一成處", () => {
-  const rank = estimateRankForLevelSum(60, data.npcs.rankBandLevelSum);
-  assert.ok(Math.abs(rank - 100000) < 5000, `rank=${rank}`);
+// ⚠️ §9.7.1 原本寫「總冊九成人 levelSum<60」,與 2026-08-21 定調的「練一週只贏得了一千人」
+// 相矛盾(見總綱 §9.7.1 的修訂註記)。以設計者當面給的校準點為準。
+test("校準點:練一週的量(levelSum 20)約贏過一千人", () => {
+  const rank = estimateRankForLevelSum(20, data.npcs.rankBandLevelSum);
+  const beaten = 1000000 - rank;
+  assert.ok(beaten > 700 && beaten < 1500, `贏過 ${beaten} 人`);
+});
+
+test("底部很黏:levelSum 7 只贏過幾百人,不會一口氣噴掉十幾萬名", () => {
+  const beaten = 1000000 - estimateRankForLevelSum(7, data.npcs.rankBandLevelSum);
+  assert.ok(beaten < 1000, `贏過 ${beaten} 人`);
+});
+
+test("中段最擠:levelSum 從 96 到 138,名次推進遠快過從 0 到 40", () => {
+  const r = (L) => estimateRankForLevelSum(L, data.npcs.rankBandLevelSum);
+  assert.ok((r(96) - r(138)) > (r(0) - r(40)) * 100, "S 型分布的中段就是要擠");
+});
+
+test("摸到百強門檻(levelSum 150)才進得了前 100", () => {
+  assert.ok(estimateRankForLevelSum(149, data.npcs.rankBandLevelSum) > 100);
+  assert.ok(estimateRankForLevelSum(150, data.npcs.rankBandLevelSum) <= 100);
 });
 
 test("estimateRankForLevelSum:百強門檻(levelSum 165)仍然對到第 100 名附近——放大總冊不動百強", () => {

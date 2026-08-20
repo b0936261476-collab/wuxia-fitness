@@ -69,36 +69,47 @@ export function generateNpcLevelSum(rank, bands, rng = Math.random) {
 }
 
 /**
- * 萬人總冊排名→levelSum 反推曲線(§9.7.1)。總綱只給了幾個錨點,不是連續公式:
- *   rank1↔1200(§9.7.3)、rank100↔165(§9.7.3 91-100帶中點)、
- *   rank1000↔60(§9.7.1「總冊九成人levelSum<60」反推:9000人在後90%,故第1000名是60的分界)、
- *   rank9000↔0(§9.7.1「玩家創角起始排名9,000開外」,新角色levelSum≈0)。
- * ⚠️ rank>100 的曲線形狀是本檔案依這些錨點做的假設(線性插值),不是總綱給的公式;
- * 只用於 Phase 1 的排名估算/整數關口播報,不影響百強本身的數值(那些照 rankBandLevelSum 精確生成)。
+ * 百強以外(#101 起)的人口分布(§9.7.1,設計者定調 2026-08-21)。
+ *
+ * 先前用線性插值,結果 levelSum 才 7 就贏過十八萬人——設計者判定太怪,
+ * 定調「大概要練一個禮拜才贏得了一千人」。改用 S 型(logistic)分布:
+ *
+ *   總冊上的一百萬人是**江湖人**,鏢師、捕快、船工都有點底子,不是路人甲。
+ *   所以底部稀疏(你下面幾乎沒人)、中段最擠(大量普通江湖人卡在那裡)、
+ *   接近百強又稀疏(真在練的是少數)。新人本來就該墊底,往上爬很慢,
+ *   熬過中段之後才會開始有感覺。
+ *
+ * 贏過的人數 = 總冊人數 × (σ(L) − σ(0)) ÷ (σ(L₁₀₀) − σ(0)),σ 為 logistic、L₁₀₀ 為百強門檻。
+ * 兩端各減 σ(0) / 除以 σ(L₁₀₀) 是為了讓 levelSum 0 剛好贏過 0 人、摸到百強門檻剛好贏過全部。
+ *
+ * ⚠️ 這條曲線只用於 Phase 1 的名次估算與關口播報,不影響百強本身的數值
+ * (那些照 rankBandLevelSum 精確生成)。
  */
-const TAIL_ANCHORS = [
-  { rank: 100, levelSum: 165 },
-  { rank: 100000, levelSum: 60 },
-  { rank: 900000, levelSum: 0.5 },
-  { rank: 950000, levelSum: 0 }   // levelSum 0 的人是一大群並列,排在這群人中間;不會「全天下最後一名」
-];
+const DEFAULT_DISTRIBUTION = { midLevelSum: 112, spread: 14 };
+
+const logistic = (x) => 1 / (1 + Math.exp(-x));
+
+/** 贏過總冊上多少比例的人(0~1);levelSum ≤ 0 回 0 */
+export function beatenFraction(levelSum, bands, distribution = DEFAULT_DISTRIBUTION) {
+  const top100LevelSum = bandLevelSum(100, bands);
+  if (levelSum <= 0) return 0;
+  if (levelSum >= top100LevelSum) return 1;
+  const mid = distribution?.midLevelSum ?? DEFAULT_DISTRIBUTION.midLevelSum;
+  const spread = distribution?.spread ?? DEFAULT_DISTRIBUTION.spread;
+  const sigma = (L) => logistic((L - mid) / spread);
+  const base = sigma(0);
+  return (sigma(levelSum) - base) / (sigma(top100LevelSum) - base);
+}
 
 /** 依萬人總冊錨點,反推「levelSum → 約略排名」(用於玩家排名估算,非精確值)。 */
-export function estimateRankForLevelSum(levelSum, bands, ledgerSize = LEDGER_SIZE) {
+export function estimateRankForLevelSum(levelSum, bands, ledgerSize = LEDGER_SIZE, distribution) {
   if (levelSum >= bandLevelSum(1, bands)) return 1;
   for (let rank = 1; rank <= 100; rank++) {
     if (levelSum >= bandLevelSum(rank, bands)) return rank;
   }
-  for (let i = 0; i < TAIL_ANCHORS.length - 1; i++) {
-    const a = TAIL_ANCHORS[i];
-    const b = TAIL_ANCHORS[i + 1];
-    if (levelSum <= a.levelSum && levelSum >= b.levelSum) {
-      if (a.levelSum === b.levelSum) return a.rank;
-      const t = (a.levelSum - levelSum) / (a.levelSum - b.levelSum);
-      return Math.round(a.rank + t * (b.rank - a.rank));
-    }
-  }
-  return ledgerSize;
+  // 百強之外:名次 = 總人數 − 贏過的人數,下限鉗在第 101 名(百強要靠 rankBandLevelSum 才進得去)
+  const beaten = Math.floor(beatenFraction(levelSum, bands, distribution) * (ledgerSize - 100));
+  return Math.max(101, ledgerSize - beaten);
 }
 
 /** 依排名算百分位(贏過多少比例的人,0~1),§8.1 群俠錄用 */
@@ -125,7 +136,9 @@ export function rankingTierIndexForPercentile(percentile, isRank1 = false) {
  */
 export function playerRankSnapshot(playerLevelSum, npcsData) {
   const ledgerSize = npcsData.totalLedger?.size ?? LEDGER_SIZE;
-  const rank = estimateRankForLevelSum(playerLevelSum, npcsData.rankBandLevelSum, ledgerSize);
+  const rank = estimateRankForLevelSum(
+    playerLevelSum, npcsData.rankBandLevelSum, ledgerSize, npcsData.totalLedger?.distribution
+  );
   const percentile = percentileForRank(rank, ledgerSize);
   const tierIndex = rankingTierIndexForPercentile(percentile, rank === 1);
   return { rank, percentile, tierIndex };
