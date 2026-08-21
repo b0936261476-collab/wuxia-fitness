@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#efe5d0"/>
+      <stop offset="1" stop-color="#f4ecdc"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4ecdc" stop-opacity="0"/>
+      <stop offset="1" stop-color="#f4ecdc" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="300" fill="url(#sky)"/>
+  <!-- 遠山:層層淡墨 -->
+  <path d="M0,190 Q120,90 240,150 Q300,180 380,140 Q470,90 560,160 L560,300 L0,300 Z" fill="#5d5346" opacity="0.16"/>
+  <path d="M420,210 Q560,70 700,150 Q790,200 900,120 Q1000,60 1100,150 Q1160,200 1200,180 L1200,300 L420,300 Z" fill="#5d5346" opacity="0.24"/>
+  <path d="M700,240 Q820,130 940,190 Q1050,240 1200,200 L1200,300 L700,300 Z" fill="#2b2620" opacity="0.28"/>
+  <!-- 近山主峰 -->
+  <path d="M-40,300 Q80,140 190,200 Q260,235 330,215 Q420,185 460,240 L470,300 Z" fill="#2b2620" opacity="0.5"/>
+  <!-- 山腰霧帶 -->
+  <rect x="0" y="180" width="1200" height="70" fill="url(#mist)"/>
+  <!-- 孤松 -->
+  <g opacity="0.75">
+    <path d="M235,208 Q233,180 240,160" stroke="#2b2620" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M240,164 Q262,158 278,166 Q260,150 241,156 Z" fill="#2b2620"/>
+    <path d="M238,178 Q214,172 202,180 Q218,164 237,171 Z" fill="#2b2620"/>
+    <path d="M239,192 Q262,186 274,193 Q258,178 240,184 Z" fill="#2b2620"/>
+  </g>
+  <!-- 官道與行人:一步一江湖 -->
+  <path d="M40,296 Q400,262 760,278 Q980,286 1200,270" stroke="#5d5346" stroke-width="5" fill="none" opacity="0.28" stroke-linecap="round" stroke-dasharray="1 14"/>
+  <g opacity="0.85">
+    <circle cx="512" cy="252" r="4.5" fill="#2b2620"/>
+    <path d="M512,256 L511,271 M511,262 L503,268 M511,261 L520,266 M511,271 L505,281 M511,271 L517,281" stroke="#2b2620" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M520,266 L526,258" stroke="#2b2620" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="527" cy="256" r="2.6" fill="#8c2f1b" opacity="0.9"/>
+  </g>
+  <!-- 雁陣 -->
+  <g stroke="#2b2620" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round">
+    <path d="M905,70 q7,-8 14,0 M925,62 q7,-8 14,0 M948,68 q7,-8 14,0 M968,78 q6,-7 12,0"/>
+  </g>
+  <!-- 印章 -->
+  <g transform="translate(1108,36)">
+    <rect x="0" y="0" width="52" height="118" rx="5" fill="#8c2f1b" opacity="0.88"/>
+    <text x="26" y="26" font-family="'Noto Serif TC','PMingLiU',serif" font-size="22" fill="#f4ecdc" text-anchor="middle" writing-mode="tb" letter-spacing="4">一步一江湖</text>
+  </g>
+</svg>

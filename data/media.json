@@ -54,14 +54,14 @@
   },
   "images": {
     "_note": "畫面。header=頁首橫幅背景;quiz=創角測驗背景;events=指定事件的插圖(eventId → 路徑);byEventType=類型備援插圖;byRegion=地域備援插圖(對 tagBlock.region 第一項,地圖 Phase 2 預埋)。事件插圖解析順序:events[id] > byRegion > byEventType。",
-    "header": null,
+    "header": "assets/img/header.svg",
     "quiz": null,
     "events": {},
     "byEventType": {
-      "daily": null,
-      "choice": null,
-      "duel": null,
-      "fortune": null
+      "daily": "assets/img/type-daily.svg",
+      "choice": "assets/img/type-choice.svg",
+      "duel": "assets/img/type-duel.svg",
+      "fortune": "assets/img/type-fortune.svg"
     },
     "byRegion": {}
   }

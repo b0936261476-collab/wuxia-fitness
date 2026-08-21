@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid slice">
+  <rect width="800" height="240" fill="#ece2cf"/>
+  <!-- 月 -->
+  <circle cx="600" cy="74" r="40" fill="#a8842c" opacity="0.28"/>
+  <circle cx="600" cy="74" r="33" fill="#f4ecdc" opacity="0.7"/>
+  <!-- 斷崖 -->
+  <path d="M0,240 L0,96 Q40,88 70,104 Q110,124 128,170 Q140,204 150,240 Z" fill="#2b2620" opacity="0.55"/>
+  <path d="M118,110 Q150,96 176,108" stroke="#2b2620" stroke-width="4" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <!-- 崖上人影遠眺 -->
+  <g opacity="0.9">
+    <circle cx="96" cy="74" r="5.4" fill="#2b2620"/>
+    <path d="M96,79 L96,100 M96,85 L87,92 M96,85 L106,90 M96,100 L90,112 M96,100 L102,112" stroke="#2b2620" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M106,90 Q114,86 118,80" stroke="#2b2620" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- 雲海 -->
+  <g fill="none" stroke="#5d5346" stroke-linecap="round" opacity="0.4">
+    <path d="M150,170 q46,-18 92,0 q46,18 92,0 q46,-18 92,0" stroke-width="5"/>
+    <path d="M230,200 q56,-20 112,0 q56,20 112,0 q56,-20 112,0" stroke-width="5" opacity="0.7"/>
+    <path d="M330,228 q70,-18 140,0 q70,18 140,0" stroke-width="5" opacity="0.45"/>
+  </g>
+  <!-- 遠山一抹 -->
+  <path d="M480,150 Q600,104 720,138 Q770,152 800,146 L800,180 Q640,196 480,172 Z" fill="#5d5346" opacity="0.18"/>
+  <!-- 歸雁 -->
+  <g stroke="#2b2620" stroke-width="2" fill="none" opacity="0.45" stroke-linecap="round">
+    <path d="M420,72 q6,-7 12,0 M440,64 q6,-7 12,0"/>
+  </g>
+  <rect x="736" y="24" width="34" height="34" rx="4" fill="#8c2f1b" opacity="0.8"/>
+  <text x="753" y="48" font-family="'Noto Serif TC','PMingLiU',serif" font-size="20" fill="#f4ecdc" text-anchor="middle">緣</text>
+</svg>

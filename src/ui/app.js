@@ -53,7 +53,7 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "b3-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "b3-2"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media"];
@@ -324,7 +324,7 @@ function regionsOf(eventId) {
 /** 事件插圖掛載點:media.json 有登記才顯示 */
 function eventArtHtml(eventId, eventType) {
   const src = eventImage(eventId, eventType, regionsOf(eventId)[0]);
-  return src ? `<div class="event-art"><img src="${src}" alt="" loading="lazy"></div>` : "";
+  return src ? `<div class="event-art"><img src="${src}" alt=""></div>` : "";
 }
 
 function renderEventArea(lastEntry = null) {

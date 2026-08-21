@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid slice">
+  <rect width="800" height="240" fill="#efe4cd"/>
+  <!-- 塵土地與夕照 -->
+  <circle cx="400" cy="250" r="150" fill="#8c2f1b" opacity="0.07"/>
+  <path d="M0,150 Q200,100 400,140 Q600,175 800,130 L800,240 L0,240 Z" fill="#5d5346" opacity="0.12"/>
+  <!-- 左方人影:持棍蓄勢 -->
+  <g opacity="0.9">
+    <circle cx="270" cy="128" r="7" fill="#2b2620"/>
+    <path d="M270,135 L266,165 M268,145 L250,156 M268,143 L292,138 M266,165 L252,190 M266,165 L280,189" stroke="#2b2620" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M238,170 L302,120" stroke="#2b2620" stroke-width="4.6" stroke-linecap="round"/>
+  </g>
+  <!-- 右方人影:拔刀式 -->
+  <g opacity="0.9">
+    <circle cx="530" cy="126" r="7" fill="#2b2620"/>
+    <path d="M530,133 L534,163 M532,142 L552,150 M532,143 L512,152 M534,163 L522,189 M534,163 L548,188" stroke="#2b2620" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M512,152 L470,128" stroke="#2b2620" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M470,128 Q460,124 454,116" stroke="#8c2f1b" stroke-width="3.4" stroke-linecap="round" opacity="0.9"/>
+  </g>
+  <!-- 刀光弧 -->
+  <path d="M330,70 Q400,40 476,66" stroke="#8c2f1b" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round" stroke-dasharray="26 10"/>
+  <!-- 揚塵 -->
+  <g stroke="#5d5346" fill="none" opacity="0.3" stroke-linecap="round">
+    <path d="M248,196 q-16,6 -30,2 M552,194 q16,6 30,2" stroke-width="3"/>
+    <path d="M300,205 q100,14 200,0" stroke-width="4" opacity="0.5"/>
+  </g>
+  <rect x="736" y="24" width="34" height="34" rx="4" fill="#8c2f1b" opacity="0.8"/>
+  <text x="753" y="48" font-family="'Noto Serif TC','PMingLiU',serif" font-size="20" fill="#f4ecdc" text-anchor="middle">武</text>
+</svg>

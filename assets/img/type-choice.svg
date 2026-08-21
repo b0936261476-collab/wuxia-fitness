@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid slice">
+  <rect width="800" height="240" fill="#f1e7d3"/>
+  <!-- 遠山淡霧 -->
+  <path d="M0,140 Q160,60 320,120 Q420,155 560,110 Q680,80 800,130 L800,240 L0,240 Z" fill="#5d5346" opacity="0.13"/>
+  <!-- 三岔路 -->
+  <g stroke="#5d5346" stroke-linecap="round" fill="none" opacity="0.5">
+    <path d="M400,238 Q396,200 380,170 Q340,110 260,84" stroke-width="7" stroke-dasharray="2 16"/>
+    <path d="M400,238 Q404,196 400,150 Q398,110 404,72" stroke-width="7" stroke-dasharray="2 16"/>
+    <path d="M400,238 Q408,198 428,168 Q470,112 552,88" stroke-width="7" stroke-dasharray="2 16"/>
+  </g>
+  <!-- 路牌 -->
+  <g opacity="0.85">
+    <path d="M400,232 L400,140" stroke="#2b2620" stroke-width="7" stroke-linecap="round"/>
+    <path d="M352,148 L448,148 L462,160 L448,172 L352,172 Z" fill="#2b2620" opacity="0.9"/>
+    <text x="404" y="166" font-family="'Noto Serif TC','PMingLiU',serif" font-size="17" fill="#f4ecdc" text-anchor="middle" letter-spacing="6">岔路</text>
+    <path d="M362,120 L438,120 L424,132 L362,132 Z" fill="#2b2620" opacity="0.6"/>
+  </g>
+  <!-- 佇立的行人 -->
+  <g opacity="0.85">
+    <circle cx="330" cy="176" r="5" fill="#2b2620"/>
+    <path d="M330,181 L330,200 M330,187 L321,193 M330,187 L339,192 M330,200 L324,214 M330,200 L336,214" stroke="#2b2620" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M339,192 L344,185" stroke="#2b2620" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="345" cy="183" r="2.6" fill="#8c2f1b" opacity="0.9"/>
+  </g>
+  <path d="M80,226 Q300,216 520,224 Q660,230 760,222" stroke="#5d5346" stroke-width="4" fill="none" opacity="0.22" stroke-linecap="round"/>
+  <rect x="736" y="24" width="34" height="34" rx="4" fill="#8c2f1b" opacity="0.8"/>
+  <text x="753" y="48" font-family="'Noto Serif TC','PMingLiU',serif" font-size="20" fill="#f4ecdc" text-anchor="middle">擇</text>
+</svg>
