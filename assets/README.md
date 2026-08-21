@@ -46,3 +46,13 @@ assets/
 - 所有欄位都可以是 `null`(沒填 = 該處自動不顯示,不會壞)
 - 瀏覽器規定:音樂要等玩家第一次點擊頁面後才會開始播(引擎已處理)
 - 音樂記得用有授權的素材(或 AI 生成)
+
+## AI 生圖提示詞(2026-08-21 給設計者的建議,生好丟進 img/ 即可)
+
+**風格基底(每張共用)**
+- 中文:水墨畫風格、宣紙米色背景、大量留白、淡墨暈染、遠山霧氣、少量硃砂紅點綴、武俠意境、無文字、橫幅構圖
+- 英文:traditional Chinese ink wash painting, wuxia atmosphere, beige rice paper texture, negative space, misty mountains, vermillion accents, no text(Midjourney 橫幅 --ar 4:1、事件圖 --ar 10:3)
+
+**五個位置的主體**:①頁首=官道獨行旅人+層疊山巒+孤松+雁陣(1200×300)②見聞=路邊茶棚熱茶(800×240)③抉擇=三岔路+路牌+佇立背影 ④比試=兩道剪影對峙塵土飛揚 ⑤機緣=崖頂觀雲海+淡月
+
+**技巧**:同一批生成裡挑五張色調才統一;有亂碼文字就加「畫面中不要文字」/ --no text watermark;壓到 300KB 內(tinypng.com)。
