@@ -45,6 +45,11 @@ function judgeLabel(ev, c) {
 
 // 條件的白話說明(逐事件手寫,避免術語)
 const COND_NOTE = {
+  "DA-008_ferry_repaid": "只有當時讓位給抱藥婦人的人會遇到(3 天後,一次性)",
+  "CH-006_ferry_grudge": "只有當時當眾揭穿艄公的人會遇到(3 天後,一次性)",
+  "DA-009_old_tune": "只有遇過霧中燈籠老人的人會遇到(3 天後,一次性)",
+  "CH-007_wine_errand": "只有喝過老漁夫魚湯的人會遇到(3 天後,一次性)",
+  "DA-010_dock_talk": "只有那晚聽過漁歌的人會遇到(3 天後,一次性)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -233,13 +238,13 @@ for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-00
 
 P("\n---");
 P("## 五、隨機池・商路(三岔口選「走東」的人更常遇到)");
-for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall"]) {
+for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 六、隨機池・水路(選「走南」的人更常遇到)");
-for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire"]) {
+for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

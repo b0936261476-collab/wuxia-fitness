@@ -508,10 +508,17 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
     }
     if (he.byFlag) {
       // 依序比對:第一個命中的 flag 版本;都沒中用 default(§9.11 L1 回聲——世界記得你做過的事)
-      const hit = he.byFlag.find((v) => v.flags.split("|").some((f) => state.flags[f])) ?? he.default;
+      let hit = he.byFlag.find((v) => v.flags.split("|").some((f) => state.flags[f])) ?? he.default;
+      const fameHit = matchTierKey(hit.fameVariants, pending.fameTier); // 出名之後,回聲也換一種講法(§9.6.2)
+      if (fameHit) hit = { ...hit, ...fameHit, fameVariants: undefined };
       return finalize(state, data, pending, ev, { outcome: hit, resultText: hit.text }, todayStr, rng, finalizeHooks);
     }
-    return finalize(state, data, pending, ev, { outcome: he, resultText: he.text }, todayStr, rng, finalizeHooks);
+    {
+      let outcome = he;
+      const fameHit = matchTierKey(he.fameVariants, pending.fameTier);
+      if (fameHit) outcome = { ...he, ...fameHit, fameVariants: undefined };
+      return finalize(state, data, pending, ev, { outcome, resultText: outcome.text }, todayStr, rng, finalizeHooks);
+    }
   }
 
   const opt = (ev.beats.cheng.choices || []).find((c) => c.id === choiceId);

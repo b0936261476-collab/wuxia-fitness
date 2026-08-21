@@ -16,6 +16,13 @@
       "restore": { "tili": 100 }
     },
     {
+      "id": "shai-yaocao",
+      "name": "曬乾的藥草",
+      "type": "consumable",
+      "description": "渡口那位抱藥的大嫂托艄公轉交的。曬得很仔細,紮得很整齊,像在還一件很重的東西。",
+      "restore": { "hp": 200 }
+    },
+    {
       "id": "liaoshangyao",
       "name": "療傷藥",
       "type": "consumable",

@@ -359,7 +359,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 全數入庫,編號一致", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 + B3 後續 5 全數入庫,編號一致", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -372,7 +372,9 @@ test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 全數入庫,編號一
     "DA-005_teatime_gossip", "DA-006_woodsman_night", "DA-007_tightrope_walker",
     "CH-003_drunkard_stall", "CH-004_overloaded_ferry", "CH-005_landslide",
     "DU-003_river_diving", "DU-004_hunter_archery",
-    "FO-003_mist_lantern", "FO-004_night_fishfire"
+    "FO-003_mist_lantern", "FO-004_night_fishfire",
+    "DA-008_ferry_repaid", "CH-006_ferry_grudge", "DA-009_old_tune",
+    "CH-007_wine_errand", "DA-010_dock_talk"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -578,4 +580,44 @@ test("FO-001 需要順口溜鑰匙;FO-002 空穗環需另過眼功察覺", () =>
   assert.ok(s.flags.flute_source_seen);
   assert.ok(!s.flags.empty_tassel_seen);
   assert.doesNotMatch(res.entry.resultText, /穗環/);
+});
+
+// ---------- B3 批次:後續回聲與出名版 ----------
+
+test("B3:byFlag 事件的出名版本生效(舊調重彈・跟燈版)", () => {
+  const mk = (fame) => {
+    const s = newState();
+    s.flags.lantern_tune = true;
+    s.flagDates = { lantern_tune: "2026-08-10" };
+    s.journal.push({ n: 1, id: "FO-003_mist_lantern", date: "2026-08-10" });
+    s.steps = { total: 9000, resolved: 1, byDate: {} };
+    s.reputation.fame = fame;
+    return s;
+  };
+  // 無名之輩:琴師把話說完
+  const s1 = mk(0);
+  startNextEvent(s1, data, D0, rngFor(s1, "DA-009_old_tune", D0));
+  const r1 = chooseOption(s1, data, null, D0);
+  assert.match(r1.entry.resultText, /聽過的人……都不在了/);
+  assert.ok(s1.flags.fiddler_knows_tune);
+  // 名人:琴師把話嚥了回去
+  const s2 = mk(data.reputation.tierThresholds.fame[4]);
+  startNextEvent(s2, data, D0, rngFor(s2, "DA-009_old_tune", D0));
+  const r2 = chooseOption(s2, data, null, D0);
+  assert.match(r2.entry.resultText, /嚥了回去/);
+  assert.ok(s2.flags.fiddler_fled_from_name);
+});
+
+test("B3:渡口冷臉 C 提醒龍骨 → 樑子一筆勾銷還倒欠一次", () => {
+  const s = newState();
+  s.flags.ferryman_grudge = true;
+  s.flagDates = { ferryman_grudge: "2026-08-10" };
+  s.journal.push({ n: 1, id: "CH-004_overloaded_ferry", date: "2026-08-10" });
+  s.steps = { total: 9000, resolved: 1, byDate: {} };
+  setLevel(s, "ear", 24); // 察覺必見
+  startNextEvent(s, data, D0, rngFor(s, "CH-006_ferry_grudge", D0));
+  const res = chooseOption(s, data, "C", D0);
+  assert.ok(res.done);
+  assert.ok(s.flags.ferryman_owes_you);
+  assert.ok(!s.flags.ferryman_grudge);
 });

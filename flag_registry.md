@@ -104,3 +104,19 @@
 | river_rite_seen | FO-004 C | 暗線 | 江上法事為誰超度?水線懸案候補 |
 | cliff_conquered_weak | FO-001 仰望成功 | 暗線 | 以弱摘藥——採藥人都得敬三分 |
 | flute_membrane | FO-002 仰望成功 | 暗線 | 窗台上的斷笛膜——被注意到了 |
+
+## B3 批次(後續回聲,DA-008 ~ DA-010,2026-08-21 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| ferry_debt_repaid | DA-008 | 回聲收尾 | 婦人的人情落地(藥草) |
+| ferry_grudge_endured | CH-006 A | 沉線 | 樑子繼續淤著 |
+| ferry_grudge_settled | CH-006 B | 回聲收尾 | 和了一半(清除 ferryman_grudge) |
+| ferryman_owes_you | CH-006 C | 暗線 | 這條江上有個艄公欠你一次(清除 grudge) |
+| fiddler_knows_tune | DA-009(跟燈版) | **暗線(高規格)** | 「聽過的人都不在了」——燈籠人線再深一寸 |
+| fiddler_fled_from_name | DA-009 跟燈版・名人 | 暗線 | 他本來想說什麼的;名聲讓他嚥了回去 |
+| fiddler_blessing | DA-009(站住版) | 暗線 | 琴師說的「他」是誰? |
+| wine_poured | CH-007 A | 暗線 | 替老漁夫倒了酒——「水裡的」是誰,留白 |
+| wine_declined | CH-007 B | 沉線 | 搖不動櫓的手 |
+| sunken_ship_heard | DA-010 | **暗線(懸案)** | 十年前無風無浪沉的船、空船艙——水線懸案主鉤 |
+| gossip_fled_from_name | DA-010 法事版・名人 | 沉線 | 名聲讓人把嘴閉緊 |
