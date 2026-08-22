@@ -50,6 +50,16 @@ const COND_NOTE = {
   "DA-009_old_tune": "只有遇過霧中燈籠老人的人會遇到(3 天後,一次性)",
   "CH-007_wine_errand": "只有喝過老漁夫魚湯的人會遇到(3 天後,一次性)",
   "DA-010_dock_talk": "只有那晚聽過漁歌的人會遇到(3 天後,一次性)",
+  "DA-011_blacksmith": "走商路的人更常遇到(可重複)",
+  "CH-008_lost_child": "走商路的人更常遇到(可重複)",
+  "DU-005_teahouse_go": "走商路的人更常遇到(可重複)",
+  "DA-012_rain_pavilion": "走山路的人更常遇到(可重複)",
+  "DU-006_runaway_mule": "走山路的人更常遇到(可重複)",
+  "FO-005_sea_of_clouds": "走山路的人更常遇到(可重複)",
+  "CH-009_letter_writing": "走水路的人更常遇到(可重複)",
+  "FO-006_sunken_bell": "走水路的人更常遇到(可重複)",
+  "CH-010_peddler_cart": "哪條路都會遇到(可重複)",
+  "DA-013_censor_passing": "哪條路都會遇到(可重複)——遇到監使,你會得知自己最新名次",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -232,25 +242,25 @@ for (const id of ["1-1_lost_purse", "1-2_purse_notice", "1-3_purse_earned", "1-4
 
 P("\n---");
 P("## 四、隨機池・通用(哪條路都會遇到)");
-for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute"]) {
+for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 五、隨機池・商路(三岔口選「走東」的人更常遇到)");
-for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune"]) {
+for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 六、隨機池・水路(選「走南」的人更常遇到)");
-for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk"]) {
+for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 七、隨機池・山路(選「走西」的人更常遇到)");
-for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern"]) {
+for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

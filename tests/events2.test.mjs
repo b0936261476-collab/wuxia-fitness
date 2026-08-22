@@ -359,7 +359,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 + B3 後續 5 全數入庫,編號一致", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 + B3 後續 5 + B4 日常 10 全數入庫,編號一致", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -374,7 +374,10 @@ test("自檢:正式庫 14 + 序章教學 7 + B2 批次 10 + B3 後續 5 全數�
     "DU-003_river_diving", "DU-004_hunter_archery",
     "FO-003_mist_lantern", "FO-004_night_fishfire",
     "DA-008_ferry_repaid", "CH-006_ferry_grudge", "DA-009_old_tune",
-    "CH-007_wine_errand", "DA-010_dock_talk"
+    "CH-007_wine_errand", "DA-010_dock_talk",
+    "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go",
+    "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds",
+    "CH-009_letter_writing", "FO-006_sunken_bell", "CH-010_peddler_cart", "DA-013_censor_passing"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -620,4 +623,30 @@ test("B3:渡口冷臉 C 提醒龍骨 → 樑子一筆勾銷還倒欠一次", () 
   assert.ok(res.done);
   assert.ok(s.flags.ferryman_owes_you);
   assert.ok(!s.flags.ferryman_grudge);
+});
+
+// ---------- B4 批次:名次得知管道 ----------
+
+test("B4:監使過境=監使管道、茶棚棋局(城鎮)=榜文管道、山巔雲海=不揭名次", async () => {
+  const { revealsRanking } = await import("../src/engine/npcs.js");
+  const by = (id) => data.events.pool.find((e) => e.eventId === id).tagBlock;
+  assert.equal(revealsRanking(by("DA-013_censor_passing")), "監使");
+  assert.equal(revealsRanking(by("DU-005_teahouse_go")), "榜文");
+  assert.equal(revealsRanking(by("FO-005_sea_of_clouds")), null);
+});
+
+test("B4:貨郎拋錨——察覺者有省力解,未察覺者只能硬推", () => {
+  const s = newState();
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "CH-010_peddler_cart", D0)); // 眼0 → 必盲
+  assert.deepEqual(presentEvent(s, data).choices.map((c) => c.id), ["A", "C"]);
+
+  const s2 = newState();
+  setLevel(s2, "eye", 24);
+  addSteps(s2, 1000);
+  startNextEvent(s2, data, D0, rngFor(s2, "CH-010_peddler_cart", D0));
+  assert.deepEqual(presentEvent(s2, data).choices.map((c) => c.id), ["A", "B", "C"]);
+  const res = chooseOption(s2, data, "B", D0);
+  assert.match(res.entry.resultText, /它認方向/);
+  assert.equal(s2.reputation.fame, 1);
 });
