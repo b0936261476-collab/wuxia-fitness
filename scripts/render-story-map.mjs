@@ -90,6 +90,10 @@ const COND_NOTE = {
   "CH-022_storyteller_you": "俠名遠播之後才會遇到(可重複)",
   "CH-023_kneeling_boy": "俠名遠播之後才會遇到(一次性)",
   "CH-024_name_escort": "俠名遠播之後才會遇到(一次性)",
+  "CH-025_new_scale": "只有當年管過米行那桿秤的人會遇到(20 天後——換秤掛招牌要日子,一次性)",
+  "DU-012_diving_rematch": "只有上回贏過摸江底的人會遇到(45 天後——他練了一個多月,一次性)",
+  "CH-026_basket_siblings": "走山路的人更常遇到(一次性)",
+  "FO-012_one_coin_fortune": "哪條路都會遇到(一次性)——結語依你的命格而不同",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -272,25 +276,25 @@ for (const id of ["1-1_lost_purse", "1-2_purse_notice", "1-3_purse_earned", "1-4
 
 P("\n---");
 P("## 四、隨機池・通用(哪條路都會遇到)");
-for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star", "CH-019_boy_returns"]) {
+for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star", "CH-019_boy_returns", "FO-012_one_coin_fortune"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 五、隨機池・商路(三岔口選「走東」的人更常遇到)");
-for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall", "CH-017_east_village"]) {
+for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall", "CH-017_east_village", "CH-025_new_scale"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 六、隨機池・水路(選「走南」的人更常遇到)");
-for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell", "CH-011_seventh_fair", "DU-008_laundry_chase", "CH-018_south_bridge"]) {
+for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell", "CH-011_seventh_fair", "DU-008_laundry_chase", "CH-018_south_bridge", "DU-012_diving_rematch"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 七、隨機池・山路(選「走西」的人更常遇到)");
-for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds", "DA-015_bow_returned", "FO-008_eave_bells", "FO-011_coin_keeper"]) {
+for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds", "DA-015_bow_returned", "FO-008_eave_bells", "FO-011_coin_keeper", "CH-026_basket_siblings"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

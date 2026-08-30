@@ -558,6 +558,13 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
     pending.subBranch = null;
   }
 
+  // 命格分歧(§1.3):結局節點帶 byFate 時,共通段後接命格軸專屬收尾(B8 卦攤壓軸)
+  if (outcome.byFate) {
+    const axis = fateAxisOf(state);
+    const body = outcome.byFate[axis] ?? outcome.byFate.default;
+    outcome = { ...outcome, text: outcome.text ? outcome.text + "\n\n" + body : body, byFate: undefined };
+  }
+
   // 名人版結果覆蓋(fameVariants on outcome)
   const fameOutcome = matchTierKey(outcome.fameVariants, pending.fameTier);
   if (fameOutcome) outcome = { ...outcome, ...fameOutcome, fameVariants: undefined };

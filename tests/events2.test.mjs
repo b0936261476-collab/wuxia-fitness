@@ -359,7 +359,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2~B7 全數入庫,編號一致", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2~B8 全數入庫,編號一致(滿 80)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -386,7 +386,8 @@ test("自檢:正式庫 14 + 序章教學 7 + B2~B7 全數入庫,編號一致", (
     "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star",
     "CH-017_east_village", "CH-018_south_bridge", "CH-019_boy_returns", "FO-011_coin_keeper",
     "DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor", "CH-022_storyteller_you",
-    "CH-023_kneeling_boy", "CH-024_name_escort"
+    "CH-023_kneeling_boy", "CH-024_name_escort",
+    "CH-025_new_scale", "DU-012_diving_rematch", "CH-026_basket_siblings", "FO-012_one_coin_fortune"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -718,4 +719,38 @@ test("B7:少年尋你——boy_will_seek_you 滿45天開門,察覺者能認出�
   const res = chooseOption(s2, data, "C", D0);
   assert.ok(res.done);
   assert.ok(s2.flags.blunt_swords_known);
+});
+
+// ---------- B8 批次:命格分歧收尾與回響間隔 ----------
+
+test("B8:卦攤壓軸——判定結局的 byFate 依命格軸接不同收尾", () => {
+  const s = newState();
+  s.talents = { genggu: 30, wuxing: 30, yunqi: 80 }; // 運氣單高 → yunqi 軸
+  skipIntro(s);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "FO-012_one_coin_fortune", D0));
+  const res = chooseOption(s, data, "A", D0, () => 0.01); // 必成
+  assert.ok(res.done);
+  assert.match(res.entry.resultText, /謝你自己,走到了這裡/); // yunqi 軸收尾
+  assert.ok(s.flags.fate_stall_heard);
+
+  const s2 = newState();
+  s2.talents = { genggu: 50, wuxing: 50, yunqi: 50 }; // 均衡 → default 軸
+  skipIntro(s2);
+  addSteps(s2, 1000);
+  startNextEvent(s2, data, D0, rngFor(s2, "FO-012_one_coin_fortune", D0));
+  const res2 = chooseOption(s2, data, "A", D0, () => 0.01);
+  assert.match(res2.entry.resultText, /骨頭最硬的,從來是普通人/);
+});
+
+test("B8:雪恥戰要隔 45 天——「練了一個多月」的時間感", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  s.flags.river_respect = true;
+  s.journal.push({ n: 1, id: "DU-003_river_diving", date: "2026-08-10" });
+  assert.ok(!eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "DU-012_diving_rematch"), "9 天太早");
+  s.journal[s.journal.length - 1].date = "2026-07-01";
+  assert.ok(eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "DU-012_diving_rematch"));
 });

@@ -177,3 +177,16 @@
 | legend_heard / legend_corrected | CH-022 | 沉線 | 「沒有八尺——是九尺!」;大俠夜探黑風寨(你沒探過) |
 | disciple_pointed / disciple_referred / disciple_father_came | CH-023 | 暗線 | 三年之約/武館「大俠的徒弟」/父子同跪——日後批次候補 |
 | escort_paid_full / escort_meal_only / escort_refused | CH-024 | 沉線 | 黑風口山匪的「借道費」;替身漢子(該收版權嗎) |
+
+## B8 批次(收尾滿 80,CH-025 ~ FO-012,2026-08-30 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| new_scale_verified / new_scale_called_out | CH-025 | 回聲收尾 | 米行線收線:秤真的換了;「秤準是本分,不是功德」 |
+| water_half_master | DU-012 贏/輾壓 | 沉線 | 「水上的半個徒弟」——教了再補全 |
+| river_avenged / rematch_ducked | DU-012 | 沉線 | 他贏了能吹一輩子;「他不敢」+替你付的船錢 |
+| siblings_helped / siblings_shortcut | CH-026 | 沉線 | 揹簍當馬騎;半塊餅的謝禮 |
+| fruit_secret_kept | CH-026 A察覺 | 沉線 | 替弟弟瞞了野果的事——天理已經在辦他了 |
+| fate_stall_heard | FO-012 A成功 | **暗線(高規格留白)** | 卦攤先生=村口那位?命格軸專屬結語(壓軸,首尾呼應創角) |
+| fate_stall_unreadable | FO-012 A失敗 | 沉線 | 「你的命在路上,不在攤上」 |
+| fate_stall_peer | FO-012 B | **暗線(留白)** | 「同行,不收錢」——哪門子的同行? |
