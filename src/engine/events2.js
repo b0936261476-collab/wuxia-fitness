@@ -4,7 +4,7 @@
 // 純邏輯、無 DOM;rng 與日期一律由呼叫端傳入,方便測試。
 
 import { levelFromExp, DIMENSIONS, addExp } from "./exp.js";
-import { regionMultiplier } from "./map.js";
+import { regionMultiplier, grantProvinceMap } from "./map.js";
 import { successRateV2 } from "./tags.js";
 import {
   HP_DEBUFF_TABLE, QI_DEBUFF_TABLE, TILI_DEBUFF_TABLE,
@@ -674,6 +674,9 @@ function applyEffects(state, data, effects, todayStr, note) {
       state.inventory[itemId] = (state.inventory[itemId] || 0) + count;
     }
   }
+  // 輿圖到手(§9.10)。門檻做好了,鑰匙也得放進世界裡——
+  // 沒有任何事件會發圖的話,那一州就永遠去不了。
+  if (effects.mapGrant) grantProvinceMap(state, data, effects.mapGrant);
   if (effects.setFlags) setFlags(state, effects.setFlags, effects.flagData, todayStr);
   for (const f of effects.clearFlags || []) delete state.flags[f];
 }

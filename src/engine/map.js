@@ -117,6 +117,29 @@ export function clearDestination(state) {
   state.travel.startTotal = 0;
 }
 
+// ---------- 輿圖到手 ----------
+
+/**
+ * 把某一州的輿圖交給玩家(事件效果 mapGrant)。
+ * 門檻擋得住人,是因為鑰匙在江湖上——沒有事件發圖,那一州就永遠去不了。
+ * @param {string} provinceId
+ * @returns {{granted:boolean, province?:object, already?:boolean}}
+ */
+export function grantProvinceMap(state, data, provinceId) {
+  ensureTravel(state, data);
+  const prov = (data.map?.provinces ?? []).find((p) => p.id === provinceId);
+  if (!prov) return { granted: false };
+  if (state.maps[provinceId]) return { granted: false, province: prov, already: true };
+  state.maps[provinceId] = true;
+  return { granted: true, province: prov };
+}
+
+/** 手上有哪幾州的圖 */
+export function ownedMaps(state, data) {
+  ensureTravel(state, data);
+  return (data.map?.provinces ?? []).filter((p) => state.maps[p.id]);
+}
+
 // ---------- 進度與抵達 ----------
 
 /** 這趟已經走了多少步 */

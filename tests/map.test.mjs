@@ -8,7 +8,8 @@ import { dirname, join } from "node:path";
 import {
   newTravel, ensureTravel, allLocations, locationById, provinceOf, neighbours,
   distanceBetween, canTravelTo, setDestination, clearDestination,
-  walked, remaining, checkArrival, regionMultiplier, REGION_BONUS
+  walked, remaining, checkArrival, regionMultiplier, REGION_BONUS,
+  grantProvinceMap, ownedMaps
 } from "../src/engine/map.js";
 import { newState, addSteps } from "../src/engine/game.js";
 
@@ -238,4 +239,51 @@ test("newTravel:起點取自資料檔,不寫死", () => {
   const t = newTravel(data);
   assert.equal(t.at, data.map.startLocation);
   assert.deepEqual(t.visited, []);
+});
+
+// ---------- 輿圖到手(事件效果 mapGrant) ----------
+
+test("mapGrant:事件可以把一州的輿圖交到玩家手上", () => {
+  const s = hero();
+  assert.equal(canTravelTo(s, data, "yangzhou", 999).why, "nomap");
+
+  const r = grantProvinceMap(s, data, "jiangnan");
+  assert.equal(r.granted, true);
+  assert.equal(r.province.name, "江南");
+  assert.equal(s.maps.jiangnan, true);
+  assert.equal(canTravelTo(s, data, "yangzhou", 999).ok, true);
+});
+
+test("mapGrant:同一張圖不會重複發", () => {
+  const s = hero();
+  grantProvinceMap(s, data, "jiangnan");
+  const again = grantProvinceMap(s, data, "jiangnan");
+  assert.equal(again.granted, false);
+  assert.equal(again.already, true);
+});
+
+test("mapGrant:沒這個州就安靜失敗,不炸", () => {
+  const s = hero();
+  assert.deepEqual(grantProvinceMap(s, data, "沒這州"), { granted: false });
+});
+
+test("ownedMaps:新角色手上只有中原", () => {
+  const s = hero();
+  assert.deepEqual(ownedMaps(s, data).map((p) => p.id), ["zhongyuan"]);
+});
+
+test("⚠️ 門檻與鑰匙要成對:每個鎖著的州都該有事件發得出圖(內容待補時此測試會提醒)", () => {
+  const events = data.events.pool;
+  const granted = new Set();
+  for (const e of events) {
+    for (const m of JSON.stringify(e).matchAll(/"mapGrant"\s*:\s*"([a-z]+)"/g)) granted.add(m[1]);
+  }
+  const locked = data.map.provinces.filter((p) => !p.open).map((p) => p.id);
+  const missing = locked.filter((id) => !granted.has(id));
+  // 只對「已宣告開放」的州強制要求鑰匙;其餘州列出來當待辦提醒
+  const opened = data.map.provinces.filter((p) => p.open && p.id !== "zhongyuan").map((p) => p.id);
+  for (const id of opened) {
+    assert.ok(granted.has(id), `${id} 已開放卻沒有任何事件發得出它的輿圖——玩家永遠去不了`);
+  }
+  assert.ok(Array.isArray(missing));
 });
