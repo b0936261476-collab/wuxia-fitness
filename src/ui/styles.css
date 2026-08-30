@@ -535,3 +535,69 @@ select, input[type="number"], textarea {
   font-size: 0.92rem;
   line-height: 1.6;
 }
+
+/* ===== 輿圖(§9.10) ===== */
+.loc-glyph { display:inline-block; width:1.4em; text-align:center; }
+.loc-glyph.town { color: var(--accent); }
+.loc-glyph.sect { color: var(--gold); }
+.loc-glyph.spot { color: var(--ink-light); }
+
+.map-here-name { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.12em; }
+.map-here-prov { color: var(--ink-light); font-size: 0.85rem; letter-spacing: 0.16em; margin: 2px 0 10px; }
+.map-see {
+  line-height: 1.9;
+  padding-left: 11px;
+  border-left: 2px solid var(--gold);
+  margin-bottom: 10px;
+}
+
+.journey-line { font-size: 1.05rem; line-height: 1.9; margin-bottom: 10px; }
+.journey-steps { color: var(--accent); font-variant-numeric: tabular-nums; font-size: 1.25rem; }
+.journey-line em { color: var(--green); font-style: normal; }
+.bar-fill.journey-fill { background: var(--accent); }
+#map-journey .btn { margin-top: 12px; }
+
+.dest-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 11px 10px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.dest-row:hover { border-color: var(--accent); }
+.dest-row:disabled { opacity: 0.55; cursor: default; }
+.dest-row:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dest-b { flex: 1; min-width: 0; }
+.dest-n { display: block; font-weight: 700; }
+.dest-n em { color: var(--accent); font-style: normal; font-size: 0.82rem; margin-left: 6px; }
+.dest-see { display: block; font-size: 0.85rem; color: var(--ink-light); line-height: 1.7; }
+.dest-d {
+  flex: none;
+  color: var(--ink-light);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.world-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--border);
+}
+.world-row:last-child { border-bottom: none; }
+.world-row.locked { color: var(--ink-light); }
+.world-n { width: 3.5em; font-weight: 700; letter-spacing: 0.1em; }
+.world-s { flex: 1; font-size: 0.88rem; color: var(--ink-light); }
+.world-row.locked .world-s { color: var(--gold); }
+.world-c { font-size: 0.82rem; color: var(--ink-light); font-variant-numeric: tabular-nums; }

@@ -4,6 +4,7 @@
 // 純邏輯、無 DOM;rng 與日期一律由呼叫端傳入,方便測試。
 
 import { levelFromExp, DIMENSIONS, addExp } from "./exp.js";
+import { regionMultiplier } from "./map.js";
 import { successRateV2 } from "./tags.js";
 import {
   HP_DEBUFF_TABLE, QI_DEBUFF_TABLE, TILI_DEBUFF_TABLE,
@@ -275,6 +276,7 @@ export function eligibleEvents(state, data, todayStr) {
       for (const [flag, w] of Object.entries(ev.conditions?.weightFlags || {})) {
         if (state.flags[flag]) weight += w;
       }
+      weight *= regionMultiplier(state, data, ev); // 人在哪,那裡的事就常遇到(§9.10 抵達=區域池切換)
       return { ev, weight };
     });
 }

@@ -52,6 +52,8 @@ export function newState() {
     training: null,            // 計時修煉 {exerciseId, startedAt} 或 null
     narrative: newNarrativeRecord(), // 敘事播放紀錄(§4 狀態四段式 / §8.7 監使頒號),避免重播
     lastTickAt: null,          // 上次結算自然恢復的時戳(ms);離線期間的恢復靠它補算
+    travel: null,              // 輿圖旅行狀態(§9.10);首次用到時由 map.js 的 ensureTravel 建立
+    maps: null,                // 手上有哪幾州的輿圖 {provinceId: true}——沒圖就走不到那一州
     journal: []                // 江湖路歷程
   };
 }

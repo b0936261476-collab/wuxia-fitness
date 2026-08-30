@@ -8,6 +8,10 @@ import {
 } from "../engine/game.js";
 import { collectNarratives } from "../engine/narratives.js";
 import {
+  ensureTravel, allLocations, locationById, provinceOf, distanceBetween,
+  canTravelTo, setDestination, clearDestination, walked, remaining, checkArrival
+} from "../engine/map.js";
+import {
   namedNpcAtRank, nextNamedNpcAbove, nextIntegerMilestone,
   surpassTier, surpassFameReward, percentileForRank
 } from "../engine/npcs.js";
@@ -46,6 +50,7 @@ const NARRATIVE_BEAT_LABELS = {
   // surpass 沒有段名:名次播報是江湖快報的口吻,不套四段式
 };
 const NARRATIVE_KIND_LABELS = {
+  arrival: "輿圖 ‧ 到了",
   state:   "身上的狀況",
   bestow:  "司天監 ‧ 頒號",
   board:   "群俠錄 ‧ 榜文",
@@ -53,10 +58,10 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "p2-3"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "p2-4"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
-  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media", "jianghu_news"];
+  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media", "jianghu_news", "map"];
   const loaded = await Promise.all(
     names.map((n) =>
       fetch(`data/${n}.json?v=${DATA_VERSION}`).then((r) => {
@@ -94,6 +99,7 @@ function renderAll() {
   renderHero();
   renderTrain();
   renderRoad();
+  renderMap();
   renderFame();
   renderBag();
 }
@@ -504,6 +510,105 @@ function renderBag() {
   }
 }
 
+// ---------- 輿圖(§9.10):步數就是趕路 ----------
+
+const LOC_GLYPH = { town: "■", sect: "▲", spot: "◇" };
+const LOC_KIND = { town: "城鎮", sect: "門派", spot: "景點" };
+
+function renderMap() {
+  if (!data.map) return;
+  ensureTravel(state, data);
+  const here = locationById(data, state.travel.at);
+  const prov = provinceOf(data, state.travel.at);
+
+  $("#map-here").innerHTML = `
+    <p class="map-here-name"><span class="loc-glyph ${here.type}">${LOC_GLYPH[here.type]}</span>${here.name}</p>
+    <p class="map-here-prov">${prov.name} ‧ ${LOC_KIND[here.type]}</p>
+    <p class="map-see">${here.see}</p>
+    <p class="hint">待在這裡的日子,遇到的多半是這一帶的事。</p>`;
+
+  // 趕路進度
+  const rest = remaining(state);
+  const card = $("#map-journey-card");
+  if (rest == null) {
+    card.hidden = true;
+  } else {
+    card.hidden = false;
+    const dest = locationById(data, state.travel.to);
+    const done = walked(state);
+    const pct = Math.min(100, (done / state.travel.distance) * 100);
+    $("#map-journey").innerHTML = `
+      <p class="journey-line">🚶 距離<strong>${dest.name}</strong>,還有
+        <strong class="journey-steps">${rest.toLocaleString()}</strong> 步。
+        ${rest <= 2000 ? "<em>再一口氣就到了。</em>" : ""}</p>
+      <div class="bar"><div class="bar-fill journey-fill" style="width:${pct}%"></div></div>
+      <p class="hint">已走 ${done.toLocaleString()} / ${state.travel.distance.toLocaleString()} 步。
+        路上照樣遇得到事——趕路才是遇事的時候。</p>
+      <button type="button" class="btn" id="map-abort">不去了</button>`;
+    $("#map-abort").addEventListener("click", () => {
+      if (!confirm(`放棄前往${dest.name}?已經走的路不會退回來。`)) return;
+      clearDestination(state);
+      save();
+      renderAll();
+    });
+  }
+
+  // 可去的地方(同州、已開放)
+  const lv = playerLevelSum(state);
+  const box = $("#map-dest");
+  const reachable = allLocations(data)
+    .filter((l) => l.id !== state.travel.at && provinceOf(data, l.id).open)
+    .map((l) => ({ l, d: distanceBetween(data, state.travel.at, l.id) }))
+    .filter((x) => x.d != null)
+    .sort((a, b) => a.d - b.d);
+  box.innerHTML = reachable.map(({ l, d }) => `
+    <button type="button" class="dest-row" data-go="${l.id}"${state.travel.to === l.id ? " disabled" : ""}>
+      <span class="loc-glyph ${l.type}">${LOC_GLYPH[l.type]}</span>
+      <span class="dest-b">
+        <span class="dest-n">${l.name}${state.travel.to === l.id ? "<em>(趕路中)</em>" : ""}</span>
+        <span class="dest-see">${l.see}</span>
+      </span>
+      <span class="dest-d">${d.toLocaleString()} 步</span>
+    </button>`).join("");
+  box.querySelectorAll("[data-go]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const res = setDestination(state, data, b.dataset.go, lv);
+      if (!res.ok) { alert(res.text); return; }
+      save();
+      renderAll();
+      $("#map-journey-card").scrollIntoView({ behavior: "smooth", block: "center" });
+    })
+  );
+
+  // 天下:六州一覽
+  $("#map-world").innerHTML = data.map.provinces.map((p) => {
+    const hasMap = !!state.maps[p.id];
+    const enough = (p.gate ?? 0) <= lv;
+    const stateText = !p.open ? "尚未開放"
+      : !hasMap ? "沒有這一州的圖"
+      : !enough ? `歷練不夠(要 ${p.gate})`
+      : "去得了";
+    const cls = !p.open || !hasMap || !enough ? " locked" : "";
+    return `<div class="world-row${cls}">
+      <span class="world-n">${p.name}</span>
+      <span class="world-s">${stateText}</span>
+      <span class="world-c">${p.locations.length} 處</span>
+    </div>`;
+  }).join("");
+}
+
+/** 走到了沒?到了就把抵達敘事排進浮層隊列 */
+function collectArrival() {
+  if (!data.map) return [];
+  const a = checkArrival(state, data);
+  if (!a) return [];
+  return [{
+    kind: "arrival",
+    name: a.name,
+    beats: [a.text, a.firstTime ? `你到了${a.provinceName}的${a.name}。` : ""]
+  }];
+}
+
 // ---------- 群俠錄(§9.7 名次 / §8.1 稱號 / §9.6 聲望) ----------
 
 function renderFame() {
@@ -712,7 +817,7 @@ function showNextNarrative() {
  * 練功本身不會讓你知道自己排第幾——除非監使找上門頒號,那才算遇上了司天監的人。
  */
 function afterAction() {
-  const items = collectNarratives(state, data, resourcePercents(state));
+  const items = [...collectArrival(), ...collectNarratives(state, data, resourcePercents(state))];
   if (items.some((n) => n.kind === "bestow")) items.push(...revealByEnvoy());
   const has = queueItems(items);
   save();
@@ -733,6 +838,7 @@ function onChoose(choiceId, isSub) {
     else if (result.entry.success === false) playSfx("judgeFail");
     playBgm({ tab: "road" }); // 事件結束,回到分頁曲
     queueItems([
+      ...collectArrival(),
       ...collectNarratives(state, data, resourcePercents(state)),
       ...broadcastsFromRankingResult(result.entry.ranking)
     ]);

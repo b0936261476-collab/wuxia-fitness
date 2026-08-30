@@ -18,6 +18,7 @@
     <button class="tab active" data-tab="hero">俠客</button>
     <button class="tab" data-tab="train">練功</button>
     <button class="tab" data-tab="road">江湖路</button>
+    <button class="tab" data-tab="map">輿圖</button>
     <button class="tab" data-tab="fame">群俠錄</button>
     <button class="tab" data-tab="bag">行囊</button>
   </nav>
@@ -90,6 +91,28 @@
       <div class="card">
         <h2>江湖路歷程</h2>
         <div id="journal"></div>
+      </div>
+    </section>
+
+    <!-- 輿圖(§9.10):步數就是趕路 -->
+    <section id="tab-map" class="panel">
+      <div class="card">
+        <h2>你在哪裡</h2>
+        <div id="map-here"></div>
+      </div>
+      <div class="card" id="map-journey-card" hidden>
+        <h2>趕路中</h2>
+        <div id="map-journey"></div>
+      </div>
+      <div class="card">
+        <h2>要去哪裡</h2>
+        <p class="hint">選了目的地,你每天走的步數就同時是趕路的進度——路上照樣遇得到事,不衝突。</p>
+        <div id="map-dest"></div>
+      </div>
+      <div class="card">
+        <h2>天下</h2>
+        <p class="hint">沒有那一州的輿圖,就走不到那一州。圖要在江湖上拿。</p>
+        <div id="map-world"></div>
       </div>
     </section>
 

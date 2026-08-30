@@ -1,0 +1,148 @@
+{
+  "note": "輿圖(§9.10 / 六州全圖規格,設計者 2026-08-23 拍板)。步數就是趕路:選定目的地後,每天走的步數同時推事件、也推路程,兩者不互斥。開放靠兩層——手上要有那一州的輿圖(道具),以及歷練(六維等級總和)要夠。已開放的州內走得到就去得了,不再設門檻。",
+  "startLocation": "zhen",
+  "provinces": [
+    {
+      "id": "zhongyuan", "name": "中原", "order": 1, "open": true, "gate": 0,
+      "mapFrom": "序章結束自動有——你總認得自己家",
+      "locations": [
+        {
+          "id": "zhen", "name": "中原小鎮", "type": "town",
+          "regionTags": ["中原小鎮", "夜市", "鎮口", "米行", "告示牆", "廟會", "墟集", "村口"],
+          "see": "一進鎮就是米行的秤聲和打鐵鋪的火星;告示牆在鎮口,榜文貼在那裡",
+          "arrival": "鎮口的老槐樹底下有人在下棋,米行的秤還在響。你在告示牆前站了一會——榜文換過了,邊角壓著新的漿糊。這裡的每一塊石板你都認得。回來了。"
+        },
+        {
+          "id": "luoyang", "name": "洛陽", "type": "town",
+          "regionTags": ["洛陽", "大城", "官道茶棚", "夜市", "告示牆"],
+          "see": "滿街的人,滿牆的榜。說書人一天講三場,講的都是榜上的人——包括你",
+          "arrival": "進城的隊伍排到城門外二里。你被人潮推著走進去,滿眼都是人:挑擔的、騎馬的、吵架的、算命的。轉過一條街,一整面牆的榜文在陽光下白得刺眼,底下圍了三層人。你這輩子沒見過這麼多人同時在看同一件事。"
+        },
+        {
+          "id": "dukou", "name": "臨江渡", "type": "town",
+          "regionTags": ["渡口", "碼頭", "江灘", "江邊", "夜航", "石灘", "魚攤", "江上"],
+          "see": "船篙碰船舷的聲音整天不停。等船的人、賣魚的人、和不說自己要去哪的人",
+          "arrival": "還沒看見江就先聞到江。空氣是濕的、鹹的,混著魚腥和桐油。渡口的木棧橋被踩得發亮,船篙碰船舷的聲音一下一下,整天不停。有人在等船,有人在等人,也有人只是坐著看水。"
+        },
+        {
+          "id": "biaoju", "name": "裴家鏢局", "type": "sect",
+          "regionTags": ["官道", "商路", "鏢局"],
+          "see": "院子裡永遠有人在裝車。想學怎麼把東西平安送到,這裡的人最懂",
+          "arrival": "鏢局的院子比你想的吵。裝車的、餵馬的、對帳的,沒有人閒著。廊下掛著十幾面走過的鏢旗,顏色深淺不一——深的是走得遠的,淺的是走得久的。"
+        },
+        {
+          "id": "kongtong", "name": "崆峒派", "type": "sect",
+          "regionTags": ["山道", "門派", "山門"],
+          "see": "正經八百的名門,規矩很多。老掌門在跟時間賽跑,想把東西傳下去",
+          "arrival": "石階三百級,每一級都掃得乾淨。山門前兩個年輕弟子攔住你,問來意,問得客氣但一句不肯少。規矩很多的地方,通常是因為裡頭有很怕失去的東西。"
+        },
+        {
+          "id": "yunling", "name": "雲嶺", "type": "spot",
+          "regionTags": ["山道", "破廟", "荒祠", "山野", "山霧", "埡口", "斷崖", "樵夫家", "山神廟"],
+          "see": "山道、破廟、荒祠。走進去就是一個人——山裡的事都在沒有人的時候發生",
+          "arrival": "官道一拐進山就變了個樣:樹合上來,聲音矮下去,只剩你自己的腳步。走了半個時辰,你才想起自己已經很久沒聽見別人的聲音了。山裡的事,都在沒有人的時候發生。"
+        },
+        {
+          "id": "duanyungang", "name": "斷雲崗", "type": "spot",
+          "regionTags": ["山道", "山霧", "斷崖", "埡口"],
+          "see": "上去只有霧,和一盞不知道誰在守的燈。老丐提過這裡,他沒說完",
+          "arrival": "崗上沒有路標,只有霧。霧裡有一點暖黃,不動,像有人提著燈在那裡站了很久很久。你朝那點光走了幾步,又停住——老丐提過這裡。他那句話沒說完。"
+        }
+      ]
+    },
+    {
+      "id": "jiangnan", "name": "江南", "order": 2, "open": false, "gate": 60,
+      "mapFrom": "裴家鏢局最順——走鏢的人本來就有各地的圖",
+      "refuse": "「江南?」掌櫃把算盤一撥,笑了,「後生,那地方水路縱橫,沒張圖你連渡口都找不著。再走幾年江湖吧。」",
+      "locations": [
+        { "id": "yangzhou", "name": "揚州", "type": "town", "regionTags": ["揚州", "大城", "渡口", "夜市"], "see": "水道穿城而過,橋比路多。酒樓裡有人在唱曲,也有人在談不能寫下來的生意" },
+        { "id": "jiannanzong", "name": "江南劍宗", "type": "sect", "regionTags": ["門派", "山門"], "see": "天下第一劍派的門面。氣派,也緊繃——他們有一樁沒了結的掌門公案" },
+        { "id": "qingxiange", "name": "清弦閣", "type": "sect", "regionTags": ["門派", "山門"], "see": "還沒進門就聽見琴。裡面的人把「差一點」當成失敗" },
+        { "id": "zuixianlou", "name": "醉仙樓", "type": "sect", "regionTags": ["大城", "酒旗下"], "see": "看起來就是家好酒樓。事實上你點的每一道菜都可能是暗號" },
+        { "id": "jinghu", "name": "鏡湖", "type": "spot", "regionTags": ["江邊", "野地"], "see": "湖面靜得像鏡子。有一派人世代守著一面鏡子,不讓任何人看" },
+        { "id": "tingtaoguwai", "name": "聽濤谷外", "type": "spot", "regionTags": ["山道", "山霧"], "see": "只到得了谷外。門就在眼前,不開——連為什麼不開都沒人告訴你" }
+      ]
+    },
+    {
+      "id": "beijiang", "name": "北疆", "order": 3, "open": false, "gate": 120,
+      "mapFrom": "邊軍的人手上才有準的關防圖",
+      "refuse": "老兵上下打量你一眼,把碗裡的酒喝乾:「北疆?那地方的風,能把人吹成兩截。再練幾年吧。」",
+      "locations": [
+        { "id": "yanmen", "name": "雁門關", "type": "town", "regionTags": ["邊關", "軍鎮"], "see": "城牆上全是箭孔。兵比百姓多,酒比茶烈,人講話很短" },
+        { "id": "xiaojia", "name": "蕭家軍舊址", "type": "sect", "regionTags": ["廢墟", "邊關"], "see": "一片燒過的地。門柱還立著,匾早就沒了。這裡曾經住著滿門的人" },
+        { "id": "bianjun", "name": "邊軍將門", "type": "sect", "regionTags": ["邊關", "軍鎮"], "see": "還在打仗的人家。他們跟蕭家有交情,也因此有些話不方便講" },
+        { "id": "quyuegonglu", "name": "缺月弓廬", "type": "spot", "regionTags": ["山野", "山道"], "see": "山裡一間屋,牆上掛著養得極好的弓。百年只收兩個弟子——現在只剩一個" }
+      ]
+    },
+    {
+      "id": "damo", "name": "大漠", "order": 4, "open": false, "gate": 180,
+      "mapFrom": "駝隊的老把式畫在羊皮上的那種",
+      "refuse": "駝隊的老把式頭也不抬:「沒圖進沙海?那不叫走江湖,那叫送死。等你走得動再說。」",
+      "locations": [
+        { "id": "heishuiyi", "name": "黑水驛", "type": "town", "regionTags": ["驛站", "沙海"], "see": "沙海裡唯一的屋頂。走大漠的人都在這裡歇,所以什麼消息都聽得到" },
+        { "id": "gulangbang", "name": "孤狼幫", "type": "sect", "regionTags": ["沙海", "營帳"], "see": "沒有山門,只有一片營帳,今天在這明天在那。他們在找一個人" },
+        { "id": "chiyanbu", "name": "赤焰部", "type": "sect", "regionTags": ["草原", "營帳"], "see": "最後一支還在草原上的部族。他們相信死在馬背上比死在床上好" },
+        { "id": "wumingshacheng", "name": "無名沙城", "type": "spot", "regionTags": ["沙海", "廢墟"], "see": "半埋在沙裡的城。街道還看得出來,人一個也沒有" }
+      ]
+    },
+    {
+      "id": "miaojiang", "name": "苗疆", "order": 5, "open": false, "gate": 180,
+      "mapFrom": "寨子裡的人願意帶你,才算有圖",
+      "refuse": "寨老搖搖頭,講了一長串你聽不懂的話。旁邊有人替他翻:「他說,山裡的路不是用眼睛走的。你還太生。」",
+      "locations": [
+        { "id": "dashanzhai", "name": "十萬大山寨", "type": "town", "regionTags": ["山寨", "墟集"], "see": "吊腳樓層層疊上山。市集賣的東西你有一半叫不出名字" },
+        { "id": "duyigu", "name": "毒醫谷", "type": "sect", "regionTags": ["山谷", "門派"], "see": "進谷要先喝一碗說不出味道的湯。這裡治得了人,也毒得了人" },
+        { "id": "taohuagu", "name": "桃花谷", "type": "sect", "regionTags": ["山谷", "門派"], "see": "滿谷的桃花,開得不合季節。谷裡的女子都不談將來" },
+        { "id": "zhanglin", "name": "瘴林", "type": "spot", "regionTags": ["山野", "山霧"], "see": "白霧壓在樹梢下不散。進去容易,出來要看運氣" }
+      ]
+    },
+    {
+      "id": "xiyu", "name": "西域", "order": 6, "open": false, "gate": 250,
+      "mapFrom": "胡商的路引。買得到,但很貴",
+      "refuse": "胡商比手畫腳講了半天,最後用生硬的中原話總結:「路——很遠。你——還不行。」他攤攤手,遞給你一顆蜜餞。",
+      "locations": [
+        { "id": "dunhuang", "name": "敦煌", "type": "town", "regionTags": ["絲路", "大城", "墟集"], "see": "幾種語言同時在講價,駝隊在城門口排到看不見尾巴" },
+        { "id": "xiyuyiren", "name": "西域異人", "type": "sect", "regionTags": ["絲路", "營帳"], "see": "他武功很好,但你們講的話彼此都聽不懂。這件事比武功難解" },
+        { "id": "yumenguguan", "name": "玉門故關", "type": "spot", "regionTags": ["廢墟", "邊關"], "see": "一座沒有守軍的關。往回看,中原在你身後幾千里" }
+      ]
+    }
+  ],
+  "roads": [
+    { "a": "zhen", "b": "luoyang", "steps": 12000 },
+    { "a": "zhen", "b": "dukou", "steps": 9000 },
+    { "a": "zhen", "b": "yunling", "steps": 10000 },
+    { "a": "zhen", "b": "biaoju", "steps": 8000 },
+    { "a": "yunling", "b": "kongtong", "steps": 11000 },
+    { "a": "yunling", "b": "duanyungang", "steps": 14000 },
+    { "a": "luoyang", "b": "dukou", "steps": 15000 },
+
+    { "a": "luoyang", "b": "yangzhou", "steps": 95000 },
+    { "a": "dukou", "b": "yangzhou", "steps": 88000 },
+    { "a": "yangzhou", "b": "jiannanzong", "steps": 11000 },
+    { "a": "yangzhou", "b": "qingxiange", "steps": 9000 },
+    { "a": "yangzhou", "b": "zuixianlou", "steps": 3000 },
+    { "a": "yangzhou", "b": "jinghu", "steps": 16000 },
+    { "a": "jinghu", "b": "tingtaoguwai", "steps": 22000 },
+
+    { "a": "luoyang", "b": "yanmen", "steps": 85000 },
+    { "a": "yanmen", "b": "xiaojia", "steps": 7000 },
+    { "a": "yanmen", "b": "bianjun", "steps": 9000 },
+    { "a": "yanmen", "b": "quyuegonglu", "steps": 18000 },
+
+    { "a": "yanmen", "b": "heishuiyi", "steps": 90000 },
+    { "a": "luoyang", "b": "heishuiyi", "steps": 120000 },
+    { "a": "heishuiyi", "b": "gulangbang", "steps": 14000 },
+    { "a": "heishuiyi", "b": "chiyanbu", "steps": 20000 },
+    { "a": "heishuiyi", "b": "wumingshacheng", "steps": 25000 },
+
+    { "a": "luoyang", "b": "dashanzhai", "steps": 105000 },
+    { "a": "yangzhou", "b": "dashanzhai", "steps": 115000 },
+    { "a": "dashanzhai", "b": "duyigu", "steps": 12000 },
+    { "a": "dashanzhai", "b": "taohuagu", "steps": 15000 },
+    { "a": "dashanzhai", "b": "zhanglin", "steps": 10000 },
+
+    { "a": "heishuiyi", "b": "dunhuang", "steps": 130000 },
+    { "a": "dunhuang", "b": "xiyuyiren", "steps": 20000 },
+    { "a": "dunhuang", "b": "yumenguguan", "steps": 15000 }
+  ]
+}
