@@ -17,7 +17,7 @@ import { thresholdForLevel } from "../src/engine/exp.js";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const loadJson = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
 const data = Object.fromEntries(
-  ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation"]
+  ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "jianghu_news"]
     .map((n) => [n, loadJson(`data/${n}.json`)])
 );
 

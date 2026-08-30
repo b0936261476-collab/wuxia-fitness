@@ -19,7 +19,7 @@ import { recordTrialProgress } from "../src/engine/rebirth.js";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const loadJson = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
 const data = Object.fromEntries(
-  ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives"]
+  ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "jianghu_news"]
     .map((n) => [n, loadJson(`data/${n}.json`)])
 );
 

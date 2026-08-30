@@ -518,3 +518,20 @@ select, input[type="number"], textarea {
   border-top: 1px solid var(--border);
   padding-top: 14px;
 }
+
+/* ===== 江湖快報(§9.7.6) ===== */
+.news-row {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.news-row:last-child { border-bottom: none; }
+.news-date {
+  color: var(--ink-light);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.news-text {
+  margin: 2px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}

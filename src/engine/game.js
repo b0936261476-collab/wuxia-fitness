@@ -18,6 +18,8 @@ import {
   playerRankSnapshot, integerMilestonesCrossed, surpassedNpcs, surpassFameReward, revealsRanking
 } from "./npcs.js";
 import { newReputation, addFame } from "./reputation.js";
+import { rollJianghuNews, effectiveNpcs, jianghuNews } from "./world.js";
+export { effectiveNpcs, jianghuNews };
 
 export const STEPS_PER_EVENT = 1000;
 
@@ -192,11 +194,12 @@ export function playerLevelSum(state) {
  */
 export function revealRanking(state, data, todayStr = null, source = null) {
   if (!data.npcs) return null;
-  const snapshot = playerRankSnapshot(levelSum(state), data.npcs);
+  const npcs = effectiveNpcs(state, data); // 江湖活水:名冊用套過跳變的生效版(§9.7.6)
+  const snapshot = playerRankSnapshot(levelSum(state), npcs);
   const firstTime = state.lastKnownRank == null;
   const prevRank = state.lastKnownRank ?? snapshot.rank; // 第一次看榜:只是知道自己在哪,沒有「跨越」
   const milestonesCrossed = integerMilestonesCrossed(prevRank, snapshot.rank);
-  const surpassed = surpassedNpcs(prevRank, snapshot.rank, data.npcs);
+  const surpassed = surpassedNpcs(prevRank, snapshot.rank, npcs);
   const newlySurpassed = [];
   for (const npc of surpassed) {
     const flagKey = `surpassed_${npc.rank}`;
@@ -388,6 +391,11 @@ export function pendingEventCount(state) {
  */
 export function startNextEvent(state, data, todayStr, rng = Math.random) {
   if (state.pendingEvent) return state.pendingEvent;
+  // 江湖活水:每天第一次進事件流程時,擲一次「今天江湖有沒有大事」(§9.7.6)
+  if (data.jianghu_news && data.npcs && state.talents) {
+    const playerRank = playerRankSnapshot(levelSum(state), effectiveNpcs(state, data)).rank;
+    rollJianghuNews(state, data, todayStr, playerRank, rng);
+  }
   if (state.rebirth) return null; // §5.1:重生中無法觸發新事件,得先完成六大試煉
   if (pendingEventCount(state) <= 0) return null;
 

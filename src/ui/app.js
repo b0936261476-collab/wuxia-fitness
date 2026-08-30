@@ -4,7 +4,7 @@ import {
   logExercise, logSteps, pendingEventCount, startNextEvent, presentEvent,
   chooseOption, chooseSub, useItem, levels, createCharacter, MAX_DAILY_STEPS,
   resourcePercents, resourceMax, catchUpRecovery, attemptRebirthCompletion,
-  playerLevelSum, revealRanking
+  playerLevelSum, revealRanking, effectiveNpcs, jianghuNews
 } from "../engine/game.js";
 import { collectNarratives } from "../engine/narratives.js";
 import {
@@ -53,10 +53,10 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "b8-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "p2-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
-  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media"];
+  const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media", "jianghu_news"];
   const loaded = await Promise.all(
     names.map((n) =>
       fetch(`data/${n}.json?v=${DATA_VERSION}`).then((r) => {
@@ -519,6 +519,7 @@ function renderFame() {
     box.innerHTML = `<p class="empty">連自己排第幾都還不知道,談什麼追前頭的人。</p>`;
     renderReputation();
     renderSurpassed();
+    renderJianghuNews();
     return;
   }
 
@@ -535,8 +536,8 @@ function renderFame() {
          之後練的功還沒登榜——榜只有你進城看見時才會更新。`
       : "這個數字有點舊了,下次進城看榜就會更新。"}</p>`;
 
-  // 前頭那個人:百強內看具名對手,總冊區看整數關口(§9.9)
-  const namedAbove = nextNamedNpcAbove(rank, data.npcs);
+  // 前頭那個人:百強內看具名對手,總冊區看整數關口(§9.9);名冊用江湖活水生效版
+  const namedAbove = nextNamedNpcAbove(rank, effectiveNpcs(state, data));
   const milestone = nextIntegerMilestone(rank);
   if (namedAbove) {
     const tier = surpassTier(namedAbove);
@@ -562,6 +563,20 @@ function renderFame() {
 
   renderReputation();
   renderSurpassed();
+  renderJianghuNews();
+}
+
+/** 江湖快報(§9.7.6:NPC 事件式變動——榜單是活的) */
+function renderJianghuNews() {
+  const box = $("#jianghu-news-box");
+  if (!box) return;
+  const news = jianghuNews(state);
+  box.innerHTML = news.length
+    ? news.slice(0, 10).map((n) => `<div class="news-row">
+        <span class="news-date">${n.date}</span>
+        <p class="news-text">${n.text}</p>
+      </div>`).join("")
+    : `<p class="empty">江湖最近很平靜。平靜不了太久的——閉關的總會出關,舊傷總會發作。</p>`;
 }
 
 /** 江湖評價(§9.6.4 矩陣) */
@@ -587,7 +602,7 @@ function renderSurpassed() {
     .sort((a, b) => a - b);
   sbox.innerHTML = ranks.length
     ? ranks.map((r) => {
-        const npc = namedNpcAtRank(r, data.npcs);
+        const npc = namedNpcAtRank(r, effectiveNpcs(state, data));
         return `<div class="surpassed-row"><span class="s-rank">#${r}</span>
           <span>${npc ? npcLabel(npc) : "無名記錄"}</span></div>`;
       }).join("")
