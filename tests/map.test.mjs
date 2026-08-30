@@ -9,7 +9,7 @@ import {
   newTravel, ensureTravel, allLocations, locationById, provinceOf, neighbours,
   distanceBetween, canTravelTo, setDestination, clearDestination,
   walked, remaining, checkArrival, regionMultiplier, REGION_BONUS,
-  grantProvinceMap, ownedMaps
+  grantProvinceMap, ownedMaps, detourFor
 } from "../src/engine/map.js";
 import { newState, addSteps } from "../src/engine/game.js";
 
@@ -42,9 +42,9 @@ test("沒有孤島:每個地方都連得到起點", () => {
   }
 });
 
-test("首發只開中原,其餘五州都是鎖的", () => {
-  const open = data.map.provinces.filter((p) => p.open);
-  assert.deepEqual(open.map((p) => p.id), ["zhongyuan"]);
+test("開放進度:中原與江南已開,其餘四州仍鎖著", () => {
+  const open = data.map.provinces.filter((p) => p.open).map((p) => p.id);
+  assert.deepEqual(open, ["zhongyuan", "jiangnan"]);
 });
 
 test("每個鎖著的州都要有一句「歷練不夠」的人話——不能是灰掉的按鈕", () => {
@@ -286,4 +286,54 @@ test("⚠️ 門檻與鑰匙要成對:每個鎖著的州都該有事件發得出
     assert.ok(granted.has(id), `${id} 已開放卻沒有任何事件發得出它的輿圖——玩家永遠去不了`);
   }
   assert.ok(Array.isArray(missing));
+});
+
+// ---------- 江南開放後的整條路(B10) ----------
+
+test("鑰匙到位:江南已開放,而且有事件發得出江南的輿圖", () => {
+  const granted = new Set();
+  for (const e of data.events.pool) {
+    for (const m of JSON.stringify(e).matchAll(/"mapGrant"\s*:\s*"([a-z]+)"/g)) granted.add(m[1]);
+  }
+  assert.ok(granted.has("jiangnan"), "江南開了卻沒有事件發圖——玩家永遠去不了");
+});
+
+test("江南的事只在江南遇得到,不會在中原亂入", () => {
+  const jn = data.events.pool.filter((e) => e.eventId.startsWith("JN-") && e.eventId !== "JN-000_biaoju_map");
+  assert.ok(jn.length >= 9);
+  for (const e of jn) {
+    const c = e.conditions || {};
+    assert.ok(c.atProvince || c.atLocation, `${e.eventId} 沒有地域門檻,會在中原亂入`);
+  }
+});
+
+test("鑰匙事件掛在裴家鏢局,三條分支都拿得到圖(不會卡死)", () => {
+  const key = data.events.pool.find((e) => e.eventId === "JN-000_biaoju_map");
+  assert.equal(key.conditions.atLocation, "biaoju");
+  const s = JSON.stringify(key.beats.he);
+  const grants = [...s.matchAll(/"mapGrant"\s*:\s*"jiangnan"/g)].length;
+  assert.ok(grants >= 4, `只有 ${grants} 個結局給圖——接鏢失敗那條也必須給,否則玩家可能永遠去不了江南`);
+});
+
+test("繞路:只問路的人第一趟要多走,走過一次就不再罰", () => {
+  const s = hero();
+  grantProvinceMap(s, data, "jiangnan");
+  const plain = setDestination(s, data, "yangzhou", 999).distance;
+
+  const s2 = hero();
+  grantProvinceMap(s2, data, "jiangnan");
+  s2.flags.jiangnan_oral_route = true;
+  const detoured = setDestination(s2, data, "yangzhou", 999);
+  assert.equal(detoured.distance, plain + 20000);
+  assert.equal(detoured.detour, 20000);
+
+  // 到過江南之後就記在腿上了
+  s2.travel.visited.push("yangzhou");
+  assert.equal(setDestination(s2, data, "jinghu", 999).detour, undefined);
+});
+
+test("繞路只罰那一州:沒有 detour 設定的州不受影響", () => {
+  const s = hero();
+  s.flags.jiangnan_oral_route = true;
+  assert.equal(setDestination(s, data, "luoyang", 0).detour, undefined);
 });

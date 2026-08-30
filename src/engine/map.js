@@ -103,10 +103,26 @@ export function canTravelTo(state, data, locId, levelSum) {
 export function setDestination(state, data, locId, levelSum) {
   const check = canTravelTo(state, data, locId, levelSum);
   if (!check.ok) return check;
+  const extra = detourFor(state, data, locId);
   state.travel.to = locId;
-  state.travel.distance = check.distance;
+  state.travel.distance = check.distance + extra;
   state.travel.startTotal = state.steps.total;
-  return { ok: true, distance: check.distance };
+  return { ok: true, distance: state.travel.distance, detour: extra || undefined };
+}
+
+/**
+ * 繞路(走錯幾次)的額外步數。
+ *
+ * 「只問路、不換圖」拿到的是一段口述路線——能走,但會走錯。沒有這個代價,
+ * 「只問路」就完勝其他兩條(不必判定、不必付出,白拿一張圖),選擇會變成假的。
+ * 只吃第一次進那一州;走過一趟之後路就記在腿上了。
+ */
+export function detourFor(state, data, locId) {
+  const prov = provinceOf(data, locId);
+  const d = prov?.detour;
+  if (!d || !state.flags?.[d.flag]) return 0;
+  const beenThere = (state.travel?.visited ?? []).some((v) => provinceOf(data, v)?.id === prov.id);
+  return beenThere ? 0 : (d.steps ?? 0);
 }
 
 /** 放棄趕路,留在原地遊蕩 */

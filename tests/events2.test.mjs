@@ -324,7 +324,7 @@ test("冷卻:同事件在 cooldown 事件數內不再出現", () => {
 // ---------- 資料自檢(生產規格書第八節,可自動化部分) ----------
 
 test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", () => {
-  const legalEffects = new Set(["fame", "infamy", "hpDamage", "mpDamage", "tiliDamage", "hpRestore", "mpRestore", "tiliRestore", "itemGrant", "expGrant", "setFlags", "clearFlags", "flagData"]);
+  const legalEffects = new Set(["fame", "infamy", "hpDamage", "mpDamage", "tiliDamage", "hpRestore", "mpRestore", "tiliRestore", "itemGrant", "expGrant", "mapGrant", "setFlags", "clearFlags", "flagData"]);
   const collectOutcomes = (node, out = []) => {
     if (!node || typeof node !== "object") return out;
     if (node.effects) out.push(node);
@@ -360,7 +360,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2~B9 全數入庫,編號一致(80+遭遇 6)", () => {
+test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B10,含遭遇 6 與江南 10)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -390,7 +390,10 @@ test("自檢:正式庫 14 + 序章教學 7 + B2~B9 全數入庫,編號一致(80+
     "CH-023_kneeling_boy", "CH-024_name_escort",
     "CH-025_new_scale", "DU-012_diving_rematch", "CH-026_basket_siblings", "FO-012_one_coin_fortune",
     "EN-001_pei_sparring", "EN-002_liu_fox", "EN-003_su_two_selves",
-    "EN-004_shi_day_night", "EN-005_zhan_tides", "EN-006_table_stranger"
+    "EN-004_shi_day_night", "EN-005_zhan_tides", "EN-006_table_stranger",
+    "JN-000_biaoju_map", "JN-001_yangzhou_arrive", "JN-002_bridge_yield", "JN-003_boatwoman",
+    "JN-004_swordsect_gate", "JN-005_one_string", "JN-006_menu",
+    "JN-007_mirror_lake", "JN-008_gate_shut", "JN-009_rain"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);

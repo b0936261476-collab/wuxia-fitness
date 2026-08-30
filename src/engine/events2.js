@@ -4,7 +4,7 @@
 // 純邏輯、無 DOM;rng 與日期一律由呼叫端傳入,方便測試。
 
 import { levelFromExp, DIMENSIONS, addExp } from "./exp.js";
-import { regionMultiplier, grantProvinceMap } from "./map.js";
+import { regionMultiplier, grantProvinceMap, provinceOf } from "./map.js";
 import { successRateV2 } from "./tags.js";
 import {
   HP_DEBUFF_TABLE, QI_DEBUFF_TABLE, TILI_DEBUFF_TABLE,
@@ -238,6 +238,19 @@ function conditionsMet(state, ev, todayStr, data) {
     if (cond.reputation.infamyTier != null) {
       const iTier = data.reputation ? infamyTierIndex(state.reputation?.infamy ?? 0, data.reputation) : 0;
       if (iTier < cond.reputation.infamyTier) return false;
+    }
+  }
+  // 地域門檻(§9.10):江南的事不該在中原遇到。沒有輿圖資料時不擋,舊存檔照舊。
+  if (data?.map && (cond.atProvince || cond.atLocation)) {
+    const here = state.travel?.at;
+    if (!here) return false;
+    if (cond.atLocation) {
+      const want = [].concat(cond.atLocation);
+      if (!want.includes(here)) return false;
+    }
+    if (cond.atProvince) {
+      const want = [].concat(cond.atProvince);
+      if (!want.includes(provinceOf(data, here)?.id)) return false;
     }
   }
   for (const req of cond.requireFlags || []) {
