@@ -145,3 +145,13 @@
 | willow_walked / willow_coin | CH-013 | **暗線(高規格留白)** | 柳家坳沒了;「只要還有人肯接這一問,它就還在。」銅錢是溫的 |
 | bell_coin_added | FO-008 A成功 | 暗線 | 無名祠添了第十八枚錢 |
 | gray_keeper_heard | FO-008 名人版 | **暗線(睡眠)** | 每年清明添錢的灰衣人——不是監裡的,瘸一條腿 |
+
+## B6 批次(通用池,DA-017 ~ FO-010,2026-08-23 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| bloody_traveler_seen | DA-018 察覺 | 沉線 | 衣角帶血的夜行人——走得動的人,還不用人操心 |
+| bandit_act_exposed | CH-014 D | 沉線 | 「回去練!」散夥的戲班 |
+| dice_cheat_exposed | CH-016 C | 暗線 | 被砸場子的莊家——同族:scale_boss_marked_you |
+| stele_name_gone | FO-009 A成功 | **暗線(留白)** | 去思碑上被鑿掉的名字——立碑的捨不得他走,鑿碑的容不下他留名 |
+| star_wish_granted | FO-010 A成功 | 沉線 | 路邊還溫著的烤地瓜,不深究 |

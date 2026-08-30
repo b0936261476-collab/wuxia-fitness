@@ -359,7 +359,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2~B5 全數入庫,編號一致", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2~B6 全數入庫,編號一致", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -380,7 +380,10 @@ test("自檢:正式庫 14 + 序章教學 7 + B2~B5 全數入庫,編號一致", (
     "CH-009_letter_writing", "FO-006_sunken_bell", "CH-010_peddler_cart", "DA-013_censor_passing",
     "DA-014_night_cart", "DA-015_bow_returned", "FO-007_go_regret", "CH-011_seventh_fair",
     "DA-016_beneath_board", "CH-012_shrine_night", "DU-007_ring_toss", "DU-008_laundry_chase",
-    "CH-013_blind_woman", "FO-008_eave_bells"
+    "CH-013_blind_woman", "FO-008_eave_bells",
+    "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu",
+    "CH-014_faked_injury", "CH-015_porter_back", "CH-016_dice_stall",
+    "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);

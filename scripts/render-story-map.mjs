@@ -70,6 +70,16 @@ const COND_NOTE = {
   "DU-008_laundry_chase": "走水路的人更常遇到(可重複)",
   "CH-013_blind_woman": "哪條路都會遇到(一次性)",
   "FO-008_eave_bells": "走山路的人更常遇到(可重複)",
+  "DA-017_old_courier": "哪條路都會遇到(可重複)",
+  "DA-018_night_traveler": "哪條路都會遇到(可重複)",
+  "DA-019_kids_kungfu": "哪條路都會遇到(可重複)",
+  "CH-014_faked_injury": "哪條路都會遇到(可重複)",
+  "CH-015_porter_back": "哪條路都會遇到(可重複)",
+  "CH-016_dice_stall": "走商路的人更常遇到(可重複)",
+  "DU-009_footrace": "哪條路都會遇到(可重複)",
+  "DU-010_chicken_chase": "哪條路都會遇到(可重複)",
+  "FO-009_broken_stele": "哪條路都會遇到(可重複)",
+  "FO-010_shooting_star": "哪條路都會遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -252,13 +262,13 @@ for (const id of ["1-1_lost_purse", "1-2_purse_notice", "1-3_purse_earned", "1-4
 
 P("\n---");
 P("## 四、隨機池・通用(哪條路都會遇到)");
-for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman"]) {
+for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 五、隨機池・商路(三岔口選「走東」的人更常遇到)");
-for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss"]) {
+for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
