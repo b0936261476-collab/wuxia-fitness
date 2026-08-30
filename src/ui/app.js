@@ -53,7 +53,7 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "b6-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "b7-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media"];

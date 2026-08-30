@@ -80,6 +80,16 @@ const COND_NOTE = {
   "DU-010_chicken_chase": "哪條路都會遇到(可重複)",
   "FO-009_broken_stele": "哪條路都會遇到(可重複)",
   "FO-010_shooting_star": "哪條路都會遇到(可重複)",
+  "CH-017_east_village": "只有看過打鐵鋪劍坯、又撞見夜裝騾車的人會遇到(3 天後,一次性)",
+  "CH-018_south_bridge": "只有初七在集上把事情看明白的人會遇到(3 天後,一次性)",
+  "CH-019_boy_returns": "只有聽過少年那句「我去找你」的人會遇到(10 天後,一次性)",
+  "FO-011_coin_keeper": "只有聽茶棚老闆講過灰衣人的人會遇到(一次性)",
+  "DU-011_challenge_seeker": "俠名遠播之後才會遇到(偶爾重複)",
+  "CH-020_water_dispute": "俠名遠播之後才會遇到(一次性)",
+  "CH-021_impostor": "俠名遠播之後才會遇到(一次性)",
+  "CH-022_storyteller_you": "俠名遠播之後才會遇到(可重複)",
+  "CH-023_kneeling_boy": "俠名遠播之後才會遇到(一次性)",
+  "CH-024_name_escort": "俠名遠播之後才會遇到(一次性)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -262,30 +272,38 @@ for (const id of ["1-1_lost_purse", "1-2_purse_notice", "1-3_purse_earned", "1-4
 
 P("\n---");
 P("## 四、隨機池・通用(哪條路都會遇到)");
-for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star"]) {
+for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star", "CH-019_boy_returns"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 五、隨機池・商路(三岔口選「走東」的人更常遇到)");
-for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall"]) {
+for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall", "CH-017_east_village"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 六、隨機池・水路(選「走南」的人更常遇到)");
-for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell", "CH-011_seventh_fair", "DU-008_laundry_chase"]) {
+for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell", "CH-011_seventh_fair", "DU-008_laundry_chase", "CH-018_south_bridge"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 七、隨機池・山路(選「走西」的人更常遇到)");
-for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds", "DA-015_bow_returned", "FO-008_eave_bells"]) {
+for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds", "DA-015_bow_returned", "FO-008_eave_bells", "FO-011_coin_keeper"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
-P("## 八、事件之外的劇情(提醒)");
+P("## 八、出名之後才會遇到的(俠名不到,這些事根本不會發生)");
+P("");
+P("你的俠名練到**俠名遠播**那一階,江湖對你的態度就變了——底下這些事,只找有名字的人。");
+for (const id of ["DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor", "CH-022_storyteller_you", "CH-023_kneeling_boy", "CH-024_name_escort"]) {
+  renderEvent(events.pool.find((e) => e.eventId === id));
+}
+
+P("\n---");
+P("## 九、事件之外的劇情(提醒)");
 P("");
 P("- **天賦耳語**(23 句):極端命格的人,約千分之一機率在事件裡多讀到一句「世界對你的異樣反應」(你自己定稿的那批)");
 P("- **狀態敘事**(6 種):血量/內力/體力掉到警戒線時的四段式文案(已入庫,UI 接線在待辦)");

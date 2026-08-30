@@ -155,3 +155,25 @@
 | dice_cheat_exposed | CH-016 C | 暗線 | 被砸場子的莊家——同族:scale_boss_marked_you |
 | stele_name_gone | FO-009 A成功 | **暗線(留白)** | 去思碑上被鑿掉的名字——立碑的捨不得他走,鑿碑的容不下他留名 |
 | star_wish_granted | FO-010 A成功 | 沉線 | 路邊還溫著的烤地瓜,不深究 |
+
+## B7 批次(伏筆三響+出名者專屬,CH-017 ~ CH-024,2026-08-30 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| sword_village_known | CH-017 全結局 | 回聲收尾 | 劍線三響收線:劍去了東邊被山匪掃過的村子 |
+| taught_east_village | CH-017 A | 沉線 | 下場教過農夫;老鐵匠「上回那瓢,還你」 |
+| blunt_swords_known | CH-017 C | **暗線(守密)** | 你知道十二把劍全沒開刃——爛在肚子裡的秘密 |
+| cipher_warned_you | CH-018 全結局 | 回聲收尾 | 暗語線三響收線:這回真的只是橋(大概) |
+| bridge_heeded / bridge_vaulted / bridge_fell_in / bridge_marked | CH-018 | 沉線 | 過橋方式;bridge_marked=在橋頭留了「三、七、九,糟」 |
+| boy_grown_seen | CH-019 全結局 | 回聲收尾 | 少年線收線:藥錢清了、記帳了、「換我請你吃麵」 |
+| boy_gift_shoes | CH-019 A | 沉線 | 秦大嫂納的千層底;「她量過你的腳印」 |
+| boy_refused_money / boy_keeps_reading | CH-019 B/C | 沉線 | 兩個銅板「買碗麵」;新封皮的舊書 |
+| gray_keeper_met | FO-011 全結局 | 回聲收尾 | 灰衣人線收一半:見過了 |
+| keeper_names_heard | FO-011 A成功 | **暗線(高規格留白)** | 他數的不是錢是名字;「錢在第三進的瓦罐裡。別多添,他們人齊了」——他是誰、那晚出了什麼事,不收 |
+| keeper_shared_water | FO-011 B | 沉線 | 「添過錢的,是半個自己人」 |
+| challenger_signed / challenger_won / challenger_befriended | DU-011 | 沉線 | 小本子簽名;「你一定是讓我對不對?!」;茶攤記了一路 |
+| water_dispute_solved / water_dispute_judged / water_dispute_walked | CH-020 | 暗線 | 分水口的石頭是誰半夜挪的?兩村都懷疑鄰縣——候補線 |
+| impostor_heard_out / impostor_exposed_public / impostor_new_road | CH-021 | 暗線 | impostor_new_road=江湖多了個講「無名大俠」的說書人——回響候補 |
+| legend_heard / legend_corrected | CH-022 | 沉線 | 「沒有八尺——是九尺!」;大俠夜探黑風寨(你沒探過) |
+| disciple_pointed / disciple_referred / disciple_father_came | CH-023 | 暗線 | 三年之約/武館「大俠的徒弟」/父子同跪——日後批次候補 |
+| escort_paid_full / escort_meal_only / escort_refused | CH-024 | 沉線 | 黑風口山匪的「借道費」;替身漢子(該收版權嗎) |

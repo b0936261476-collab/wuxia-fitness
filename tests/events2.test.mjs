@@ -359,7 +359,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2~B6 全數入庫,編號一致", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2~B7 全數入庫,編號一致", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -383,7 +383,10 @@ test("自檢:正式庫 14 + 序章教學 7 + B2~B6 全數入庫,編號一致", (
     "CH-013_blind_woman", "FO-008_eave_bells",
     "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu",
     "CH-014_faked_injury", "CH-015_porter_back", "CH-016_dice_stall",
-    "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star"
+    "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star",
+    "CH-017_east_village", "CH-018_south_bridge", "CH-019_boy_returns", "FO-011_coin_keeper",
+    "DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor", "CH-022_storyteller_you",
+    "CH-023_kneeling_boy", "CH-024_name_escort"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -655,4 +658,62 @@ test("B4:貨郎拋錨——察覺者有省力解,未察覺者只能硬推", () =
   const res = chooseOption(s2, data, "B", D0);
   assert.match(res.entry.resultText, /它認方向/);
   assert.equal(s2.reputation.fame, 1);
+});
+
+// ---------- B7 批次:俠名門檻與伏筆三響 ----------
+
+test("B7:出名者專屬事件——俠名不到抽不到,俠名遠播(第4階)入池", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  const gated = [
+    "DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor",
+    "CH-022_storyteller_you", "CH-023_kneeling_boy", "CH-024_name_escort"
+  ];
+  let ids = eligibleEvents(s, data, D0).map((c) => c.ev.eventId);
+  for (const id of gated) assert.ok(!ids.includes(id), `${id} 不該出現在無名之輩的池中`);
+
+  s.reputation.fame = data.reputation.tierThresholds.fame[4]; // 俠名遠播
+  ids = eligibleEvents(s, data, D0).map((c) => c.ev.eventId);
+  for (const id of gated) assert.ok(ids.includes(id), `${id} 該出現在俠名遠播的池中`);
+});
+
+test("B7:劍線三響——兩響旗標齊+隔3天才開門", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  const has = (d) => eligibleEvents(s, data, d).some((c) => c.ev.eventId === "CH-017_east_village");
+  assert.ok(!has(D3), "沒看過劍坯與騾車不該開門");
+  s.flags.smith_swords_seen = true;
+  s.flags.sword_cart_seen = true;
+  s.journal.push({ n: 1, id: "DA-014_night_cart", date: D0 });
+  assert.ok(!has(D1), "隔天太早");
+  assert.ok(has(D3), "第3天該開門");
+});
+
+test("B7:少年尋你——boy_will_seek_you 滿10天開門,察覺者能認出沒開刃", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  s.flags.boy_will_seek_you = true;
+  s.flagDates = { boy_will_seek_you: "2026-08-01" };
+  assert.ok(eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "CH-019_boy_returns"));
+
+  // 東邊的村子:眼功高看破沒開刃 → C 解鎖
+  const s2 = newState();
+  s2.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s2);
+  setLevel(s2, "eye", 24);
+  addSteps(s2, 1000);
+  s2.flags.smith_swords_seen = true;
+  s2.flags.sword_cart_seen = true;
+  s2.journal.push({ n: 1, id: "DA-014_night_cart", date: "2026-08-10" });
+  startNextEvent(s2, data, D0, rngFor(s2, "CH-017_east_village", D0));
+  assert.deepEqual(presentEvent(s2, data).choices.map((c) => c.id), ["A", "B", "C"]);
+  const res = chooseOption(s2, data, "C", D0);
+  assert.ok(res.done);
+  assert.ok(s2.flags.blunt_swords_known);
 });

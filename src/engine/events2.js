@@ -226,8 +226,15 @@ export function laborSettlement(state, data, todayStr) {
 
 // ---------- 抽選 ----------
 
-function conditionsMet(state, ev, todayStr) {
+function conditionsMet(state, ev, todayStr, data) {
   const cond = ev.conditions || {};
+  if (cond.reputation) { // 聲望門檻:俠名/惡名未達階者抽不到(規格書 conditions.reputation)
+    if (cond.reputation.fameTier != null && fameTierOf(state, data) < cond.reputation.fameTier) return false;
+    if (cond.reputation.infamyTier != null) {
+      const iTier = data.reputation ? infamyTierIndex(state.reputation?.infamy ?? 0, data.reputation) : 0;
+      if (iTier < cond.reputation.infamyTier) return false;
+    }
+  }
   for (const req of cond.requireFlags || []) {
     const alternatives = req.split("|");
     if (!alternatives.some((f) => state.flags[f])) return false;
@@ -257,7 +264,7 @@ function cooldownReady(state, ev) {
 export function eligibleEvents(state, data, todayStr) {
   return data.events.pool
     .filter((ev) => !ev.triggerOnly)
-    .filter((ev) => conditionsMet(state, ev, todayStr))
+    .filter((ev) => conditionsMet(state, ev, todayStr, data))
     .filter((ev) => cooldownReady(state, ev))
     .map((ev) => {
       let weight = 1;
