@@ -693,13 +693,15 @@ test("B7:劍線三響——兩響旗標齊+隔3天才開門", () => {
   assert.ok(has(D3), "第3天該開門");
 });
 
-test("B7:少年尋你——boy_will_seek_you 滿10天開門,察覺者能認出沒開刃", () => {
+test("B7:少年尋你——boy_will_seek_you 滿45天開門,察覺者能認出沒開刃", () => {
   const s = newState();
   s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
   skipIntro(s);
   addSteps(s, 1000);
   s.flags.boy_will_seek_you = true;
   s.flagDates = { boy_will_seek_you: "2026-08-01" };
+  assert.ok(!eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "CH-019_boy_returns"), "18 天太早——債還沒還完");
+  s.flagDates = { boy_will_seek_you: "2026-06-01" };
   assert.ok(eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "CH-019_boy_returns"));
 
   // 東邊的村子:眼功高看破沒開刃 → C 解鎖
