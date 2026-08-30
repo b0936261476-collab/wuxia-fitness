@@ -389,7 +389,7 @@ export function pendingEventCount(state) {
  * 勞務結算(§9.11.4)優先插隊;其餘依 conditions/cooldown/weightFlags 抽池。
  * @param {string} todayStr 今天日期(YYYY-MM-DD),樓梯階距與勞務期限都靠它
  */
-export function startNextEvent(state, data, todayStr, rng = Math.random) {
+export function startNextEvent(state, data, todayStr, rng = Math.random, hour = null) {
   if (state.pendingEvent) return state.pendingEvent;
   // 江湖活水:每天第一次進事件流程時,擲一次「今天江湖有沒有大事」(§9.7.6)
   if (data.jianghu_news && data.npcs && state.talents) {
@@ -399,7 +399,7 @@ export function startNextEvent(state, data, todayStr, rng = Math.random) {
   if (state.rebirth) return null; // §5.1:重生中無法觸發新事件,得先完成六大試煉
   if (pendingEventCount(state) <= 0) return null;
 
-  const ev = startEventV2(state, data, todayStr, rng);
+  const ev = startEventV2(state, data, todayStr, rng, hour); // hour:時間型 NPC 狀態機用(§9.8.1 史晝夜)
   if (!ev) return null; // 池子全在冷卻/條件不符:不消耗步數,明日再來
   state.steps.resolved += 1;
   return ev;

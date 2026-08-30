@@ -209,3 +209,43 @@ export function surpassTier(npc) {
 export function surpassFameReward(rank) {
   return Math.round(1 + (100 - rank) * (49 / 99));
 }
+
+// ---------- §9.8.1 NPC 狀態機(✓ 定版) ----------
+
+/**
+ * 解析有狀態 NPC 的當前狀態(時間型/隨機型/軌道型)。
+ * 資料形制(npcs.json 該 NPC 的 states 欄):
+ *   clock : { type:"clock",  table:{ day:{...}, night:{...} } }        // 現實時鐘 06–18 / 18–06
+ *   random: { type:"random", table:{ 態:{ weight, ... }, ... } }        // 每次遭遇擲態
+ *   cycle : { type:"cycle",  periodDays, phases:[{...}, ...] }          // 週期輪轉(心境潮汐)
+ * 每個狀態物件可帶 key/label/benchmarkModifier;回傳該物件(補上 key),無狀態回 null。
+ *
+ * @param {object} npc npcs.json top100 的一筆
+ * @param {{todayStr?:string, hour?:number, rng?:function}} ctx
+ */
+export function resolveNpcState(npc, { todayStr = null, hour = null, rng = Math.random } = {}) {
+  const st = npc?.states;
+  if (!st) return null;
+  if (st.type === "clock") {
+    const h = hour ?? 12; // 引擎拿不到時鐘時當作白天(測試與模擬的保守預設)
+    const key = h >= 6 && h < 18 ? "day" : "night";
+    return { key, ...st.table[key] };
+  }
+  if (st.type === "random") {
+    const entries = Object.entries(st.table);
+    const total = entries.reduce((a, [, v]) => a + (v.weight ?? 1), 0);
+    let roll = rng() * total;
+    for (const [key, v] of entries) {
+      if (roll < (v.weight ?? 1)) return { key, ...v };
+      roll -= v.weight ?? 1;
+    }
+    const [key, v] = entries[entries.length - 1];
+    return { key, ...v };
+  }
+  if (st.type === "cycle") {
+    const day = todayStr ? Math.floor(Date.parse(todayStr) / 86400000) : 0;
+    const idx = Math.floor(day / (st.periodDays ?? 5)) % st.phases.length;
+    return { ...st.phases[idx] };
+  }
+  return null;
+}

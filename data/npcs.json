@@ -77,7 +77,27 @@
       "nickname": "一劍江湖路",
       "loreLine": null,
       "flags": [],
-      "surpassReaction": "【本人】「又過去一個。」他搖著櫓笑了笑,「江湖跟江水一樣,攔不住要往前的。」"
+      "surpassReaction": "【本人】「又過去一個。」他搖著櫓笑了笑,「江湖跟江水一樣,攔不住要往前的。」",
+      "states": {
+        "type": "cycle",
+        "periodDays": 5,
+        "phases": [
+          {
+            "key": "high",
+            "label": "高潮期",
+            "benchmarkModifier": 6
+          },
+          {
+            "key": "mid",
+            "label": "平潮期"
+          },
+          {
+            "key": "low",
+            "label": "低潮期",
+            "benchmarkModifier": -8
+          }
+        ]
+      }
     },
     {
       "rank": 12,
@@ -93,7 +113,21 @@
       "nickname": "一曲醉江湖",
       "loreLine": null,
       "flags": [],
-      "surpassReaction": "【本人】她給自己斟了一杯,朝榜文的方向遙遙一舉:「醒著的我替你高興——醉著的那個,改天自己找你。」"
+      "surpassReaction": "【本人】她給自己斟了一杯,朝榜文的方向遙遙一舉:「醒著的我替你高興——醉著的那個,改天自己找你。」",
+      "states": {
+        "type": "random",
+        "table": {
+          "awake": {
+            "weight": 0.6,
+            "label": "醒"
+          },
+          "drunk": {
+            "weight": 0.4,
+            "label": "醉",
+            "benchmarkModifier": 8
+          }
+        }
+      }
     },
     {
       "rank": 14,
@@ -221,7 +255,19 @@
       "nickname": "白日夜叉",
       "loreLine": null,
       "flags": [],
-      "surpassReaction": "【旁白】白日的郎中聽聞道賀,困惑地笑說自己何曾在什麼榜上;當夜,榜文前有個影子站了很久。"
+      "surpassReaction": "【旁白】白日的郎中聽聞道賀,困惑地笑說自己何曾在什麼榜上;當夜,榜文前有個影子站了很久。",
+      "states": {
+        "type": "clock",
+        "table": {
+          "day": {
+            "label": "史晝(郎中)"
+          },
+          "night": {
+            "label": "史夜",
+            "benchmarkModifier": 6
+          }
+        }
+      }
     },
     {
       "rank": 30,

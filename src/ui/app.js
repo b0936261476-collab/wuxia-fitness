@@ -53,7 +53,7 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "p2-1"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "p2-2"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media", "jianghu_news"];
@@ -870,7 +870,7 @@ function bindEvents() {
       renderEventArea();
       return;
     }
-    const ev = startNextEvent(state, data, today());
+    const ev = startNextEvent(state, data, today(), Math.random, new Date().getHours()); // 現實時鐘進狀態機(§9.8.1)
     if (!ev) {
       const flash = $("#road-flash");
       flash.hidden = false;

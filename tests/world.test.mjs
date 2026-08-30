@@ -103,3 +103,46 @@ test("黑馬:快報式空降,不動百強名冊", () => {
   assert.match(news.text, /位/);
   assert.equal(s.world.ranks, null, "黑馬不動百強");
 });
+
+// ---------- §9.8.1 NPC 狀態機 ----------
+
+import { resolveNpcState } from "../src/engine/npcs.js";
+
+const fullNpcs = data.npcs.top100;
+const byName = (nm) => fullNpcs.find((n) => n.name === nm);
+
+test("時間型:史晝夜依現實時鐘切人格——白天是郎中,夜裡是史夜", () => {
+  const shi = byName("史晝夜");
+  assert.ok(shi.states, "史晝夜要有狀態機資料");
+  assert.equal(resolveNpcState(shi, { hour: 10 }).key, "day");
+  assert.equal(resolveNpcState(shi, { hour: 23 }).key, "night");
+  assert.equal(resolveNpcState(shi, { hour: 5 }).key, "night");
+  assert.ok(resolveNpcState(shi, { hour: 23 }).benchmarkModifier > 0, "史夜要比郎中難對付");
+});
+
+test("隨機型:蘇挽秋擲態——醒 60% / 醉 40%,醉態基準大幅上修", () => {
+  const su = byName("蘇挽秋");
+  assert.equal(resolveNpcState(su, { rng: () => 0.1 }).key, "awake"); // 0.1 < 0.6
+  const drunk = resolveNpcState(su, { rng: () => 0.7 }); // 0.7 落在醉區
+  assert.equal(drunk.key, "drunk");
+  assert.ok(drunk.benchmarkModifier >= 6);
+});
+
+test("軌道型:展孤舟心境如潮——同一週期內穩定,跨週期輪轉三態", () => {
+  const zhan = byName("展孤舟");
+  const a = resolveNpcState(zhan, { todayStr: "2026-08-19" });
+  const b = resolveNpcState(zhan, { todayStr: "2026-08-20" });
+  assert.ok(["high", "mid", "low"].includes(a.key));
+  // 連續 15 天應該三態都出現(週期 5 天)
+  const seen = new Set();
+  for (let i = 0; i < 15; i++) {
+    const day = new Date(Date.parse("2026-08-19") + i * 86400000).toISOString().slice(0, 10);
+    seen.add(resolveNpcState(zhan, { todayStr: day }).key);
+  }
+  assert.deepEqual([...seen].sort(), ["high", "low", "mid"]);
+  void a; void b;
+});
+
+test("無狀態 NPC 回 null", () => {
+  assert.equal(resolveNpcState(byName("沈聽雪"), { hour: 12 }), null);
+});

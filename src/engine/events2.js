@@ -12,6 +12,7 @@ import {
 import { addFame, addInfamy, fameTierIndex, infamyTierIndex, hypocriteMultiplier, prodigalMultiplier } from "./reputation.js";
 import { titleTiers, balancedTier } from "./titles.js";
 import { classifyFate } from "./talent.js";
+import { resolveNpcState } from "./npcs.js";
 
 /** 判定標籤 key ↔ 六維內部 key 對照(tags.json 用拼音,exp 池用英文) */
 export const TAG_TO_DIM = {
@@ -111,7 +112,10 @@ export function optionSuccessRate(state, data, ev, opt) {
   const percents = resourcePercentsOf(state);
   if (percents) relevantLevel *= hpDebuffEffects(percents.hp).sixdimMultiplier; // §4.1 血量DEBUFF六維乘數
 
-  const benchmark = (ev.benchmarkLevel ?? 0) + (opt.benchmarkModifier ?? 0);
+  // NPC 狀態機的基準修正(§9.8.1):蘇挽秋醉態上修、展孤舟低潮下修
+  const stateMod = state.pendingEvent?.id === ev.eventId
+    ? (state.pendingEvent.npcState?.benchmarkModifier ?? 0) : 0;
+  const benchmark = (ev.benchmarkLevel ?? 0) + (opt.benchmarkModifier ?? 0) + stateMod;
 
   // 標籤修正:tagBlock.ability 去掉判定主維(避免與等級差重複計算)+ 稱號輕加成
   const abilityTags = (ev.tagBlock?.ability || []).filter((t) => t !== tag);
@@ -176,12 +180,12 @@ function matchTierKey(variants, tier) {
 }
 
 /** 判定型事件的形態:crush(輾壓,跳判定)/awe(仰望)/normal */
-export function eventForm(state, data, ev) {
+export function eventForm(state, data, ev, benchMod = 0) {
   if (ev.benchmarkLevel == null || !(ev.eventType === "duel" || ev.eventType === "fortune")) return "normal";
   const c = cfg(data).judgment;
   const sixdimTags = (ev.tagBlock?.ability || []).filter((t) => TAG_TO_DIM[t]);
   const best = Math.max(0, ...sixdimTags.map((t) => dimLevelOfTag(state, t)));
-  const ratio = best / ev.benchmarkLevel;
+  const ratio = best / (ev.benchmarkLevel + benchMod); // NPC 狀態機可修正基準(§9.8.1)
   if (ratio >= c.crushRatio && ev.variants?.crush) return "crush";
   if (ratio < c.aweRatio && ev.variants?.awe) return "awe";
   return "normal";
@@ -267,7 +271,7 @@ export function eligibleEvents(state, data, todayStr) {
     .filter((ev) => conditionsMet(state, ev, todayStr, data))
     .filter((ev) => cooldownReady(state, ev))
     .map((ev) => {
-      let weight = 1;
+      let weight = ev.conditions?.baseWeight ?? 1; // 遭遇型事件靠低基礎權重保持稀有(§9.8)
       for (const [flag, w] of Object.entries(ev.conditions?.weightFlags || {})) {
         if (state.flags[flag]) weight += w;
       }
@@ -344,13 +348,21 @@ function fillTemplates(text, data) {
  * 抽下一個事件,寫入 state.pendingEvent(可序列化,重載後可續)。
  * 回傳 pendingEvent 或 null(沒有事件可走)。
  */
-export function startEventV2(state, data, todayStr, rng = Math.random) {
+export function startEventV2(state, data, todayStr, rng = Math.random, hour = null) {
   const drawn = drawEventV2(state, data, todayStr, rng);
   if (!drawn) return null;
   const ev = eventById(data, drawn.id);
 
+  // 遭遇型事件綁定具名 NPC(§9.8):有狀態機的先解析狀態,基準隨狀態修正(§9.8.1)
+  let npcState = null;
+  if (ev.npcBind && data.npcs) {
+    const npc = data.npcs.top100.find((n) => n.name === ev.npcBind);
+    const st = npc ? resolveNpcState(npc, { todayStr, hour, rng }) : null;
+    if (st) npcState = { npc: ev.npcBind, ...st };
+  }
+
   const perception = perceptionCheck(state, data, ev, rng);
-  const form = drawn.laborOutcome ? "normal" : eventForm(state, data, ev);
+  const form = drawn.laborOutcome ? "normal" : eventForm(state, data, ev, npcState?.benchmarkModifier ?? 0);
   const tier = fameTierOf(state, data);
 
   const pending = {
@@ -360,6 +372,7 @@ export function startEventV2(state, data, todayStr, rng = Math.random) {
     perception,
     form,
     fameTier: tier,
+    npcState,
     laborOutcome: drawn.laborOutcome ?? null,
     isIntro: drawn.isIntro ?? false,
     phase: "cheng"
@@ -439,6 +452,7 @@ export function presentEventV2(state, data) {
     for (const [key, text] of Object.entries(qiVariants)) {
       if (key.startsWith("flag:") && state.flags[key.slice(5)]) { qi = text; break; }
       if (key === "injured" && isInjured(state)) { qi = text; break; }
+      if (key.startsWith("state:") && pending.npcState?.key === key.slice(6)) { qi = text; break; } // §9.8.1 狀態變體
     }
     const fameQi = matchTierKey(ev.beats.qi.fameVariants, pending.fameTier);
     if (fameQi?.text) qi = fameQi.text;
