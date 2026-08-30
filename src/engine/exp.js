@@ -36,3 +36,26 @@ export function milestoneTitle(exp, thresholds, titles) {
   }
   return title;
 }
+
+/**
+ * 經驗增減:懲罰不會扣到負值;里程碑一經解鎖永久保留。
+ * (自 game.js 移入,讓事件結算的 expGrant——裴景明陪練加成——可共用,避免循環引用)
+ */
+export function addExp(state, gains, data) {
+  const thresholds = data.titles.milestones.thresholds; // §8.2:等級門檻(非經驗值!)
+  for (const [dim, v] of Object.entries(gains)) {
+    if (!(dim in state.exp)) continue;
+    state.exp[dim] = Math.max(0, state.exp[dim] + v);
+    const level = levelFromExp(state.exp[dim]);
+    let idx = state.milestones[dim] ?? -1;
+    while (idx + 1 < thresholds.length && level >= thresholds[idx + 1]) idx++;
+    if (idx >= 0) state.milestones[dim] = idx;
+  }
+
+  // 均衡里程碑(§8.3):六維等級總和達門檻,永久保留
+  const balancedThresholds = data.titles.balanced.thresholds;
+  const levelSum = DIMENSIONS.reduce((a, d) => a + levelFromExp(state.exp[d]), 0);
+  let bIdx = state.balancedMilestone ?? -1;
+  while (bIdx + 1 < balancedThresholds.length && levelSum >= balancedThresholds[bIdx + 1]) bIdx++;
+  if (bIdx >= 0) state.balancedMilestone = bIdx;
+}

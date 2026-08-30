@@ -3,7 +3,7 @@
 // fameVariants 聲望反應、勞務折銀(§9.11.4)。
 // 純邏輯、無 DOM;rng 與日期一律由呼叫端傳入,方便測試。
 
-import { levelFromExp, DIMENSIONS } from "./exp.js";
+import { levelFromExp, DIMENSIONS, addExp } from "./exp.js";
 import { successRateV2 } from "./tags.js";
 import {
   HP_DEBUFF_TABLE, QI_DEBUFF_TABLE, TILI_DEBUFF_TABLE,
@@ -520,7 +520,11 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
 
   // 無選項事件(序章/日常直敘):he.byFate 依命格分歧、he.byFlag 依抉擇紀錄分版本(L1回聲),或 he.text 直接收尾
   if ((ev.beats.cheng.choices || []).length === 0) {
-    const he = ev.beats.he;
+    let he = ev.beats.he;
+    if (he.stateVariants && pending.npcState) { // §9.8.1:無選項遭遇依 NPC 狀態換整段收尾
+      const sv = he.stateVariants[pending.npcState.key];
+      if (sv) he = { ...he, ...sv, stateVariants: undefined };
+    }
     if (he.byFate) {
       const axis = fateAxisOf(state);
       const body = he.byFate[axis] ?? he.byFate.default;
@@ -570,6 +574,12 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
     outcome = ev.beats.he.byChoice[choiceId];
     pending.subSource = choiceId;
     pending.subBranch = null;
+  }
+
+  // NPC 狀態變體(§9.8.1):同一選項,醒/醉、晝/夜各講各的結局
+  if (outcome.stateVariants && pending.npcState) {
+    const sv = outcome.stateVariants[pending.npcState.key];
+    if (sv) outcome = { ...outcome, ...sv, stateVariants: undefined };
   }
 
   // 命格分歧(§1.3):結局節點帶 byFate 時,共通段後接命格軸專屬收尾(B8 卦攤壓軸)
@@ -656,6 +666,7 @@ function applyEffects(state, data, effects, todayStr, note) {
       if (effects.tiliRestore) state.resources.tili = Math.min(max.tili, state.resources.tili + max.tili * effects.tiliRestore);
     }
   }
+  if (effects.expGrant) addExp(state, effects.expGrant, data); // 事件直接發六維經驗(B9 裴景明「打了就賺」)
   if (effects.itemGrant) {
     for (const [itemId, count] of Object.entries(effects.itemGrant)) {
       state.inventory[itemId] = (state.inventory[itemId] || 0) + count;

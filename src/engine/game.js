@@ -2,7 +2,8 @@
 // 純邏輯、無 DOM,測試可直接在 Node 執行。
 
 import { effectiveAmount } from "./decay.js";
-import { DIMENSIONS, levelFromExp } from "./exp.js";
+import { DIMENSIONS, levelFromExp, addExp } from "./exp.js";
+export { addExp };
 import { generateTalents, wuxingMultiplier, openingFateLine } from "./talent.js";
 import { startEventV2, presentEventV2, chooseOptionV2, chooseSubV2, laborOnExercise } from "./events2.js";
 import {
@@ -310,25 +311,7 @@ function rolloverDaily(state, date) {
   }
 }
 
-/** 經驗增減:懲罰不會扣到負值;里程碑一經解鎖永久保留 */
-export function addExp(state, gains, data) {
-  const thresholds = data.titles.milestones.thresholds; // §8.2:等級門檻(非經驗值!)
-  for (const [dim, v] of Object.entries(gains)) {
-    if (!(dim in state.exp)) continue;
-    state.exp[dim] = Math.max(0, state.exp[dim] + v);
-    const level = levelFromExp(state.exp[dim]);
-    let idx = state.milestones[dim] ?? -1;
-    while (idx + 1 < thresholds.length && level >= thresholds[idx + 1]) idx++;
-    if (idx >= 0) state.milestones[dim] = idx;
-  }
-
-  // 均衡里程碑(§8.3):六維等級總和達門檻,永久保留
-  const balancedThresholds = data.titles.balanced.thresholds;
-  const levelSum = Object.values(levels(state)).reduce((a, b) => a + b, 0);
-  let bIdx = state.balancedMilestone ?? -1;
-  while (bIdx + 1 < balancedThresholds.length && levelSum >= balancedThresholds[bIdx + 1]) bIdx++;
-  if (bIdx >= 0) state.balancedMilestone = bIdx;
-}
+// addExp 移駐 exp.js(事件結算的 expGrant 共用,避免循環引用);此處轉出口維持既有引用不變
 
 export function levels(state) {
   const out = {};

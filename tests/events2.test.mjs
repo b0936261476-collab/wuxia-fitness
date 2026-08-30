@@ -46,13 +46,14 @@ function setLevel(state, dim, level) {
   state.exp[dim] = thresholdForLevel(level);
 }
 
-/** 造一個可強制抽中指定事件的 rng(權重均一時按池內位置) */
+/** 造一個可強制抽中指定事件的 rng(依累積權重瞄準——B9 起池內權重不再均一) */
 function rngFor(state, eventId, todayStr) {
   const candidates = eligibleEvents(state, data, todayStr);
   const idx = candidates.findIndex((c) => c.ev.eventId === eventId);
   assert.ok(idx >= 0, `${eventId} 不在可抽池中`);
   const total = candidates.reduce((a, c) => a + c.weight, 0);
-  return () => (idx + 0.5) / total;
+  const before = candidates.slice(0, idx).reduce((a, c) => a + c.weight, 0);
+  return () => (before + candidates[idx].weight / 2) / total;
 }
 
 // ---------- 察覺判定(§9.11.1) ----------
@@ -323,7 +324,7 @@ test("冷卻:同事件在 cooldown 事件數內不再出現", () => {
 // ---------- 資料自檢(生產規格書第八節,可自動化部分) ----------
 
 test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", () => {
-  const legalEffects = new Set(["fame", "infamy", "hpDamage", "mpDamage", "tiliDamage", "hpRestore", "mpRestore", "tiliRestore", "itemGrant", "setFlags", "clearFlags", "flagData"]);
+  const legalEffects = new Set(["fame", "infamy", "hpDamage", "mpDamage", "tiliDamage", "hpRestore", "mpRestore", "tiliRestore", "itemGrant", "expGrant", "setFlags", "clearFlags", "flagData"]);
   const collectOutcomes = (node, out = []) => {
     if (!node || typeof node !== "object") return out;
     if (node.effects) out.push(node);
@@ -359,7 +360,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:正式庫 14 + 序章教學 7 + B2~B8 全數入庫,編號一致(滿 80)", () => {
+test("自檢:正式庫 14 + 序章教學 7 + B2~B9 全數入庫,編號一致(80+遭遇 6)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -387,7 +388,9 @@ test("自檢:正式庫 14 + 序章教學 7 + B2~B8 全數入庫,編號一致(滿
     "CH-017_east_village", "CH-018_south_bridge", "CH-019_boy_returns", "FO-011_coin_keeper",
     "DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor", "CH-022_storyteller_you",
     "CH-023_kneeling_boy", "CH-024_name_escort",
-    "CH-025_new_scale", "DU-012_diving_rematch", "CH-026_basket_siblings", "FO-012_one_coin_fortune"
+    "CH-025_new_scale", "DU-012_diving_rematch", "CH-026_basket_siblings", "FO-012_one_coin_fortune",
+    "EN-001_pei_sparring", "EN-002_liu_fox", "EN-003_su_two_selves",
+    "EN-004_shi_day_night", "EN-005_zhan_tides", "EN-006_table_stranger"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -753,4 +756,80 @@ test("B8:雪恥戰要隔 45 天——「練了一個多月」的時間感", () =
   assert.ok(!eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "DU-012_diving_rematch"), "9 天太早");
   s.journal[s.journal.length - 1].date = "2026-07-01";
   assert.ok(eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "DU-012_diving_rematch"));
+});
+
+// ---------- B9 批次:遭遇系統 ----------
+
+test("B9:裴景明——輸了也發經驗(打了就賺),贏了發更多", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  setLevel(s, "hard", 20);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "EN-001_pei_sparring", D0));
+  const expBefore = s.exp.eye + s.exp.hard;
+  const res = chooseOption(s, data, "A", D0, () => 0.99); // 必輸(基準40)
+  assert.ok(res.done);
+  assert.ok(s.flags.met_pei && s.flags.pei_pointers);
+  assert.ok(s.exp.eye + s.exp.hard > expBefore, "輸了也要有指點經驗");
+  assert.match(res.entry.resultText, /輸給他,比贏別人學得多/);
+});
+
+test("B9:蘇挽秋擲態——醉態基準上修,成功率變低;結局換醉版", () => {
+  const su = data.npcs.top100.find((n) => n.name === "蘇挽秋");
+  assert.equal(su.states.type, "random");
+  const ev = data.events.pool.find((e) => e.eventId === "EN-003_su_two_selves");
+  const optB = ev.beats.cheng.choices.find((c) => c.id === "B");
+
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  setLevel(s, "ear", 26);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "EN-003_su_two_selves", D0));
+  s.pendingEvent.npcState = { npc: "蘇挽秋", key: "awake" }; // 明確設醒態當基準
+  const awakeRate = optionSuccessRate(s, data, ev, optB);
+  s.pendingEvent.npcState = { npc: "蘇挽秋", key: "drunk", benchmarkModifier: 8 };
+  const drunkRate = optionSuccessRate(s, data, ev, optB);
+  assert.ok(drunkRate < awakeRate, "醉態要更難打");
+  const res = chooseOption(s, data, "B", D0, () => 0.01); // 必成
+  assert.match(res.entry.resultText, /這位——是朋友/); // 醉版成功結局
+  assert.ok(s.flags.met_su_drunk);
+});
+
+test("B9:史晝夜依時辰換整件事——白天求醫回血,夜裡遇見史夜", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  s.resources = { hp: 100, qi: 500, tili: 1000 };
+  startNextEvent(s, data, D0, rngFor(s, "EN-004_shi_day_night", D0), 10); // 上午十點
+  assert.equal(s.pendingEvent.npcState.key, "day");
+  const view = presentEvent(s, data);
+  assert.match(view.qi, /郎中/);
+  chooseOption(s, data, null, D0);
+  assert.ok(s.flags.met_shi_zhou && !s.flags.met_shi_ye);
+  assert.ok(s.resources.hp > 100, "白天求醫要回血");
+
+  const s2 = newState();
+  s2.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s2);
+  addSteps(s2, 1000);
+  startNextEvent(s2, data, D0, rngFor(s2, "EN-004_shi_day_night", D0), 23); // 夜裡十一點
+  assert.equal(s2.pendingEvent.npcState.key, "night");
+  assert.match(presentEvent(s2, data).qi, /史夜/);
+  const res2 = chooseOption(s2, data, null, D0);
+  assert.ok(s2.flags.met_shi_ye);
+  assert.match(res2.entry.resultText, /什麼都沒問|什麼都沒發生/);
+});
+
+test("B9:遭遇事件靠 baseWeight 保持稀有(權重 0.15)", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  const cands = eligibleEvents(s, data, D0);
+  const pei = cands.find((c) => c.ev.eventId === "EN-001_pei_sparring");
+  const normal = cands.find((c) => c.ev.eventId === "DA-017_old_courier");
+  assert.ok(pei && normal);
+  assert.ok(pei.weight < normal.weight, "遭遇事件要比普通事件稀有");
 });
