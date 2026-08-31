@@ -262,8 +262,7 @@ function conditionsMet(state, ev, todayStr, data) {
     if (key.startsWith("flag:")) {
       sinceDate = state.flagDates?.[key.slice(5)];
     } else {
-      const entry = [...state.journal].reverse().find((j) => j.id === key);
-      sinceDate = entry?.date;
+      sinceDate = lastJournalById(state).get(key)?.date;
     }
     if (!sinceDate) return false; // 引用的事件/flag 還沒發生
     if (daysBetween(sinceDate, todayStr) < minDays) return false;
@@ -271,9 +270,25 @@ function conditionsMet(state, ev, todayStr, data) {
   return true;
 }
 
+/**
+ * 「事件 → 歷程中最後一筆」索引。原本每判斷一件事件就複製反轉整本歷程來找,
+ * 歷程長到幾百筆、池子近百件時,蒙地卡羅會被拖慢一個量級;改成整本掃一遍建表
+ * (後蓋前=最後一筆),同一次抽選內重用。
+ */
+function lastJournalById(state) {
+  const cached = state._journalIndex;
+  if (cached && cached.n === state.journal.length) return cached.map;
+  const map = new Map();
+  for (const j of state.journal) map.set(j.id, j);
+  Object.defineProperty(state, "_journalIndex", { // 不可枚舉:不進存檔、不進比對
+    value: { n: state.journal.length, map }, writable: true, configurable: true, enumerable: false
+  });
+  return map;
+}
+
 function cooldownReady(state, ev) {
   if (!ev.cooldown) return true;
-  const last = [...state.journal].reverse().find((j) => j.id === ev.eventId);
+  const last = lastJournalById(state).get(ev.eventId);
   if (!last) return true;
   return state.steps.resolved - last.n >= ev.cooldown;
 }

@@ -37,8 +37,22 @@ export function allLocations(data) {
   );
 }
 
+// 地點查表快取:regionMultiplier 在抽選熱路徑上逐事件呼叫,
+// 每次重新展開 28 個地點會把蒙地卡羅拖慢一個量級。地圖資料靜態,快取安全。
+const locIndexCache = new WeakMap();
+
+function locIndex(data) {
+  if (!data.map) return null;
+  let idx = locIndexCache.get(data.map);
+  if (!idx) {
+    idx = new Map(allLocations(data).map((l) => [l.id, l]));
+    locIndexCache.set(data.map, idx);
+  }
+  return idx;
+}
+
 export function locationById(data, id) {
-  return allLocations(data).find((l) => l.id === id) ?? null;
+  return locIndex(data)?.get(id) ?? null;
 }
 
 export function provinceOf(data, locId) {
