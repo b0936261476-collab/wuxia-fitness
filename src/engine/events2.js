@@ -479,13 +479,21 @@ export function presentEventV2(state, data) {
   else if (fameShort?.qi) qi = fameShort.qi;
   else {
     const qiVariants = ev.beats.qi.variants || {};
+    let matched = false;
     for (const [key, text] of Object.entries(qiVariants)) {
-      if (key.startsWith("flag:") && state.flags[key.slice(5)]) { qi = text; break; }
-      if (key === "injured" && isInjured(state)) { qi = text; break; }
-      if (key.startsWith("state:") && pending.npcState?.key === key.slice(6)) { qi = text; break; } // §9.8.1 狀態變體
+      if (key.startsWith("flag:") && state.flags[key.slice(5)]) { qi = text; matched = true; break; }
+      if (key === "injured" && isInjured(state)) { qi = text; matched = true; break; }
+      if (key.startsWith("state:") && pending.npcState?.key === key.slice(6)) { qi = text; matched = true; break; } // §9.8.1 狀態變體
+    }
+    // 再遇變體(設計者定調 2026-08-31):可重複事件第二次遇到,不能像初見。
+    // 具體變體(flag/帶傷/狀態)優先;都沒中、而歷程裡來過這件事,就換「見過的人」的開場。
+    let revisited = false;
+    if (!matched && qiVariants.revisit && lastJournalById(state).has(ev.eventId)) {
+      qi = qiVariants.revisit;
+      revisited = true; // 再遇版不再被名人版蓋掉——「他認出你了!」重播一次就穿幫
     }
     const fameQi = matchTierKey(ev.beats.qi.fameVariants, pending.fameTier);
-    if (fameQi?.text) qi = fameQi.text;
+    if (fameQi?.text && !revisited) qi = fameQi.text;
   }
   view.qi = fillTemplates(qi, data);
   if (pending.whisper) view.whisper = pending.whisper;

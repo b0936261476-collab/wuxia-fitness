@@ -100,6 +100,12 @@ const COND_NOTE = {
   "EN-004_shi_day_night": "很稀有的遭遇。你現實中幾點玩,決定遇到哪個人格(白天郎中/夜裡史夜)",
   "EN-005_zhan_tides": "很稀有的遭遇,水路更常見。他的心境五天一換:高潮/平潮/低潮三種深淺",
   "EN-006_table_stranger": "很稀有的遭遇(一次性)。她是誰,這件事不會告訴你",
+  "EN-007_teller_of_xianren": "只有拼過桌的人會遇到(20 天後,一次性)——你會知道那天對面坐的是誰",
+  "EN-008_zhan_names": "只有三種展孤舟都遇過的人會遇到(一次性)",
+  "EN-009_fishing_elder": "很稀有的遭遇。他只跟無名的人搭話——出了名,反而虧",
+  "EN-010_mad_scholar": "很稀有的遭遇。名頭在他這裡不好使",
+  "EN-011_fate_gambler": "很稀有的遭遇。賭的是小事,看的是你的命",
+  "EN-012_hong_gu": "很稀有的遭遇。衣裳不會說謊",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -316,7 +322,7 @@ P("\n---");
 P("## 九、路上遇到的人(遭遇——很稀有,榜上的人真的會出現)");
 P("");
 P("百強不只是榜文上的名字。走著走著,你可能真的遇到他們——大約五到七天才可能碰上一件,遇到誰看緣分。同一個人可以遇到很多次,關係是攢出來的。");
-for (const id of ["EN-001_pei_sparring", "EN-002_liu_fox", "EN-003_su_two_selves", "EN-004_shi_day_night", "EN-005_zhan_tides", "EN-006_table_stranger"]) {
+for (const id of ["EN-001_pei_sparring", "EN-002_liu_fox", "EN-003_su_two_selves", "EN-004_shi_day_night", "EN-005_zhan_tides", "EN-006_table_stranger", "EN-007_teller_of_xianren", "EN-008_zhan_names", "EN-009_fishing_elder", "EN-010_mad_scholar", "EN-011_fate_gambler", "EN-012_hong_gu"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

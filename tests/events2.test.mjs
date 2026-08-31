@@ -360,7 +360,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B10,含遭遇 6 與江南 10)", () => {
+test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B11,含遭遇 12 與江南 10)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -393,7 +393,9 @@ test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B10,含遭遇
     "EN-004_shi_day_night", "EN-005_zhan_tides", "EN-006_table_stranger",
     "JN-000_biaoju_map", "JN-001_yangzhou_arrive", "JN-002_bridge_yield", "JN-003_boatwoman",
     "JN-004_swordsect_gate", "JN-005_one_string", "JN-006_menu",
-    "JN-007_mirror_lake", "JN-008_gate_shut", "JN-009_rain"
+    "JN-007_mirror_lake", "JN-008_gate_shut", "JN-009_rain",
+    "EN-007_teller_of_xianren", "EN-008_zhan_names", "EN-009_fishing_elder",
+    "EN-010_mad_scholar", "EN-011_fate_gambler", "EN-012_hong_gu"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -835,4 +837,70 @@ test("B9:遭遇事件靠 baseWeight 保持稀有(權重 0.15)", () => {
   const normal = cands.find((c) => c.ev.eventId === "DA-017_old_courier");
   assert.ok(pei && normal);
   assert.ok(pei.weight < normal.weight, "遭遇事件要比普通事件稀有");
+});
+
+// ---------- B11 批次:再遇變體與世外奇人 ----------
+
+test("B11:再遇鐵律——第二次遇到換「見過的人」的開場,名人版不蓋再遇版", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "DA-017_old_courier", D0));
+  assert.doesNotMatch(presentEvent(s, data).qi, /熟客/); // 初見
+  chooseOption(s, data, null, D0);
+
+  addSteps(s, 20000); // 過冷卻
+  s.steps.resolved += 15;
+  startNextEvent(s, data, D1, rngFor(s, "DA-017_old_courier", D1));
+  assert.match(presentEvent(s, data).qi, /熟客/); // 再遇版
+
+  chooseOption(s, data, null, D1);
+  s.reputation.fame = data.reputation.tierThresholds.fame[4]; // 出名後再遇:仍用再遇版
+  addSteps(s, 20000);
+  s.steps.resolved += 15;
+  startNextEvent(s, data, D2, rngFor(s, "DA-017_old_courier", D2));
+  assert.match(presentEvent(s, data).qi, /熟客/);
+});
+
+test("B11:賣魚翁——無名者深聊得指點,出名者被嫌名頭太響", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "EN-009_fishing_elder", D0));
+  assert.match(presentEvent(s, data).qi, /坐。今天魚不咬/);
+  const expBefore = s.exp.soft;
+  chooseOption(s, data, null, D0);
+  assert.ok(s.exp.soft > expBefore, "無名者要拿到指點經驗");
+
+  const s2 = newState();
+  s2.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s2);
+  s2.reputation.fame = data.reputation.tierThresholds.fame[4];
+  addSteps(s2, 1000);
+  startNextEvent(s2, data, D0, rngFor(s2, "EN-009_fishing_elder", D0));
+  assert.match(presentEvent(s2, data).qi, /名頭太響,魚都嚇跑了/);
+  const exp2 = s2.exp.soft;
+  const res2 = chooseOption(s2, data, null, D0);
+  assert.equal(s2.exp.soft, exp2, "出名者拿不到指點");
+  assert.ok(s2.flags.fisher_snubbed_you);
+  assert.match(res2.entry.resultText, /反而想回去/);
+});
+
+test("B11:展孤舟回響——三態集齊才開門", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  s.flags.met_zhan_high = true;
+  s.flags.met_zhan_mid = true;
+  const has = () => eligibleEvents(s, data, D0).some((c) => c.ev.eventId === "EN-008_zhan_names");
+  assert.ok(!has(), "缺低潮期不開門");
+  s.flags.met_zhan_low = true;
+  assert.ok(has());
+  startNextEvent(s, data, D0, rngFor(s, "EN-008_zhan_names", D0));
+  const res = chooseOption(s, data, null, D0);
+  assert.ok(s.flags.zhan_named_friend);
+  assert.match(res.entry.resultText, /叫名字/);
 });
