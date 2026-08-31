@@ -360,7 +360,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B11,含遭遇 12 與江南 10)", () => {
+test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B12,含遭遇 12、江南 10、日常擴充 12)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -395,7 +395,11 @@ test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B11,含遭遇
     "JN-004_swordsect_gate", "JN-005_one_string", "JN-006_menu",
     "JN-007_mirror_lake", "JN-008_gate_shut", "JN-009_rain",
     "EN-007_teller_of_xianren", "EN-008_zhan_names", "EN-009_fishing_elder",
-    "EN-010_mad_scholar", "EN-011_fate_gambler", "EN-012_hong_gu"
+    "EN-010_mad_scholar", "EN-011_fate_gambler", "EN-012_hong_gu",
+    "CH-027_taoist_story", "DA-020_road_measurer", "CH-028_shade_quarrel", "CH-029_hiccup_master",
+    "CH-030_barber_blade", "DU-013_lantern_riddle", "DA-021_night_watchman",
+    "DA-022_net_cat", "DA-023_mute_ferryboy", "CH-031_mountain_fog",
+    "DU-014_monkey_persimmon", "CH-032_shrine_lots"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
@@ -903,4 +907,68 @@ test("B11:展孤舟回響——三態集齊才開門", () => {
   const res = chooseOption(s, data, null, D0);
   assert.ok(s.flags.zhan_named_friend);
   assert.match(res.entry.resultText, /叫名字/);
+});
+
+// ---------- B12 批次:日常池擴充與旗標解鎖選項 ----------
+
+test("B12:山霧——聽過樵夫那句話的人才有「聽水聲」這個選項", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "CH-031_mountain_fog", D0));
+  assert.deepEqual(presentEvent(s, data).choices.map((c) => c.id), ["A", "C"]);
+  assert.throws(() => chooseOption(s, data, "B", D0), /旗標/);
+  chooseOption(s, data, "C", D0);
+
+  const s2 = newState();
+  s2.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s2);
+  setLevel(s2, "ear", 20);
+  addSteps(s2, 1000);
+  s2.flags.heard_mountain_saying = true; // 山夜柴話聽過樵夫的話
+  startNextEvent(s2, data, D0, rngFor(s2, "CH-031_mountain_fog", D0));
+  assert.deepEqual(presentEvent(s2, data).choices.map((c) => c.id), ["A", "B", "C"]);
+  const res = chooseOption(s2, data, "B", D0, () => 0.01); // 必成
+  assert.ok(s2.flags.fog_water_way);
+  assert.match(res.entry.resultText, /一碗水的交情/);
+});
+
+test("B12:更夫——耳力好的人聽出節奏不對(新伏筆線)", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  setLevel(s, "ear", 28); // ≥14×2 必見
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "DA-021_night_watchman", D0));
+  assert.ok(s.flags.nightwatch_code_heard, "察覺即得旗標");
+  const res = chooseOption(s, data, null, D0);
+  assert.match(res.entry.resultText, /指節叩牆/);
+  assert.ok(s.flags.nightwatch_shadow_seen);
+});
+
+test("B12:猴群輾壓版——猴王捧柿子", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  setLevel(s, "light", 20); // 20 ≥ 8×2 → crush
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "DU-014_monkey_persimmon", D0));
+  assert.equal(s.pendingEvent.form, "crush");
+  const res = chooseOption(s, data, null, D0);
+  assert.match(res.entry.resultText, /雞認強者,猴,也認/);
+  assert.ok(s.flags.monkey_king_offering);
+});
+
+test("引擎回歸:察覺加段的 setFlags 要真的發出去(劍線三響的起點靠它)", () => {
+  const s = newState();
+  s.talents = { genggu: 50, wuxing: 50, yunqi: 50 };
+  skipIntro(s);
+  setLevel(s, "eye", 24); // 隱蔽度12 → 必見
+  addSteps(s, 1000);
+  startNextEvent(s, data, D0, rngFor(s, "DA-011_blacksmith", D0));
+  const res = chooseOption(s, data, null, D0);
+  assert.match(res.entry.resultText, /農具/);
+  assert.ok(s.flags.smith_swords_seen, "看見劍坯就該記下來——這是整條劍線的起點");
+  assert.equal(s.flagDates.smith_swords_seen, D0);
 });

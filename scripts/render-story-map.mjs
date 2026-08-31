@@ -106,6 +106,18 @@ const COND_NOTE = {
   "EN-010_mad_scholar": "很稀有的遭遇。名頭在他這裡不好使",
   "EN-011_fate_gambler": "很稀有的遭遇。賭的是小事,看的是你的命",
   "EN-012_hong_gu": "很稀有的遭遇。衣裳不會說謊",
+  "CH-027_taoist_story": "哪條路都會遇到(可重複)",
+  "DA-020_road_measurer": "哪條路都會遇到(可重複)",
+  "CH-028_shade_quarrel": "哪條路都會遇到(可重複)",
+  "CH-029_hiccup_master": "哪條路都會遇到(可重複)",
+  "CH-030_barber_blade": "走商路的人更常遇到(可重複)",
+  "DU-013_lantern_riddle": "走商路的人更常遇到(可重複)",
+  "DA-021_night_watchman": "走商路的人更常遇到(可重複)——耳力好的人會聽出蹊蹺",
+  "DA-022_net_cat": "走水路的人更常遇到(可重複)",
+  "DA-023_mute_ferryboy": "走水路的人更常遇到(可重複)",
+  "CH-031_mountain_fog": "走山路的人更常遇到(可重複)——聽過樵夫那句話的人多一條路",
+  "DU-014_monkey_persimmon": "走山路的人更常遇到(可重複)",
+  "CH-032_shrine_lots": "走山路的人更常遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -288,25 +300,25 @@ for (const id of ["1-1_lost_purse", "1-2_purse_notice", "1-3_purse_earned", "1-4
 
 P("\n---");
 P("## 四、隨機池・通用(哪條路都會遇到)");
-for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star", "CH-019_boy_returns", "FO-012_one_coin_fortune"]) {
+for (const id of ["DA-001_teahouse_storyteller", "DA-002_sugar_figurine", "DA-003_rain_shelter", "DA-004_herb_gatherer", "CH-001_cheat_scale", "CH-002_street_duel", "DU-001_arm_wrestle_dock", "DU-002_wandering_staff", "FO-001_cliff_herb", "FO-002_night_flute", "CH-010_peddler_cart", "DA-013_censor_passing", "CH-012_shrine_night", "CH-013_blind_woman", "DA-017_old_courier", "DA-018_night_traveler", "DA-019_kids_kungfu", "CH-014_faked_injury", "CH-015_porter_back", "CH-027_taoist_story", "DA-020_road_measurer", "CH-028_shade_quarrel", "CH-029_hiccup_master", "DU-009_footrace", "DU-010_chicken_chase", "FO-009_broken_stele", "FO-010_shooting_star", "CH-019_boy_returns", "FO-012_one_coin_fortune"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 五、隨機池・商路(三岔口選「走東」的人更常遇到)");
-for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall", "CH-017_east_village", "CH-025_new_scale"]) {
+for (const id of ["DA-005_teatime_gossip", "DA-007_tightrope_walker", "CH-003_drunkard_stall", "DA-009_old_tune", "DA-011_blacksmith", "CH-008_lost_child", "DU-005_teahouse_go", "DA-014_night_cart", "FO-007_go_regret", "DA-016_beneath_board", "DU-007_ring_toss", "CH-016_dice_stall", "CH-017_east_village", "CH-025_new_scale", "CH-030_barber_blade", "DU-013_lantern_riddle", "DA-021_night_watchman"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 六、隨機池・水路(選「走南」的人更常遇到)");
-for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell", "CH-011_seventh_fair", "DU-008_laundry_chase", "CH-018_south_bridge", "DU-012_diving_rematch"]) {
+for (const id of ["CH-004_overloaded_ferry", "DU-003_river_diving", "FO-004_night_fishfire", "DA-008_ferry_repaid", "CH-006_ferry_grudge", "CH-007_wine_errand", "DA-010_dock_talk", "CH-009_letter_writing", "FO-006_sunken_bell", "CH-011_seventh_fair", "DU-008_laundry_chase", "CH-018_south_bridge", "DU-012_diving_rematch", "DA-022_net_cat", "DA-023_mute_ferryboy"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
 P("\n---");
 P("## 七、隨機池・山路(選「走西」的人更常遇到)");
-for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds", "DA-015_bow_returned", "FO-008_eave_bells", "FO-011_coin_keeper", "CH-026_basket_siblings"]) {
+for (const id of ["DA-006_woodsman_night", "CH-005_landslide", "DU-004_hunter_archery", "FO-003_mist_lantern", "DA-012_rain_pavilion", "DU-006_runaway_mule", "FO-005_sea_of_clouds", "DA-015_bow_returned", "FO-008_eave_bells", "FO-011_coin_keeper", "CH-026_basket_siblings", "CH-031_mountain_fog", "DU-014_monkey_persimmon", "CH-032_shrine_lots"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

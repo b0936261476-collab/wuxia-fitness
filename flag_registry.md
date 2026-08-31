@@ -214,3 +214,18 @@
 | met_scholar / scholar_verse_read | EN-010 | 暗線 | 滿地拆招口訣;「記住的東西會擋路」 |
 | met_gambler / gambler_word_won / gambler_saw_fate | EN-011 | **暗線(留白)** | 站著的銅錢;「你的命我看過了。不用賭,也知道。」 |
 | met_hong_gu | EN-012 | 暗線(關係攢積) | 「衣裳不會說謊。人會,衣裳不會。」多縫的一顆釦子 |
+
+## B12 批次(日常池擴充,2026-08-31 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| taoist_story_told | CH-027 A/B | 沉線 | 化緣不化錢,化一個故事;講法不同,回的卦不同 |
+| hiccup_cured | CH-029 B成功 | 沉線 | 一掌治嗝,被追著要拜師 |
+| barber_shaved / barber_blade_seen | CH-030 | **暗線(留白)** | 「以前是砍柴的」「所以現在剃頭」——刀收進盒子就別再翻開 |
+| riddle_won | DU-013 | 沉線 | 燈謎攤主的陰影 |
+| nightwatch_code_heard / nightwatch_shadow_seen | DA-021 察覺 | **暗線(新伏筆線)** | 三更打的不是三更的點;牆根影子以指節應了半拍——回響後批收 |
+| cat_stole_fish | DA-022 | 沉線 | 「牠挑人偷。上回偷的是個縣太爺。」 |
+| mute_boy_met / mute_boy_hums | DA-023 | **暗線(留白)** | 他不是不能說,是不想說;那個看不懂的手勢 |
+| fog_water_way | CH-031 B成功 | **回聲收尾** | 樵夫「迷了路找水」在山霧裡回本——一碗水的交情 |
+| monkey_beaten / monkey_lost / monkey_king_offering | DU-014 | 沉線 | 猴王捧柿子(輾壓);雞認強者,猴也認 |
+| shrine_secret_known / shrine_lot_taken | CH-032 | 沉線 | 籤筒裡全是上上籤;「求籤的人要的不是準,是個心安」 |

@@ -510,6 +510,7 @@ export function presentEventV2(state, data) {
     .filter((c) => !c.autoWhenInsufficient) // 金錢系統上線前一律視為湊得出(1-4 設計註②)
     .filter((c) => !c.requirePerception || pending.perception.seen)
     .filter((c) => !c.requireCrush || pending.perception.crush)
+    .filter((c) => !c.requireFlag || c.requireFlag.split("|").some((f) => state.flags[f])) // 記得的人才有的選項(B12 山霧)
     .map((c) => ({ id: c.id, text: c.text, judged: !!c.judge }));
   view.immediate = view.choices.length === 0;
   return view;
@@ -588,6 +589,7 @@ export function chooseOptionV2(state, data, choiceId, todayStr, rng = Math.rando
   if (!opt) throw new Error(`未知選項:${choiceId}`);
   if (opt.requirePerception && !pending.perception.seen) throw new Error("此選項需要察覺");
   if (opt.requireCrush && !pending.perception.crush) throw new Error("此選項需要輾壓級察覺");
+  if (opt.requireFlag && !opt.requireFlag.split("|").some((f) => state.flags[f])) throw new Error("此選項需要旗標");
 
   pending.choiceId = choiceId;
   pending.choiceText = opt.text;
@@ -721,7 +723,12 @@ function finalize(state, data, pending, ev, { outcome, resultText, zhuanText, pr
   let text = (prefixText ? prefixText + "\n\n" : "") + resultText;
 
   // 察覺者/輾壓者的加聽加看段
-  if (outcome.perceivedExtra && pending.perception.seen) text += "\n\n" + outcome.perceivedExtra.text;
+  // 察覺者的加看加聽段。setFlags 一定要跟著發——先前漏掉,害得「打鐵鋪看見劍坯」
+  // 這種靠加段落地的旗標永遠不會亮,整條劍線三響在實際遊玩中都觸發不了。
+  if (outcome.perceivedExtra && pending.perception.seen) {
+    text += "\n\n" + outcome.perceivedExtra.text;
+    if (outcome.perceivedExtra.setFlags) setFlags(state, outcome.perceivedExtra.setFlags, null, todayStr);
+  }
   if (outcome.crushExtra && pending.perception.crush) {
     text += "\n\n" + outcome.crushExtra.text;
     if (outcome.crushExtra.setFlags) setFlags(state, outcome.crushExtra.setFlags, null, todayStr);
