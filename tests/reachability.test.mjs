@@ -215,7 +215,7 @@ test("十強真容:靠帳面超越開門,而那個旗標確實是名次引擎寫
 
 test("十強真容:三件都要有再遇版,而且不是慶祝——沒有一件在結算時給名次獎勵", () => {
   const ten = events.pool.filter((e) => e.eventId.startsWith("TEN-"));
-  assert.equal(ten.length, 3);
+  assert.equal(ten.length, 10, "十強真容應該十個人到齊");
   for (const e of ten) {
     assert.ok(e.beats.qi.variants?.revisit, `${e.eventId} 缺再遇版`);
     assert.ok(e.npcBind, `${e.eventId} 沒綁人`);
@@ -236,4 +236,31 @@ test("十強真容:每一件都在它該在的地方,不會在錯的地方撞見
   }
   const ahe = events.pool.find((x) => x.eventId === "TEN-010_ahe");
   assert.equal(ahe.conditions.atProvince, "zhongyuan", "阿禾是市井裡的人,該在中原遇到");
+
+  // 每一件都要開得了門:不是綁地點就是綁州,不能哪裡都撞得到
+  for (const e of events.pool.filter((x) => x.eventId.startsWith("TEN-"))) {
+    const c = e.conditions;
+    assert.ok(c.atLocation || c.atProvince || c.requireFlags.length > 1,
+      `${e.eventId} 沒有任何地域或前置限制,會在奇怪的地方撞見`);
+  }
+
+  // 綁了地點的,場景寫的地方要跟那個地點對得上——
+  // 否則會發生「酒樓二樓那場戲在山門前上演」這種事(2026-09-02 實測抓到三件)
+  const locOf = new Map();
+  for (const p of map.provinces) for (const l of p.locations) locOf.set(l.id, l);
+  for (const e of events.pool.filter((x) => x.eventId.startsWith("TEN-"))) {
+    const evTags = e.tagBlock.region ?? [];
+    const loc = locOf.get(e.conditions.atLocation);
+    if (loc) {
+      assert.ok(evTags.some((t) => (loc.regionTags ?? []).includes(t)),
+        `${e.eventId} 綁在${loc.name},但它的場景寫的是「${evTags.join("/")}」——對不上`);
+      continue;
+    }
+    // 只綁州的:那一州至少要有一個地方接得住這場戲,否則酒旗會插在雪地廢墟上
+    const prov = map.provinces.find((p) => p.id === e.conditions.atProvince);
+    if (!prov) continue;
+    const fits = prov.locations.filter((l) => evTags.some((t) => (l.regionTags ?? []).includes(t)));
+    assert.ok(fits.length > 0,
+      `${e.eventId} 綁在${prov.name},但那一州沒有一個地方的風味是「${evTags.join("/")}」`);
+  }
 });

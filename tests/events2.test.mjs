@@ -405,7 +405,9 @@ test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B13 + 十強�
     "BJ-008_horse_milk", "BJ-009_beacon",
     "BJ-010_bow_owner", "BJ-011_the_town", "BJ-012_bring_word",
     "ZY-001_home_town", "ZY-002_notice_wall", "ZY-003_ferry_wait", "ZY-004_dock_ledger", "ZY-005_kongtong_gate", "ZY-006_old_man_kongtong", "ZY-007_yunling_charcoal", "ZY-008_yunling_trap", "ZY-009_duanyun_fog", "ZY-010_duanyun_oil",
-    "TEN-001_shen_tingxue", "TEN-002_xiao_lingxue", "TEN-010_ahe"
+    "TEN-001_shen_tingxue", "TEN-002_xiao_lingxue", "TEN-003_gu_jinghong",
+    "TEN-004_han_changfeng", "TEN-005_liu_qingluan", "TEN-006_pei_true",
+    "TEN-007_xuan_lingzi", "TEN-008_a_man", "TEN-009_qi_zimo", "TEN-010_ahe"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
