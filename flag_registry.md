@@ -245,3 +245,12 @@
 | met_bowmaker / bowmaker_rest / broken_bow_story | BJ-007 | **暗線(留白)** | 滿屋等人來取的弓;「我這輩子不該再拉弓了」;缺一半也是弓 |
 | horse_milk_drunk / horse_milk_choked / horse_milk_toasted | BJ-008 | 沉線 | 笑你的人會把最好的肉夾給你 |
 | met_beacon_keeper / beacon_dust_seen | BJ-009 | 沉線 | 「沒事的日子,才是我最忙的日子」 |
+
+## B14 收線(設計者指出「留白不能斷尾」,2026-08-31)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| veteran_hand_seen | BJ-000 察覺 | **暗線→已收** | 老兵少了三根指頭、虎口是弓弦崩的疤——BJ-010 的伏筆 |
+| bow_owner_known / bow_owner_confessed / bow_still_hangs | BJ-010 | **回聲收尾** | 削弓的人就是洛陽那個老兵;「怕的人拉弓,箭會殺錯人」;「我以為他早劈了當柴燒」 |
+| found_sanlipu / sanlipu_grandma / stone_righted | BJ-011 | **回聲** | 三里鋪還在,但三十年前大水後往高處挪了二里;界石扶正了 |
+| wenren_answered / wenren_debt / wenren_willow_echo | BJ-012 | **回聲收尾** | 他鬆了口氣:「還好不是我離開之後才荒的」;柳家坳老婦那句話成了答案 |

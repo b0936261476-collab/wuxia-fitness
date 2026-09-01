@@ -6,35 +6,45 @@
       "name": "金創藥",
       "type": "consumable",
       "description": "貨郎的「祖傳」金創藥——祖傳到他這是第一代。不靈不要錢,倒是真的靈。",
-      "restore": { "hp": 400 }
+      "restore": {
+        "hp": 400
+      }
     },
     {
       "id": "suanmei",
       "name": "酸梅",
       "type": "consumable",
       "description": "開張大吉,送的。酸得人一個激靈,趕路的乏勁全散了。",
-      "restore": { "tili": 100 }
+      "restore": {
+        "tili": 100
+      }
     },
     {
       "id": "shai-yaocao",
       "name": "曬乾的藥草",
       "type": "consumable",
       "description": "渡口那位抱藥的大嫂托艄公轉交的。曬得很仔細,紮得很整齊,像在還一件很重的東西。",
-      "restore": { "hp": 200 }
+      "restore": {
+        "hp": 200
+      }
     },
     {
       "id": "liaoshangyao",
       "name": "療傷藥",
       "type": "consumable",
       "description": "跌打鋪老師傅祖傳藥膏,聞起來嗆,抹起來燙,但真的有效。",
-      "cures": ["dieda"]
+      "cures": [
+        "dieda"
+      ]
     },
     {
       "id": "qingxinsan",
       "name": "清心散",
       "type": "consumable",
       "description": "一包淡青色藥粉,以山泉送服,可平定紊亂的氣息。",
-      "cures": ["qixi"]
+      "cures": [
+        "qixi"
+      ]
     },
     {
       "id": "canpo-ditu",
@@ -48,7 +58,9 @@
       "name": "《輕身訣》殘頁",
       "type": "manual",
       "description": "崖壁旁拾得的殘頁,記載一套提縱之法。研讀後身法大進。",
-      "expOnGain": { "light": 500 }
+      "expOnGain": {
+        "light": 500
+      }
     },
     {
       "id": "zangfeng-pai",
@@ -61,7 +73,20 @@
       "name": "《藏鋒入門篇》",
       "type": "manual",
       "description": "藏鋒山門的入門功法,字跡工整,首頁只有八個字:藏鋒於鞘,守拙於心。",
-      "expOnGain": { "light": 300, "inner": 300, "hard": 300, "soft": 300, "eye": 300, "ear": 300 }
+      "expOnGain": {
+        "light": 300,
+        "inner": 300,
+        "hard": 300,
+        "soft": 300,
+        "eye": 300,
+        "ear": 300
+      }
+    },
+    {
+      "id": "bianjun-yinggong",
+      "name": "邊軍硬弓",
+      "type": "weapon",
+      "description": "邊軍校尉雙手遞回來的那張。弓臂硬得像鐵,尋常人拉不開三分。他說:「拿著。它認你。」——裝備系統上線前,它先在行囊裡待著。"
     }
   ],
   "debuffs": [

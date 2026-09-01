@@ -128,6 +128,9 @@ const COND_NOTE = {
   "BJ-007_bow_maker": "到了缺月弓廬才會遇到(可重複)",
   "BJ-008_horse_milk": "北疆境內都會遇到(可重複)",
   "BJ-009_beacon": "北疆境內都會遇到(可重複)",
+  "BJ-010_bow_owner": "只有在弓廬聽過斷弓來歷的人會遇到(10 天後,回洛陽,一次性)",
+  "BJ-011_the_town": "只有遇過那位打聽地方的人會遇到(15 天後,在中原境內,一次性)",
+  "BJ-012_bring_word": "找到那個地方之後,回北疆才會遇到(10 天後,一次性)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -344,7 +347,7 @@ P("\n---");
 P("## 北疆(要先拿到關防圖、歷練也夠,才走得到)");
 P("");
 P("風大、話少、規矩硬。北邊的人不比劍,比誰的弓拉得久。");
-for (const id of ["BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground", "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker", "BJ-008_horse_milk", "BJ-009_beacon"]) {
+for (const id of ["BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground", "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker", "BJ-008_horse_milk", "BJ-009_beacon", "BJ-010_bow_owner", "BJ-011_the_town", "BJ-012_bring_word"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
