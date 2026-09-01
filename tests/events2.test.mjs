@@ -360,7 +360,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B13,含遭遇 12、江南 10、日常擴充 12、北疆 10+收線 3+中原補完 10)", () => {
+test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B13 + 十強真容 3)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -404,7 +404,8 @@ test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B13,含遭遇
     "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker",
     "BJ-008_horse_milk", "BJ-009_beacon",
     "BJ-010_bow_owner", "BJ-011_the_town", "BJ-012_bring_word",
-    "ZY-001_home_town", "ZY-002_notice_wall", "ZY-003_ferry_wait", "ZY-004_dock_ledger", "ZY-005_kongtong_gate", "ZY-006_old_man_kongtong", "ZY-007_yunling_charcoal", "ZY-008_yunling_trap", "ZY-009_duanyun_fog", "ZY-010_duanyun_oil"
+    "ZY-001_home_town", "ZY-002_notice_wall", "ZY-003_ferry_wait", "ZY-004_dock_ledger", "ZY-005_kongtong_gate", "ZY-006_old_man_kongtong", "ZY-007_yunling_charcoal", "ZY-008_yunling_trap", "ZY-009_duanyun_fog", "ZY-010_duanyun_oil",
+    "TEN-001_shen_tingxue", "TEN-002_xiao_lingxue", "TEN-010_ahe"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);

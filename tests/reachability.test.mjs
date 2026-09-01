@@ -80,8 +80,18 @@ test("可達性:setFlags 只出現在引擎真的會讀的位置", () => {
   assert.deepEqual(bad, [], `這些旗標掛在引擎不會讀的位置,寫了也不會生效:\n${bad.join("\n")}`);
 });
 
+/**
+ * 不是事件發的、但引擎自己會寫的旗標。
+ * 這類旗標一樣開得了門,只是來源不在事件庫裡,稽核時要放行——
+ * 但**只放行寫得出來源的**,免得這個名單變成漏洞的藏身處。
+ */
+const ENGINE_FLAGS = [
+  // updateRanking / revealRanking:帳面超越百強某人時寫入(§9.9)。十強真容就靠這個開門。
+  ...Array.from({ length: 100 }, (_, i) => `surpassed_${i + 1}`)
+];
+
 test("可達性:每個被當條件用的旗標,都有某條路發得出來(無死路內容)", () => {
-  const grantable = new Set();
+  const grantable = new Set(ENGINE_FLAGS);
   for (const ev of events.pool) {
     const found = [];
     collectSetFlags(ev, "root", found);
@@ -180,4 +190,50 @@ test("可達性:再遇鐵律——可重複且有固定人物的事件要有再�
   }
   assert.deepEqual(bad, [],
     `這些事件會重複遇到又有固定人物,卻沒有再遇版開場(第二次遇到會像初見):\n${bad.join("\n")}`);
+});
+
+// ---------- 十強真容(§9.7.5:超過之後遇見他們,才知道實力不只這樣) ----------
+
+test("十強真容:靠帳面超越開門,而那個旗標確實是名次引擎寫的", async () => {
+  const { newState, addExp, revealRanking } = await import("../src/engine/game.js");
+  const { DIMENSIONS, thresholdForLevel } = await import("../src/engine/exp.js");
+  const npcs = loadJson("data/npcs.json");
+  const reputation = loadJson("data/reputation.json");
+  const titles = loadJson("data/titles.json");
+
+  const s = newState();
+  revealRanking(s, { npcs, reputation, titles }); // 先對時
+  const gains = {};
+  for (const d of DIMENSIONS) gains[d] = thresholdForLevel(120); // 練到十強水準
+  addExp(s, gains, { titles });
+  revealRanking(s, { npcs, reputation, titles });
+
+  for (const rank of [1, 2, 10]) {
+    assert.equal(s.flags[`surpassed_${rank}`], true, `帳面超越第 ${rank} 名之後應該落旗標`);
+  }
+});
+
+test("十強真容:三件都要有再遇版,而且不是慶祝——沒有一件在結算時給名次獎勵", () => {
+  const ten = events.pool.filter((e) => e.eventId.startsWith("TEN-"));
+  assert.equal(ten.length, 3);
+  for (const e of ten) {
+    assert.ok(e.beats.qi.variants?.revisit, `${e.eventId} 缺再遇版`);
+    assert.ok(e.npcBind, `${e.eventId} 沒綁人`);
+    assert.ok((e.conditions.baseWeight ?? 1) < 1, `${e.eventId} 該是稀有遭遇`);
+    // §9.7.5:觸發的不是慶祝。這裡只擋「把名次當獎品發下去」這種寫法。
+    assert.ok(!JSON.stringify(e).includes("rankGrant"), `${e.eventId} 不該直接發名次`);
+  }
+});
+
+test("十強真容:每一件都在它該在的地方,不會在錯的地方撞見", () => {
+  const where = {
+    "TEN-001_shen_tingxue": "tingtaoguwai",
+    "TEN-002_xiao_lingxue": "xiaojia"
+  };
+  for (const [id, loc] of Object.entries(where)) {
+    const e = events.pool.find((x) => x.eventId === id);
+    assert.equal(e.conditions.atLocation, loc);
+  }
+  const ahe = events.pool.find((x) => x.eventId === "TEN-010_ahe");
+  assert.equal(ahe.conditions.atProvince, "zhongyuan", "阿禾是市井裡的人,該在中原遇到");
 });
