@@ -254,3 +254,18 @@
 | bow_owner_known / bow_owner_confessed / bow_still_hangs | BJ-010 | **回聲收尾** | 削弓的人就是洛陽那個老兵;「怕的人拉弓,箭會殺錯人」;「我以為他早劈了當柴燒」 |
 | found_sanlipu / sanlipu_grandma / stone_righted | BJ-011 | **回聲** | 三里鋪還在,但三十年前大水後往高處挪了二里;界石扶正了 |
 | wenren_answered / wenren_debt / wenren_willow_echo | BJ-012 | **回聲收尾** | 他鬆了口氣:「還好不是我離開之後才荒的」;柳家坳老婦那句話成了答案 |
+
+## B15 中原補完(ZY-001 ~ ZY-010,2026-08-31 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| home_town_known | ZY-001 | 沉線 | 「有人知道你穿幾號鞋」是很奢侈的事 |
+| read_the_wall / old_notice_read | ZY-002 | **暗線(留白)** | 壓在最底層的十幾年前尋人啟事——江湖的記性只到最上面那一層 |
+| ferry_waiting_woman / cheng_family_asked | ZY-003 | **暗線(留白)** | 等了六年的食盒;「他要是真回來,總不能餓著」;她託你留意姓程的 |
+| dock_ledger_solved / dock_ledger_seen | ZY-004 | 沉線 | 描過的那一筆是老頭自己算錯的;輾壓版三息看穿 |
+| kongtong_gate_seen / kongtong_hint / kongtong_steps_read | ZY-005 | 暗線 | 三百級石階是一個人掃的,因為他師兄病了 |
+| met_kongtong_elder / elder_saw_your_rank | ZY-006 | **暗線** | 榜上第三十掃了四十年階;「掃得動,才是好日子」——與江湖快報的衰退首發同一人 |
+| charcoal_family | ZY-007 | 沉線 | 七天不睡整覺,為的是「他要念書」 |
+| traps_cleared / trap_marked / hunter_never_returned | ZY-008 | **暗線(留白)** | 三副鏽了三年沒人收的獸夾——下夾子的人沒再回來過 |
+| duanyun_visited / duanyun_waited / duanyun_listened | ZY-009 | **暗線(主線,設計者已決議押後)** | 那點光的距離從頭到尾沒變過;聽不見腳步、呼吸、燈芯 |
+| oil_shop_known / oil_shop_evaded | ZY-010 | **暗線(同上)** | 上崗的人回來都會買油,買了也不知道要點什麼;問誰添油,老闆娘不答 |

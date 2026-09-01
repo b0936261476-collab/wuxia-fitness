@@ -172,7 +172,9 @@ test("可達性:再遇鐵律——可重複且有固定人物的事件要有再�
   for (const ev of events.pool) {
     if (ev.triggerOnly || (ev.cooldown ?? 0) >= 999) continue;
     if (EXEMPT.has(ev.eventId)) continue;
-    if (!(ev.tagBlock?.character ?? []).length) continue; // 現場沒人物,無所謂認不認得
+    const chars = ev.tagBlock?.character ?? [];
+    if (!chars.length) continue;                                   // 現場沒人物,無所謂認不認得
+    if (chars.every((c) => /留白|不在場|不知何人/.test(c))) continue; // 人不在場或刻意不點名,每次都像初見才對味
     const hasRevisit = !!ev.beats.qi.variants?.revisit;
     if (!hasRevisit) bad.push(`${ev.eventId}(${ev.title})`);
   }

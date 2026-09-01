@@ -131,6 +131,16 @@ const COND_NOTE = {
   "BJ-010_bow_owner": "只有在弓廬聽過斷弓來歷的人會遇到(10 天後,回洛陽,一次性)",
   "BJ-011_the_town": "只有遇過那位打聽地方的人會遇到(15 天後,在中原境內,一次性)",
   "BJ-012_bring_word": "找到那個地方之後,回北疆才會遇到(10 天後,一次性)",
+  "ZY-001_home_town": "回到中原小鎮才會遇到(可重複)",
+  "ZY-002_notice_wall": "回到中原小鎮才會遇到(可重複)",
+  "ZY-003_ferry_wait": "到了臨江渡才會遇到(可重複)",
+  "ZY-004_dock_ledger": "到了臨江渡才會遇到(可重複)",
+  "ZY-005_kongtong_gate": "到了崆峒派山門才會遇到(可重複)",
+  "ZY-006_old_man_kongtong": "崆峒山門的稀有遭遇——榜上第三十,坐在石階上歇氣",
+  "ZY-007_yunling_charcoal": "到了雲嶺才會遇到(可重複)",
+  "ZY-008_yunling_trap": "到了雲嶺才會遇到(可重複)",
+  "ZY-009_duanyun_fog": "到了斷雲崗才會遇到(可重複)——你只會拿到問題",
+  "ZY-010_duanyun_oil": "上過斷雲崗的人,10 天後再上崗會遇到(一次性)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -340,6 +350,14 @@ P("## 八、出名之後才會遇到的(俠名不到,這些事根本不會發生
 P("");
 P("你的俠名練到**俠名遠播**那一階,江湖對你的態度就變了——底下這些事,只找有名字的人。");
 for (const id of ["DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor", "CH-022_storyteller_you", "CH-023_kneeling_boy", "CH-024_name_escort"]) {
+  renderEvent(events.pool.find((e) => e.eventId === id));
+}
+
+P("\n---");
+P("## 中原各地(走到那裡才會遇到的事)");
+P("");
+P("中原是起點,也是你回得去的地方。這些事只在特定地方發生——走到了,才遇得到。");
+for (const id of ["ZY-001_home_town", "ZY-002_notice_wall", "ZY-003_ferry_wait", "ZY-004_dock_ledger", "ZY-005_kongtong_gate", "ZY-006_old_man_kongtong", "ZY-007_yunling_charcoal", "ZY-008_yunling_trap", "ZY-009_duanyun_fog", "ZY-010_duanyun_oil"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
