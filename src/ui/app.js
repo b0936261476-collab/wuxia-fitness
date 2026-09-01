@@ -58,7 +58,7 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "p2-12"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "p2-13"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media", "jianghu_news", "map"];
@@ -81,6 +81,27 @@ function dateWithOffset(offsetDays) {
 
 function today() {
   return dateWithOffset(0);
+}
+
+
+/**
+ * 江湖傳話:遊戲裡的訊息一律用自己的樣式顯示,不用瀏覽器的 alert。
+ * 那些被擋下來的話是寫過的戲(「北疆?那地方的風,能把人吹成兩截」),
+ * 用系統彈窗演出來就毀了。
+ */
+function say(text, tone = "info") {
+  let box = $("#say-box");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "say-box";
+    document.body.appendChild(box);
+  }
+  box.className = "say " + tone;
+  box.textContent = text;
+  box.hidden = false;
+  clearTimeout(say._t);
+  say._t = setTimeout(() => { box.hidden = true; }, 6000);
+  box.onclick = () => { box.hidden = true; };
 }
 
 function dimName(key) {
@@ -309,9 +330,9 @@ function renderRebirth() {
     $("#rebirth-btn").addEventListener("click", () => {
       const res = attemptRebirthCompletion(state, today());
       if (!res) return;
-      alert(res.success
+      say(res.success
         ? "你撐著牆站起來,才發現這副筋骨比倒下之前更耐折騰。這一趟疼,沒有白疼。"
-        : "傷是好了,人還是那個人。你拍拍身上的土,推門出去——外頭天正亮著。");
+        : "傷是好了,人還是那個人。你拍拍身上的土,推門出去——外頭天正亮著。", "good");
       afterAction();
     });
   }
@@ -471,15 +492,15 @@ function renderBag() {
         const result = useItem(state, data, btn.dataset.use);
         if (typeof result === "string") {
           const d = data.items.debuffs.find((x) => x.id === result);
-          alert(`用藥之後,「${d?.name ?? result}」痊癒了。`);
+          say(`用藥之後,「${d?.name ?? result}」痊癒了。`, "good");
         } else if (result?.restore) {
           const names = { hp: "血量", qi: "內力", tili: "體力" };
           const text = Object.entries(result.restore)
             .map(([k, v]) => `${names[k] ?? k} +${Math.round(v)}`)
             .join("、");
-          alert(`服下之後,${text}。`);
+          say(`服下之後,${text}。`, "good");
         } else {
-          alert("現在用不上這個。留著吧,江湖路長。");
+          say("現在用不上這個。留著吧,江湖路長。");
         }
         afterAction();
       })
@@ -573,7 +594,7 @@ function renderMap() {
   box.querySelectorAll("[data-go]").forEach((b) =>
     b.addEventListener("click", () => {
       const res = setDestination(state, data, b.dataset.go, lv);
-      if (!res.ok) { alert(res.text); return; }
+      if (!res.ok) { say(res.text, "block"); return; }
       save();
       renderAll();
       $("#map-journey-card").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -948,7 +969,7 @@ function bindEvents() {
     try {
       res = logSteps(state, data, amount, dateWithOffset(offset));
     } catch {
-      alert(`${dayLabel}已經記過步數了。一日一記,莫要重複。`);
+      say(`${dayLabel}已經記過步數了。一日一記,莫要重複。`, "block");
       return;
     }
     save();

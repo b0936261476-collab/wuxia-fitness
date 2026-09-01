@@ -601,3 +601,24 @@ select, input[type="number"], textarea {
 .world-s { flex: 1; font-size: 0.88rem; color: var(--ink-light); }
 .world-row.locked .world-s { color: var(--gold); }
 .world-c { font-size: 0.82rem; color: var(--ink-light); font-variant-numeric: tabular-nums; }
+
+/* ===== 江湖傳話(取代瀏覽器彈窗) ===== */
+#say-box {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 14px 18px;
+  background: var(--paper, #f3ead7);
+  color: var(--ink, #3a3226);
+  border: 1px solid var(--border, #cbbb9a);
+  border-left: 4px solid var(--gold, #9c7a3c);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  z-index: 60;
+  cursor: pointer;
+}
+#say-box.good { border-left-color: var(--green, #4a6741); }
+#say-box.block { border-left-color: var(--red, #8c3b2e); }
