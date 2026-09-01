@@ -360,7 +360,7 @@ test("自檢:標籤都在字典、判定配置合規、effects 欄位合法", ()
   }
 });
 
-test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B12,含遭遇 12、江南 10、日常擴充 12)", () => {
+test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B13,含遭遇 12、江南 10、日常擴充 12、北疆 10)", () => {
   const ids = data.events.pool.map((e) => e.eventId);
   const expected = [
     "TU-000_setting_out", "TU-001_leaving_village", "TU-002_forked_road",
@@ -399,7 +399,10 @@ test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B12,含遭遇
     "CH-027_taoist_story", "DA-020_road_measurer", "CH-028_shade_quarrel", "CH-029_hiccup_master",
     "CH-030_barber_blade", "DU-013_lantern_riddle", "DA-021_night_watchman",
     "DA-022_net_cat", "DA-023_mute_ferryboy", "CH-031_mountain_fog",
-    "DU-014_monkey_persimmon", "CH-032_shrine_lots"
+    "DU-014_monkey_persimmon", "CH-032_shrine_lots",
+    "BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground",
+    "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker",
+    "BJ-008_horse_milk", "BJ-009_beacon"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);

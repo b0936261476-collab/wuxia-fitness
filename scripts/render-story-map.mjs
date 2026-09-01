@@ -118,6 +118,16 @@ const COND_NOTE = {
   "CH-031_mountain_fog": "走山路的人更常遇到(可重複)——聽過樵夫那句話的人多一條路",
   "DU-014_monkey_persimmon": "走山路的人更常遇到(可重複)",
   "CH-032_shrine_lots": "走山路的人更常遇到(可重複)",
+  "BJ-000_veteran_map": "只在洛陽遇到(一次性)——北疆的圖從這裡來",
+  "BJ-001_yanmen_arrive": "到了雁門關才會遇到(可重複)",
+  "BJ-002_names_on_wall": "到了雁門關才會遇到(可重複)",
+  "BJ-003_archery_ground": "到了邊軍將門才會遇到(可重複)",
+  "BJ-004_wenren_gui": "北疆境內的稀有遭遇——榜上第十九,在北疆打聽一個地方",
+  "BJ-005_xiao_ruins": "到了蕭家軍舊址才會遇到(可重複)",
+  "BJ-006_swept_snow": "只有去過舊址的人會遇到(20 天後,一次性)",
+  "BJ-007_bow_maker": "到了缺月弓廬才會遇到(可重複)",
+  "BJ-008_horse_milk": "北疆境內都會遇到(可重複)",
+  "BJ-009_beacon": "北疆境內都會遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -327,6 +337,14 @@ P("## 八、出名之後才會遇到的(俠名不到,這些事根本不會發生
 P("");
 P("你的俠名練到**俠名遠播**那一階,江湖對你的態度就變了——底下這些事,只找有名字的人。");
 for (const id of ["DU-011_challenge_seeker", "CH-020_water_dispute", "CH-021_impostor", "CH-022_storyteller_you", "CH-023_kneeling_boy", "CH-024_name_escort"]) {
+  renderEvent(events.pool.find((e) => e.eventId === id));
+}
+
+P("\n---");
+P("## 北疆(要先拿到關防圖、歷練也夠,才走得到)");
+P("");
+P("風大、話少、規矩硬。北邊的人不比劍,比誰的弓拉得久。");
+for (const id of ["BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground", "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker", "BJ-008_horse_milk", "BJ-009_beacon"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

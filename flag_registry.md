@@ -229,3 +229,19 @@
 | fog_water_way | CH-031 B成功 | **回聲收尾** | 樵夫「迷了路找水」在山霧裡回本——一碗水的交情 |
 | monkey_beaten / monkey_lost / monkey_king_offering | DU-014 | 沉線 | 猴王捧柿子(輾壓);雞認強者,猴也認 |
 | shrine_secret_known / shrine_lot_taken | CH-032 | 沉線 | 籤筒裡全是上上籤;「求籤的人要的不是準,是個心安」 |
+
+## B13 批次(北疆開通,BJ-000 ~ BJ-009,2026-08-31 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| veteran_map_gift | BJ-000 全結局 | 鑰匙 | 北疆輿圖到手——三條分支都給圖 |
+| touch_the_wall_promise | BJ-000 A | **回聲** | 老兵託你在雁門關城牆上摸一把;BJ-002 才有那個選項 |
+| beijiang_arrived | BJ-001 | 沉線 | 買了皮襖,滿街都是熊 |
+| name_on_wall / touched_the_wall / wall_blanks_read | BJ-002 | **暗線(留白)** | 刻名字要回來劃掉;姓還在名沒了的刻痕;一批批空白留給沒回來的人 |
+| archery_passed / archery_invited / bow_recognized | BJ-003 | 沉線 | 軍弓要笨才射得遠;輾壓版「它認你」 |
+| met_wenren / wenren_looking_home / wenren_home_town | BJ-004 | **暗線(高規格留白)** | 榜上第十九在北疆打聽中原小鎮;「怕的不是找不到,是找到了認不出」 |
+| xiao_ruins_seen / xiao_someone_tends / xiao_fire_read | BJ-005 | **暗線(蕭家構陷案)** | 沒有碑的廢墟;有人事後把碎瓷擺好;火是從裡面點的=滅口 |
+| xiao_snow_swept / xiao_watcher_knew | BJ-006 | **暗線(高規格留白)** | 年年有人來掃雪、留一枝白梅;腳印輕得踩不進雪;出名後她知道你來了,不打算見 |
+| met_bowmaker / bowmaker_rest / broken_bow_story | BJ-007 | **暗線(留白)** | 滿屋等人來取的弓;「我這輩子不該再拉弓了」;缺一半也是弓 |
+| horse_milk_drunk / horse_milk_choked / horse_milk_toasted | BJ-008 | 沉線 | 笑你的人會把最好的肉夾給你 |
+| met_beacon_keeper / beacon_dust_seen | BJ-009 | 沉線 | 「沒事的日子,才是我最忙的日子」 |

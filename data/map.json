@@ -197,7 +197,7 @@
       "id": "beijiang",
       "name": "北疆",
       "order": 3,
-      "open": false,
+      "open": true,
       "gate": 120,
       "mapFrom": "邊軍的人手上才有準的關防圖",
       "refuse": "老兵上下打量你一眼,把碗裡的酒喝乾:「北疆?那地方的風,能把人吹成兩截。再練幾年吧。」",

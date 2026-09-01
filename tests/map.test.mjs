@@ -42,9 +42,9 @@ test("沒有孤島:每個地方都連得到起點", () => {
   }
 });
 
-test("開放進度:中原與江南已開,其餘四州仍鎖著", () => {
+test("開放進度:中原、江南、北疆已開,其餘三州仍鎖著", () => {
   const open = data.map.provinces.filter((p) => p.open).map((p) => p.id);
-  assert.deepEqual(open, ["zhongyuan", "jiangnan"]);
+  assert.deepEqual(open, ["zhongyuan", "jiangnan", "beijiang"]);
 });
 
 test("每個鎖著的州都要有一句「歷練不夠」的人話——不能是灰掉的按鈕", () => {
