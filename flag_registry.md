@@ -269,3 +269,16 @@
 | traps_cleared / trap_marked / hunter_never_returned | ZY-008 | **暗線(留白)** | 三副鏽了三年沒人收的獸夾——下夾子的人沒再回來過 |
 | duanyun_visited / duanyun_waited / duanyun_listened | ZY-009 | **暗線(主線,設計者已決議押後)** | 那點光的距離從頭到尾沒變過;聽不見腳步、呼吸、燈芯 |
 | oil_shop_known / oil_shop_evaded | ZY-010 | **暗線(同上)** | 上崗的人回來都會買油,買了也不知道要點什麼;問誰添油,老闆娘不答 |
+
+## B17 江南補完(JN-010 ~ JN-017,2026-09-01 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| sect_backyard_seen / madwoman_clapped / liu_sister_known | JN-010 | **暗線(總綱雙生線)** | 柳青鸞在瘋了的師姐面前演雙劍——「這個院子只有兩個人的位子」;師姐拍了兩下手 |
+| sect_drill_won / sect_drill_lost / sect_drill_awed | JN-011 | 沉線 | 「有人踢館!」;輾壓版地上劃一道,誰也不敢說看懂了 |
+| met_gu_qingxian / gu_tune_praised / gu_tune_truth | JN-012 | **暗線(顧清弦線)** | 一個開頭彈了十一年;「彈到這裡,還來得及不彈」——那一次發生了什麼,後批收 |
+| qingxian_gate_passed / qingxian_gate_failed | JN-013 | 沉線 | 守衛是一首哼低了一個音的曲子 |
+| zuixianlou_rules_told / zuixianlou_overheard / zuixianlou_note / zuixianlou_marked_famous | JN-014 | **暗線(醉仙樓暗號線)** | 碗底壓了一張沒打開的紙條——後批收 |
+| jinghu_stone_kept / jinghu_keeper_spoke / jinghu_secret_seen | JN-015 | **暗線(鏡湖封印,總綱幕後大勢力線)** | 水花在碰到水面前就沒了;「試的人不是每一個都回得去」——綁 #22,後批 |
+| night_song_su_link / night_song_heard | JN-016 | **回聲** | 蘇挽秋教的最後一支曲;「唱到有人聽出來的那天,就可以不唱了」 |
+| plum_rain_lesson | JN-017 | 沉線 | 「哪有什麼等得乾的事——都是穿著穿著,就乾了」 |

@@ -141,6 +141,14 @@ const COND_NOTE = {
   "ZY-008_yunling_trap": "到了雲嶺才會遇到(可重複)",
   "ZY-009_duanyun_fog": "到了斷雲崗才會遇到(可重複)——你只會拿到問題",
   "ZY-010_duanyun_oil": "上過斷雲崗的人,10 天後再上崗會遇到(一次性)",
+  "JN-010_sect_backyard": "到了江南劍宗才會遇到(稀有,可重複)——後山偏院,兩個人的位子",
+  "JN-011_morning_drill": "到了江南劍宗才會遇到(可重複)",
+  "JN-012_unfinished_tune": "清弦閣的稀有遭遇——榜上第二十五,一段開頭彈了十一年",
+  "JN-013_gate_boy_hum": "到了清弦閣才會遇到(可重複)",
+  "JN-014_next_table": "到了醉仙樓才會遇到(可重複)——聽得懂的人,別急著開口",
+  "JN-015_stone_no_ripple": "到了鏡湖才會遇到(可重複)",
+  "JN-016_night_market_song": "到了揚州才會遇到(可重複)——遇過渡口那位琴師的人多一句話",
+  "JN-017_plum_rain": "江南境內都會遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -358,6 +366,14 @@ P("## 中原各地(走到那裡才會遇到的事)");
 P("");
 P("中原是起點,也是你回得去的地方。這些事只在特定地方發生——走到了,才遇得到。");
 for (const id of ["ZY-001_home_town", "ZY-002_notice_wall", "ZY-003_ferry_wait", "ZY-004_dock_ledger", "ZY-005_kongtong_gate", "ZY-006_old_man_kongtong", "ZY-007_yunling_charcoal", "ZY-008_yunling_trap", "ZY-009_duanyun_fog", "ZY-010_duanyun_oil"]) {
+  renderEvent(events.pool.find((e) => e.eventId === id));
+}
+
+P("\n---");
+P("## 江南各地(要先拿到江南的輿圖)");
+P("");
+P("水道穿城、橋比路多。這裡的人把差一點當失敗,把菜名當暗號,把一面湖當祖傳的祕密。");
+for (const id of ["JN-010_sect_backyard", "JN-011_morning_drill", "JN-012_unfinished_tune", "JN-013_gate_boy_hum", "JN-014_next_table", "JN-015_stone_no_ripple", "JN-016_night_market_song", "JN-017_plum_rain"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 
