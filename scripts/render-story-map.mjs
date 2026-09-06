@@ -149,6 +149,18 @@ const COND_NOTE = {
   "JN-015_stone_no_ripple": "到了鏡湖才會遇到(可重複)",
   "JN-016_night_market_song": "到了揚州才會遇到(可重複)——遇過渡口那位琴師的人多一句話",
   "JN-017_plum_rain": "江南境內都會遇到(可重複)",
+  "DM-000_camel_map": "只在裴家鏢局遇到(一次性)——大漠的圖從這裡來,三種聊法都給",
+  "DM-001_heishui_roof": "到了黑水驛才會遇到(可重複)",
+  "DM-002_silk_road_blade": "黑水驛的稀有遭遇——榜上第二十八,耍彎刀給誰看都不像,就是高興",
+  "DM-003_water_rule": "大漠境內都會遇到(可重複)——半囊水,兩個人",
+  "DM-004_wolf_camp": "到了孤狼幫才會遇到(可重複)",
+  "DM-005_shayue": "孤狼幫的稀有遭遇——榜上第二十四,擦刀擦了二十年",
+  "DM-006_horse_race": "到了赤焰部才會遇到(可重複)",
+  "DM-007_star_priest": "赤焰部的稀有遭遇——榜上第五十四,看的不是星,是那塊空的",
+  "DM-008_sand_city": "到了無名沙城才會遇到(可重複)",
+  "DM-009_sandstorm": "大漠境內都會遇到(可重複)——學過「沙海的東西都是彎的」的人多一條路",
+  "DM-010_camel_spit": "大漠境內都會遇到(可重複)",
+  "BJ-013_army_kitchen": "到了邊軍將門才會遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
   "1-3_purse_earned": "只有選了「湊錢」的人會遇到——由你現實中的運動速度決定結局",
@@ -378,10 +390,18 @@ for (const id of ["JN-010_sect_backyard", "JN-011_morning_drill", "JN-012_unfini
 }
 
 P("\n---");
+P("## 大漠(要先拿到羊皮上的沙海圖)");
+P("");
+P("沙海裡沒有可以躲的地方。水在圖上,路是彎的,消息是拿來活命的。");
+for (const id of ["DM-000_camel_map", "DM-001_heishui_roof", "DM-002_silk_road_blade", "DM-003_water_rule", "DM-004_wolf_camp", "DM-005_shayue", "DM-006_horse_race", "DM-007_star_priest", "DM-008_sand_city", "DM-009_sandstorm", "DM-010_camel_spit"]) {
+  renderEvent(events.pool.find((e) => e.eventId === id));
+}
+
+P("\n---");
 P("## 北疆(要先拿到關防圖、歷練也夠,才走得到)");
 P("");
 P("風大、話少、規矩硬。北邊的人不比劍,比誰的弓拉得久。");
-for (const id of ["BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground", "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker", "BJ-008_horse_milk", "BJ-009_beacon", "BJ-010_bow_owner", "BJ-011_the_town", "BJ-012_bring_word"]) {
+for (const id of ["BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground", "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker", "BJ-008_horse_milk", "BJ-009_beacon", "BJ-013_army_kitchen", "BJ-010_bow_owner", "BJ-011_the_town", "BJ-012_bring_word"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

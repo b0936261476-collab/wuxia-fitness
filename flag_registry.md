@@ -282,3 +282,20 @@
 | jinghu_stone_kept / jinghu_keeper_spoke / jinghu_secret_seen | JN-015 | **暗線(鏡湖封印,總綱幕後大勢力線)** | 水花在碰到水面前就沒了;「試的人不是每一個都回得去」——綁 #22,後批 |
 | night_song_su_link / night_song_heard | JN-016 | **回聲** | 蘇挽秋教的最後一支曲;「唱到有人聽出來的那天,就可以不唱了」 |
 | plum_rain_lesson | JN-017 | 沉線 | 「哪有什麼等得乾的事——都是穿著穿著,就乾了」 |
+
+## B18 大漠開通(DM-000 ~ DM-010)+ 補薄 BJ-013,2026-09-01 入庫
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| camel_map_gift / camel_team_member | DM-000 | 鑰匙 | 大漠輿圖;「誰餵過我的駱駝,誰就是駝隊的人」——DM-009 多一條路 |
+| heishui_arrived / wolf_seekers_heard | DM-001 | **暗線(沙月線)** | 有一桌人挨桌問狼頭紋的刀 |
+| met_arslan / arslan_beaten / arslan_lesson / arslan_awed | DM-002 | 沉線 | 「沙海裡的東西都是彎的」——DM-009 多一條路 |
+| water_shared / water_given_all / water_returned / water_collapsed / water_kept | DM-003 | 沉線 | 沙海的水是這樣轉的;沒回頭的人以後每次喝水都想起那雙眼睛 |
+| wolf_camp_asked / wolf_camp_visited / wolf_eyes_closed | DM-004 | **暗線(沙月線)** | 旗上的狼閉著眼——不是在獵,是在等 |
+| met_shayue / shayue_promise / shayue_tribe_told / shayue_footstep_told | DM-005 | **暗線(沙月滅族,總綱幕後大勢力三線同源,祁子墨樞紐——綁主線後批)** | 「再見到一把,就是再見到一個人」;族人走路左腳重右腳輕 |
+| chiyan_rode / chiyan_fell / chiyan_declined / chiyan_saluted | DM-006 | 沉線 | 那個禮只對頭領和草原做 |
+| met_star_priest / red_star_told / priest_honest / missing_star_told | DM-007 | **暗線(草原內鬥,同上三線同源——後批)** | 二十年前沒了的那顆星;「有人在後面推」 |
+| sand_city_walked / sand_city_seen / wolf_mark_seen / wolf_blade_buried | DM-008 | **暗線(沙月線)** | 半埋的城門楣刻著閉眼的狼頭;沙是一次埋的——沙月那句「見過狼頭紋樣的兵刃來告訴我」的實物在此 |
+| sandstorm_* | DM-009 | 沉線 | 硬頂的人,埋在直線上 |
+| camel_spat | DM-010 | 沉線 | 名頭人認狼認雞認猴認,駱駝不認 |
+| army_porridge / cook_ledger_known | BJ-013 | 沉線 | 「我這勺子,是給守城的人記帳的」 |
