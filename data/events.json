@@ -35,7 +35,9 @@
         "TU-001_leaving_village",
         "TU-002_forked_road"
       ]
-    }
+    },
+    "stepsPerEvent": 1000,
+    "note_stepsPerEvent": "幾步觸發一件事(行動力密度)。設計者「先擴充、密度不動」的決定生效中;要調就改這一個數字。"
   },
   "pool": [
     {

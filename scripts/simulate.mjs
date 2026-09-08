@@ -78,7 +78,7 @@ function simulateOne(talents) {
     logSteps(s, data, 8000, date);
 
     let guard = 0;
-    while (pendingEventCount(s) > 0 && !s.rebirth && guard++ < 20) {
+    while (pendingEventCount(s, data) > 0 && !s.rebirth && guard++ < 20) {
       const ev = startNextEvent(s, data, date, Math.random);
       if (!ev) break; // 池子全冷卻:今天沒事發生
       if (s.pendingEvent?.whisper) m.whispers++;

@@ -4,7 +4,7 @@ import {
   logExercise, logSteps, pendingEventCount, startNextEvent, presentEvent,
   chooseOption, chooseSub, useItem, levels, createCharacter, MAX_DAILY_STEPS,
   resourcePercents, resourceMax, catchUpRecovery, attemptRebirthCompletion,
-  playerLevelSum, revealRanking, effectiveNpcs, jianghuNews
+  playerLevelSum, revealRanking, effectiveNpcs, jianghuNews, stepsPerEvent
 } from "../engine/game.js";
 import { collectNarratives } from "../engine/narratives.js";
 import {
@@ -58,7 +58,7 @@ const NARRATIVE_KIND_LABELS = {
 };
 const LEDGER_SIZE_FALLBACK = 1000000;
 
-const DATA_VERSION = "p2-17"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
+const DATA_VERSION = "p2-18"; // 改資料檔時遞增,破 GitHub Pages 的 10 分鐘快取,避免新舊檔案混用
 
 async function loadData() {
   const names = ["exercises", "events", "titles", "items", "tags", "quiz", "npcs", "reputation", "whispers", "narratives", "media", "jianghu_news", "map"];
@@ -290,7 +290,8 @@ function renderTodayLog() {
 }
 
 function renderRoad() {
-  const pending = pendingEventCount(state);
+  const pending = pendingEventCount(state, data);
+  const spe = $("#steps-per-event"); if (spe) spe.textContent = stepsPerEvent(data).toLocaleString();
   $("#pending-count").textContent = pending;
   $("#walk-btn").disabled = !!state.rebirth || (pending <= 0 && !state.pendingEvent);
   const bd = state.steps.byDate || {};

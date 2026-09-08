@@ -365,8 +365,13 @@ export function logSteps(state, data, amount, date) {
 }
 
 /** 尚未觸發的事件數 */
-export function pendingEventCount(state) {
-  return Math.floor(state.steps.total / STEPS_PER_EVENT) - state.steps.resolved;
+export function stepsPerEvent(data) {
+  return data?.events?.config?.stepsPerEvent ?? STEPS_PER_EVENT;
+}
+
+/** 待觸發事件數。密度(幾步一件)讀 data/events.json 的 config.stepsPerEvent;沒傳 data 時沿用預設 */
+export function pendingEventCount(state, data) {
+  return Math.floor(state.steps.total / stepsPerEvent(data)) - state.steps.resolved;
 }
 
 /**

@@ -20,6 +20,11 @@ const data = Object.fromEntries(
 
 const DAYS = Number(process.argv[2]) || 180;
 const RUNS = Number(process.argv[3]) || 200;
+// 旋鈕試算:第 4 個參數=幾步一件事(預設讀資料檔),第 5 個=冷卻倍率(預設 1)
+const SPE = Number(process.argv[4]) || data.events.config.stepsPerEvent || 1000;
+const CD_SCALE = Number(process.argv[5]) || 1;
+data.events.config.stepsPerEvent = SPE;
+if (CD_SCALE !== 1) for (const e of data.events.pool) if (e.cooldown && e.cooldown < 999) e.cooldown = Math.round(e.cooldown * CD_SCALE);
 
 const dateStr = (i) => new Date(Date.UTC(2026, 8, 1 + i)).toISOString().slice(0, 10);
 
@@ -39,7 +44,7 @@ function simulateOne() {
     logSteps(s, data, 8000, date);
 
     let events = 0, fresh = 0, guard = 0;
-    while (pendingEventCount(s) > 0 && !s.rebirth && guard++ < 20) {
+    while (pendingEventCount(s, data) > 0 && !s.rebirth && guard++ < 20) {
       const ev = startNextEvent(s, data, date, Math.random);
       if (!ev) break;
       events++;
@@ -61,7 +66,7 @@ function simulateOne() {
 // ---------- 跑 ----------
 
 const total = data.events.pool.filter((e) => !e.triggerOnly).length;
-console.log(`內容耗盡模擬:標準玩家(日走 8000 步+跑步 30 分 ≈ 每天 10 件事)× ${RUNS} 場 × ${DAYS} 天`);
+console.log(`內容耗盡模擬:標準玩家(日走 8000 步+跑步 30 分)× ${RUNS} 場 × ${DAYS} 天|每 ${SPE} 步一件事|冷卻 ×${CD_SCALE}`);
 console.log(`可抽事件總數:${total} 件\n`);
 
 const agg = Array.from({ length: DAYS }, () => ({ events: 0, fresh: 0, distinct: 0 }));
