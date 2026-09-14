@@ -9,6 +9,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const J = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
 const events = J("data/events.json");
 const map = J("data/map.json");
+const itemName = Object.fromEntries((J("data/items.json").items || []).map((i) => [i.id, i.name]));
 
 const BATCHES = {
   b17: {
@@ -96,6 +97,26 @@ function outcomeLabels(ch, evType) {
 }
 const fameOf = (o) => o?.fameVariants?.["fameTier>=4"]?.text;
 
+// 結算給了什麼,用玩家看得懂的話列出來——過稿時才看得出「文案答應的有沒有兌現」
+const EXP = { hard: "硬功", soft: "軟功", eye: "眼力", ear: "耳力", inner: "內功", light: "輕功" };
+const RES = { hp: "氣血", mp: "內力", tili: "體力" };
+const tenths = (f) => ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "全"][Math.round(f * 10)] ?? String(f);
+function gainOf(eff) {
+  if (!eff) return "";
+  const g = [];
+  for (const [d, n] of Object.entries(eff.expGrant || {})) g.push(`${EXP[d] ?? d}經驗 +${n}`);
+  if (eff.fame) g.push(`名聲 +${eff.fame}`);
+  if (eff.infamy) g.push(`惡名 +${eff.infamy}`);
+  for (const [k, id] of Object.entries(eff.itemGrant || {})) g.push(`得到〈${itemName[id] ?? itemName[k] ?? id}〉`);
+  if (eff.mapGrant) g.push(`得到${provName[eff.mapGrant] ?? eff.mapGrant}輿圖`);
+  for (const r of Object.keys(RES)) {
+    const dmg = eff[`${r}Damage`], rec = eff[`${r}Restore`];
+    if (dmg) g.push(`${RES[r]} −${dmg}`);
+    if (rec) g.push(rec <= 1 ? `恢復${tenths(rec)}成${RES[r]}` : `${RES[r]} +${rec}`);
+  }
+  return g.join("、");
+}
+
 const items = [];
 for (const ev of events.pool.filter((e) => B.pick(e.eventId))) {
   const b = ev.beats;
@@ -113,19 +134,19 @@ for (const ev of events.pool.filter((e) => B.pick(e.eventId))) {
     if (zh) res.push({ l: null, x: md(zh) });
     if (out.success || out.fail) {
       const [ok, ng] = outcomeLabels(ch, ev.eventType);
-      if (out.success) res.push({ l: ok, x: md(out.success.text) });
-      if (out.fail) res.push({ l: ng, x: md(out.fail.text) });
-    } else if (out.text) res.push({ l: null, x: md(out.text) });
+      if (out.success) res.push({ l: ok, x: md(out.success.text), g: gainOf(out.success.effects) });
+      if (out.fail) res.push({ l: ng, x: md(out.fail.text), g: gainOf(out.fail.effects) });
+    } else if (out.text) res.push({ l: null, x: md(out.text), g: gainOf(out.effects) });
     if (out.perceivedExtra) res.push({ l: "察覺到的人這條會多一段", x: md(out.perceivedExtra.text), k: "reveal" });
     if (fameOf(out)) res.push({ l: "出名之後這條變成", x: md(fameOf(out)), k: "fame" });
     body.push({ t: "pick", g: gatesOf(ch), x: md(ch.text), res });
   }
   if (!(b.cheng?.choices || []).length && b.he?.text) {
-    body.push({ t: "plain", x: md(b.he.text) });
+    body.push({ t: "plain", x: md(b.he.text), g: gainOf(b.he.effects) });
     if (b.he.perceivedExtra) body.push({ t: "reveal", l: "察覺到的人會多看到這一段", x: md(b.he.perceivedExtra.text) });
     if (fameOf(b.he)) body.push({ t: "fame", l: "出名之後,結尾變成", x: md(fameOf(b.he)) });
   }
-  if (ev.variants?.crush?.text) body.push({ t: "crush", l: "練得很強的人,比試直接變成", x: md(ev.variants.crush.text) });
+  if (ev.variants?.crush?.text) body.push({ t: "crush", l: "練得很強的人,比試直接變成", x: md(ev.variants.crush.text), g: gainOf(ev.variants.crush.effects) });
   const revisit = b.qi.variants?.revisit;
   items.push({
     kind: TYPE[ev.eventType] ?? ev.eventType,
@@ -234,6 +255,7 @@ const html = `<title>${B.title}</title>
     letter-spacing:.16em; display:block; margin-bottom:4px; }
   em.beat { font-style:normal; font-weight:700; color:var(--ink); }
   .ph { color:var(--zhu); font-weight:700; }
+  .gain { display:block; margin-top:4px; font-size:.74rem; letter-spacing:.06em; color:var(--green); line-height:1.6; }
   .verdict { margin:18px -18px 0; padding:12px 18px; border-top:1px solid var(--rule);
     background:var(--card-sunk); display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .vq { font-family:"Noto Sans TC","PingFang TC",system-ui,sans-serif; font-size:.74rem;
@@ -297,17 +319,18 @@ const html = `<title>${B.title}</title>
   var NUM = "一二三四五六七八九十";
   function cn(i) { i += 1; return i <= 10 ? NUM[i - 1] : "十" + (i % 10 ? NUM[i % 10 - 1] : ""); }
 
-  function box(k, l, x) { return '<div class="box ' + k + '"><span class="lbl ui">' + l + '</span>' + x + '</div>'; }
+  function gain(g) { return g ? '<span class="gain ui">得到:' + g + '</span>' : ''; }
+  function box(k, l, x, g) { return '<div class="box ' + k + '"><span class="lbl ui">' + l + '</span>' + x + gain(g) + '</div>'; }
   function bodyHtml(parts) {
     return parts.map(function (p) {
       if (p.t === "scene") return '<p class="scene">' + p.x + '</p>';
-      if (p.t === "plain") return '<p class="plain">' + p.x + '</p>';
-      if (p.t === "reveal" || p.t === "fame" || p.t === "crush") return box(p.t, p.l, p.x);
+      if (p.t === "plain") return '<p class="plain">' + p.x + gain(p.g) + '</p>';
+      if (p.t === "reveal" || p.t === "fame" || p.t === "crush") return box(p.t, p.l, p.x, p.g);
       if (p.t === "pick") {
         var gates = (p.g || []).map(function (g) { return '<span class="gate">' + g + '</span>'; }).join("");
         var res = (p.res || []).map(function (r) {
-          if (r.k) return box(r.k, r.l, r.x);
-          return '<p>' + (r.l ? '<span class="res">' + r.l + '</span>' : '') + r.x + '</p>';
+          if (r.k) return box(r.k, r.l, r.x, r.g);
+          return '<p>' + (r.l ? '<span class="res">' + r.l + '</span>' : '') + r.x + gain(r.g) + '</p>';
         }).join("");
         return '<div class="branch"><p class="pick"><span>' + gates + p.x + '</span></p><div class="out">' + res + '</div></div>';
       }
