@@ -5,8 +5,51 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { newState } from "../src/engine/game.js";
+import { eligibleEvents } from "../src/engine/events2.js";
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const pool = JSON.parse(readFileSync(join(ROOT, "data/events.json"), "utf8")).pool;
+const J = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
+const events = J("data/events.json");
+const map = J("data/map.json");
+const pool = events.pool;
+
+/** 事件庫裡任何一條路發得出來的旗標 */
+function grantableFlags() {
+  const set = new Set(Array.from({ length: 100 }, (_, i) => `surpassed_${i + 1}`)); // 引擎寫的名次旗標
+  (function walk(o) {
+    if (Array.isArray(o)) return o.forEach(walk);
+    if (!o || typeof o !== "object") return;
+    for (const [k, v] of Object.entries(o)) {
+      if (k === "setFlags" && Array.isArray(v)) v.forEach((f) => set.add(f));
+      else walk(v);
+    }
+  })(pool);
+  return set;
+}
+
+test("收線:forbidFlags 引用的旗標都發得出來(寫錯字的話,該收的事件會一直出現)", () => {
+  const ok = grantableFlags();
+  const bad = [];
+  for (const ev of pool) {
+    for (const group of ev.conditions?.forbidFlags ?? []) {
+      for (const f of group.split("|")) if (!ok.has(f)) bad.push(`${ev.eventId}:${f}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
+test("收線:兒子回家以後,渡口不會再有人抱著食盒等船", {
+  todo: "等 Codex 實作 conditions.forbidFlags(需求見 AGENTS.md);實作後拿掉這個 todo"
+}, () => {
+  const data = { events, map };
+  const s = newState();
+  s.travel = { at: "dukou" };
+  const inPool = () => eligibleEvents(s, data, "2026-09-15").some((c) => c.ev.eventId === "ZY-003_ferry_wait");
+  assert.ok(inPool(), "前提:還沒收線時,等船的人在池子裡");
+  s.flags.cheng_home_told = true;
+  assert.ok(!inPool(), "收線之後不該再抽到她");
+});
 
 /** 一件事件所有「結果」段落:選項結果、成敗、察覺加段、出名版本、輾壓版、無選項事件的結尾 */
 function outcomes(ev) {

@@ -299,3 +299,31 @@
 | sandstorm_* | DM-009 | 沉線 | 硬頂的人,埋在直線上 |
 | camel_spat | DM-010 | 沉線 | 名頭人認狼認雞認猴認,駱駝不認 |
 | army_porridge / cook_ledger_known | BJ-013 | 沉線 | 「我這勺子,是給守城的人記帳的」 |
+
+## B16 十強真容(TEN-001 ~ TEN-010,2026-09-02 入庫,2026-09-15 全數過稿)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| met_shen / shen_valley_hinted / shen_shared_wine / shen_paper_only | TEN-001 | **暗線(聽濤谷舊事,設計者定調後收)** | 「十七個師父」「後來有人來過一趟」 |
+| met_xiao / xiao_told_number / xiao_swept_together / xiao_forged_letter | TEN-002 | **暗線(蕭家構陷案,幕後推手 #48,主線)** | 「之」字不那樣收尾;在找能證明的人;替一個人擺的白梅 |
+| met_gu / gu_told_mercy / gu_paper_only / gu_one_eyed_hint | TEN-003 | **暗線(江南劍宗雙生線・掌門繼承之爭,後批)** | 瞎了一隻眼的老頭——別跟他提江南劍宗 |
+| met_han / han_brother_hint / han_blunt_arrows / han_one_inch | TEN-004 | **暗線(韓長歌,線索斷在雪山之巔,後批)** | 「弓廬還亮著燈」這句話還沒帶到——要等韓長歌登場 |
+| met_liu / liu_refused_duel / liu_told_sister | TEN-005 | 回聲→JN-010 後院的雙劍 | 師姐往下劈了 |
+| met_pei_true / pei_brother_told / pei_full_saying | TEN-006 | 回聲收尾 | 「贏了也是輸」的後半截 |
+| met_xuan / xuan_child_hint / xuan_paper_only / xuan_one_step | TEN-007 | xuan_child_hint / xuan_one_step → **B19 ZY-012 部分收** | 救過的孩子;差一步飛升 |
+| met_aman / aman_pei_echo / aman_grandmother | TEN-008 | 沉線+回聲 | 裴景明那句「贏了也是輸」 |
+| met_qi / qi_father_told / qi_knows_your_road | TEN-009 | qi_knows_your_road → **B19 BJ-016 收**;其餘暗線(幕後樞紐) | 「客人若往北去,繞著點走」 |
+| met_ahe / ahe_worked_together / ahe_true_depth | TEN-010 | met_ahe → B19 ZY-012 | 「別人肯教我,我就記著」 |
+
+## B19 收線二(2026-09-15 入庫)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| cheng_word_carried / cheng_freed / cheng_money_sent | JN-018 | 鑰匙 | ZY-011 的三種版本(帶話/扛完一船米讓他回家/帶錢) |
+| cheng_home_told | ZY-011 | **收尾** | ZY-003 等船的人從此不出現(forbidFlags,等引擎支援);ZY-013 條件 |
+| cheng_reunited | ZY-013 | 回聲收尾 | 「那三層布以後用不著了」 |
+| bow_seen_for_him / bow_maker_message / bow_wine_debt | BJ-014 | 鑰匙 | BJ-015 的三種帶話 |
+| bow_word_delivered / veteran_woodshop | BJ-015 | 回聲收尾 | 半碗留著/去木匠鋪削木頭/欠著就得活著 |
+| ahe_child_told / ahe_went_yunling / ahe_child_linked | ZY-012 | **暗線(孩子身分之謎,設定集伏筆 2——等「那孩子」登場時收)** | ahe_went_yunling → TEN-007 開場變化:玄泠子「後不後悔,我想出答案了」 |
+| qi_warning_heeded / qi_warning_ignored / qi_warning_proved | BJ-016 | 回聲 | qi_warning_proved → TEN-009 開場變化:「北邊的路,還好走嗎?」 |
+| grassland_arrows_same | BJ-016 C | **暗線(草原內鬥,三線同源主線——設計者決定動主線時收)** | 同一家中原鋪子賣箭給打架的兩邊 |

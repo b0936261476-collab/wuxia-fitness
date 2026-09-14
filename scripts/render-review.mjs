@@ -29,6 +29,31 @@ const BATCHES = {
     sub: "玩家大約第 55 天就會走到大漠門口,而大漠一直是空的。<br>這批十一件把大漠開起來(黑水驛、孤狼幫、赤焰部、無名沙城),<b>最後一件是順手補北疆邊軍的</b>。",
     key: "wuxia-b18-review-v1",
     copyHead: "大漠開通・十二件"
+  },
+  b19: {
+    pick: (id) => ["JN-018_cheng_boatman", "ZY-011_cheng_lunchbox", "ZY-013_cheng_home", "BJ-014_bow_look",
+      "BJ-015_bow_word", "ZY-012_ahe_child", "BJ-016_detour"].includes(id),
+    // 既有事件只多了一個「某件事之後」的開場,單獨列出來過稿
+    extraOpenings: [
+      ["TEN-007_xuan_lingzi", "flag:ahe_went_yunling", "阿禾去過雲嶺之後,再遇到玄泠子"],
+      ["TEN-009_qi_zimo", "flag:qi_warning_proved", "應驗了「繞著點走」之後,再遇到祁子墨"]
+    ],
+    // 同一件事件的不同走法會開不同選項,光寫「遇過某件」看不出差別——這幾個旗標用白話講清楚
+    flagLabels: {
+      cheng_word_carried: "替程滿帶了話的人",
+      cheng_money_sent: "帶著程滿存的錢的人",
+      cheng_freed: "替程滿扛完那一船米的人",
+      bow_owner_confessed: "當面說破「是您削的」的人",
+      bow_maker_message: "帶了做弓老人那句話的人",
+      bow_wine_debt: "提過那壺酒的人",
+      xuan_one_step: "在玄泠子對面坐下調息過的人"
+    },
+    title: "收線二過稿頁",
+    seal: "一步一江湖 ‧ 收線 ‧ 七件",
+    h1: "收 線",
+    sub: "你親口答應過、卻一直沒有下文的三件事,這批把它們辦完:<br>渡口的婦人託你留意姓程的、洛陽老兵託你替他看一眼那張弓、阿禾和玄泠子各自救過的孩子。<br>最後一件是祁子墨那句「往北繞著點走」——<b>他說對了</b>。",
+    key: "wuxia-b19-review-v1",
+    copyHead: "收線二・七件"
   }
 };
 
@@ -54,10 +79,15 @@ for (const e of events.pool) (function walk(o) {
     else walk(v);
   }
 })(e);
-const needFlags = (flags) => {
+// 一組 "a|b" = 擇一(或);多組並列 = 全都要(和)
+const groupTitles = (group) => {
   const titles = new Set();
-  for (const f of flags) for (const t of setterOf[f] ?? []) titles.add(`〈${t}〉`);
-  return titles.size ? `遇過${[...titles].join("或")}的人才有` : "之前的事記得的人才有";
+  for (const f of group.split("|")) for (const t of setterOf[f] ?? []) titles.add(`〈${t}〉`);
+  return [...titles].join("或");
+};
+const needFlags = (flags) => {
+  const phrases = [...new Set(flags.map(groupTitles).filter(Boolean))];
+  return phrases.length ? `遇過${phrases.join("和")}的人才有` : "之前的事記得的人才有";
 };
 
 const md = (s) =>
@@ -83,7 +113,11 @@ function gateOf(ev) {
 function gatesOf(ch) {
   const g = [];
   if (ch.requirePerception) g.push("察覺到的人才有");
-  if (ch.requireFlag) g.push(needFlags(ch.requireFlag.split("|")));
+  if (ch.requireFlag) {
+    const alts = ch.requireFlag.split("|");
+    const labels = alts.map((f) => B.flagLabels?.[f]);
+    g.push(labels.every(Boolean) ? `${labels.join("或")}才有` : needFlags([ch.requireFlag]));
+  }
   if (ch.judge) {
     if (ch.judgeType?.startsWith("fortune")) g.push("看運氣");
     else g.push("比試:" + (ch.tags || []).map((t) => ABILITY[t] ?? t).join("或"));
@@ -156,6 +190,13 @@ for (const ev of events.pool.filter((e) => B.pick(e.eventId))) {
     revisit: revisit ? md(revisit) : null,
     body
   });
+}
+for (const [id, key, label] of B.extraOpenings ?? []) {
+  const ev = events.pool.find((e) => e.eventId === id);
+  const text = ev?.beats.qi.variants?.[key];
+  if (!text) { console.error("找不到開場變化:", id, key); process.exit(1); }
+  items.push({ kind: "既有事件多一個開場", title: ev.title, where: whereOf(ev), gate: label, revisit: null,
+    body: [{ t: "scene", x: md(text) }] });
 }
 if (!items.length) { console.error("這個批次抓不到任何事件"); process.exit(1); }
 
