@@ -315,7 +315,7 @@
 | met_qi / qi_father_told / qi_knows_your_road | TEN-009 | qi_knows_your_road → **B19 BJ-016 收**;其餘暗線(幕後樞紐) | 「客人若往北去,繞著點走」 |
 | met_ahe / ahe_worked_together / ahe_true_depth | TEN-010 | met_ahe → B19 ZY-012 | 「別人肯教我,我就記著」 |
 
-## B19 收線二(2026-09-15 入庫)
+## B19 收線二(2026-09-15 入庫,同日全數過稿)
 
 | flag | 來源 | 命運 | 引用處 / 後續 |
 |---|---|---|---|
