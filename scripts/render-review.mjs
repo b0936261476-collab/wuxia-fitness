@@ -54,6 +54,24 @@ const BATCHES = {
     sub: "你親口答應過、卻一直沒有下文的三件事,這批把它們辦完:<br>渡口的婦人託你留意姓程的、洛陽老兵託你替他看一眼那張弓、阿禾和玄泠子各自救過的孩子。<br>最後一件是祁子墨那句「往北繞著點走」——<b>他說對了</b>。",
     key: "wuxia-b19-review-v1",
     copyHead: "收線二・七件"
+  },
+  b20: {
+    pick: (id) => /^MJ-0\d\d_/.test(id),
+    extraOpenings: [
+      ["MJ-008_hua_wulei", "state:night", "夜裡走到桃花谷,樹頂上的那個人"]
+    ],
+    flagLabels: {
+      met_shen: "在聽濤谷外跟沈聽雪喝過酒的人",
+      taohua_seekers_heard: "在寨子裡聽見有中原人打聽桃花谷的人",
+      lantern_tune: "跟過霧中人那盞燈的人",
+      lantern_man_met: "聽出霧中人腳步沒有聲音的人"
+    },
+    title: "苗疆開通過稿頁",
+    seal: "一步一江湖 ‧ 苗疆開通 ‧ 十二件",
+    h1: "苗 疆",
+    sub: "第五州。吊腳樓、蠱市、聽不懂的話;毒醫谷治得了人也毒得了人;桃花谷的女子不談將來;瘴林進去容易出來看運氣。<br>這批十二件把苗疆開起來,<b>圖從揚州藥市那個阿婆手上來</b>。",
+    key: "wuxia-b20-review-v1",
+    copyHead: "苗疆開通・十二件"
   }
 };
 

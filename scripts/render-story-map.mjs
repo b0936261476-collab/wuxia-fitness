@@ -160,6 +160,18 @@ const COND_NOTE = {
   "DM-008_sand_city": "到了無名沙城才會遇到(可重複)",
   "DM-009_sandstorm": "大漠境內都會遇到(可重複)——學過「沙海的東西都是彎的」的人多一條路",
   "DM-010_camel_spit": "大漠境內都會遇到(可重複)",
+  "MJ-000_zhai_guide": "只在揚州遇到(一次性)——苗疆的圖從這裡來:阿婆願意帶你,三種聊法都給",
+  "MJ-001_zhai_arrive": "到了十萬大山寨才會遇到(可重複)——耳力好的人聽見有中原人在打聽桃花谷",
+  "MJ-002_gu_market": "到了十萬大山寨才會遇到(可重複)",
+  "MJ-003_stilt_race": "到了十萬大山寨才會遇到(可重複)",
+  "MJ-004_valley_soup": "到了毒醫谷才會遇到(可重複)——谷口那碗湯",
+  "MJ-005_tong_chuxue": "毒醫谷的稀有遭遇——榜上第十五;跟沈聽雪喝過酒的人多一條路",
+  "MJ-006_yao_buhui": "毒醫谷的稀有遭遇——榜上第五十八",
+  "MJ-007_taohua_arrive": "到了桃花谷才會遇到(可重複)",
+  "MJ-008_hua_wulei": "桃花谷的稀有遭遇——榜上第二十;夜裡遇到是另一個開場;聽過中原人打聽桃花谷的人多一條路",
+  "MJ-009_zhanglin": "到了瘴林才會遇到(可重複)——跟過霧中人那盞燈的人多一條路",
+  "MJ-010_hand_talk": "苗疆境內都會遇到(可重複)",
+  "MJ-011_miao_buji": "瘴林的稀有遭遇——榜上第五十三",
   "BJ-013_army_kitchen": "到了邊軍將門才會遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
@@ -402,6 +414,14 @@ P("## 北疆(要先拿到關防圖、歷練也夠,才走得到)");
 P("");
 P("風大、話少、規矩硬。北邊的人不比劍,比誰的弓拉得久。");
 for (const id of ["BJ-000_veteran_map", "BJ-001_yanmen_arrive", "BJ-002_names_on_wall", "BJ-003_archery_ground", "BJ-004_wenren_gui", "BJ-005_xiao_ruins", "BJ-006_swept_snow", "BJ-007_bow_maker", "BJ-008_horse_milk", "BJ-009_beacon", "BJ-013_army_kitchen", "BJ-010_bow_owner", "BJ-011_the_town", "BJ-012_bring_word"]) {
+  renderEvent(events.pool.find((e) => e.eventId === id));
+}
+
+P("\n---");
+P("## 苗疆(要先讓寨子裡的人願意帶你)");
+P("");
+P("聽不懂的話、叫不出名字的東西。這裡治得了人也毒得了人,谷裡的女子不談將來,霧裡走要看苔不看路。");
+for (const id of ["MJ-000_zhai_guide", "MJ-001_zhai_arrive", "MJ-002_gu_market", "MJ-003_stilt_race", "MJ-004_valley_soup", "MJ-005_tong_chuxue", "MJ-006_yao_buhui", "MJ-007_taohua_arrive", "MJ-008_hua_wulei", "MJ-009_zhanglin", "MJ-010_hand_talk", "MJ-011_miao_buji"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

@@ -327,3 +327,22 @@
 | ahe_child_told / ahe_went_yunling / ahe_child_linked | ZY-012 | **暗線(孩子身分之謎,設定集伏筆 2——等「那孩子」登場時收)** | ahe_went_yunling → TEN-007 開場變化:玄泠子「後不後悔,我想出答案了」 |
 | qi_warning_heeded / qi_warning_ignored / qi_warning_proved | BJ-016 | 回聲 | qi_warning_proved → TEN-009 開場變化:「北邊的路,還好走嗎?」 |
 | grassland_arrows_same | BJ-016 C | **暗線(草原內鬥,三線同源主線——設計者決定動主線時收)** | 同一家中原鋪子賣箭給打架的兩邊 |
+
+## B20 苗疆開通(MJ-000 ~ MJ-011,2026-09-15 入庫,待過稿)
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| miao_guide / miao_medicine_given / miao_stood_between / miao_ears_praised | MJ-000 | 鑰匙 | 苗疆輿圖(阿婆願意帶你);藥包真的入行囊(承諾鐵律,新道具 苗家藥包) |
+| dashanzhai_arrived | MJ-001 | 沉線 | 聽不懂,不妨礙聽 |
+| taohua_seekers_heard | MJ-001 察覺加段 | **回聲→MJ-008 D 收**(這批自己收) | 有中原人在打聽桃花谷——花無淚:「買情蠱的,谷裡不賣」 |
+| gu_market_asked / gu_jar_empty / gu_market_truth | MJ-002 | 沉線 | 蠱不在罐子裡,在買的人心裡;擺攤的是賣怕的 |
+| stilt_climbed / stilt_taught / stilt_watched / stilt_crushed | MJ-003 | 沉線 | 「你的腳,是山裡長的」;小女孩教的「貼」給輕功硬功經驗(教學鐵律) |
+| duyigu_entered / soup_endured / soup_numbed / soup_nothing / soup_shared / duyigu_refused | MJ-004 | 沉線 | 那碗湯試的是肯不肯把身子交出去一次 |
+| met_tong / tong_taught / tong_offended / tong_fear_told | MJ-005 | **暗線(苗疆補完批:谷主藥無涯出場收)** | 「沒說破就還不算」——設定集寫藥無涯「心知肚明,選擇不點破」 |
+| tong_tingtao_hint | MJ-005 D(requireFlag met_shen) | **暗線(沈聽雪身世主線,設計者定調後收)** | 師父那個刻著「聽濤」的葫蘆——設定集:毒醫谷谷主是沈聽雪查身世「第一個能找到的活口線索」 |
+| met_yao / yao_tasted_endured / yao_lesson / yao_counting_heard / yao_awed | MJ-006 | 沉線 | 「怕死了還沒懂」;比輸那條他講半個時辰給內功眼功經驗(教學鐵律) |
+| taohua_entered / taohua_future_asked / taohua_wine / taohua_jars_seen | MJ-007 | **暗線(苗疆補完批:谷主花無憂出場收)** | 一人一罈,誰走了誰的那罈就開;花無憂是唯一動了真心卻活下來的人 |
+| met_hua / hua_shared_wine / hua_curse_told / hua_mask_seen / hua_gu_buyers_told | MJ-008 | 沉線+回聲收尾 | 「笑不算真心,對吧?」;夜版開場(npc 時鐘態)她不笑 |
+| zhanglin_crossed / zhanglin_hunter_saved / zhanglin_detoured / zhanglin_listened / zhanglin_no_lamp / zhanglin_moss | MJ-009 | 沉線;C 路是 FO-003 霧中人的回聲(requireFlag lantern_tune|lantern_man_met) | 「那個老人說的燈,不一定是燈」;獵人教的走高處給內功經驗(教學鐵律) |
+| hand_talk_fed / hand_talk_understood | MJ-010 | 沉線 | 名頭傳到山裡變成一句聽不懂的話,飯照吃 |
+| met_miao / miao_sat_with / miao_talk_heard / miao_gu_seen | MJ-011 | 沉線(他自己說了不想知道) | 「我只想知道——牠在」 |

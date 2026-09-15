@@ -410,7 +410,8 @@ test("自檢:全庫編號一致(序章教學 7 + 正式庫 14 + B2~B13 + 十強�
     "TEN-007_xuan_lingzi", "TEN-008_a_man", "TEN-009_qi_zimo", "TEN-010_ahe",
     "JN-010_sect_backyard", "JN-011_morning_drill", "JN-012_unfinished_tune", "JN-013_gate_boy_hum", "JN-014_next_table", "JN-015_stone_no_ripple", "JN-016_night_market_song", "JN-017_plum_rain",
     "DM-000_camel_map", "DM-001_heishui_roof", "DM-002_silk_road_blade", "DM-003_water_rule", "DM-004_wolf_camp", "DM-005_shayue", "DM-006_horse_race", "DM-007_star_priest", "DM-008_sand_city", "DM-009_sandstorm", "DM-010_camel_spit", "BJ-013_army_kitchen",
-    "JN-018_cheng_boatman", "ZY-011_cheng_lunchbox", "ZY-013_cheng_home", "BJ-014_bow_look", "BJ-015_bow_word", "ZY-012_ahe_child", "BJ-016_detour"
+    "JN-018_cheng_boatman", "ZY-011_cheng_lunchbox", "ZY-013_cheng_home", "BJ-014_bow_look", "BJ-015_bow_word", "ZY-012_ahe_child", "BJ-016_detour",
+    "MJ-000_zhai_guide", "MJ-001_zhai_arrive", "MJ-002_gu_market", "MJ-003_stilt_race", "MJ-004_valley_soup", "MJ-005_tong_chuxue", "MJ-006_yao_buhui", "MJ-007_taohua_arrive", "MJ-008_hua_wulei", "MJ-009_zhanglin", "MJ-010_hand_talk", "MJ-011_miao_buji"
   ];
   for (const id of expected) assert.ok(ids.includes(id), `缺 ${id}`);
   assert.equal(ids.length, expected.length);
