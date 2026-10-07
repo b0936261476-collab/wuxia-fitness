@@ -346,3 +346,31 @@
 | zhanglin_crossed / zhanglin_hunter_saved / zhanglin_detoured / zhanglin_listened / zhanglin_no_lamp / zhanglin_moss | MJ-009 | 沉線;C 路是 FO-003 霧中人的回聲(requireFlag lantern_tune|lantern_man_met) | 「那個老人說的燈,不一定是燈」;獵人教的走高處給內功經驗(教學鐵律) |
 | hand_talk_fed / hand_talk_understood | MJ-010 | 沉線 | 名頭傳到山裡變成一句聽不懂的話,飯照吃 |
 | met_miao / miao_sat_with / miao_talk_heard / miao_gu_seen | MJ-011 | 沉線(他自己說了不想知道) | 「我只想知道——牠在」 |
+
+## B21 苗疆補完(MJ-012 ~ MJ-021,2026-10-07 入庫,待過稿)
+
+這批的任務是**收 B20 留的線**。兩位谷主出場,把話說完。
+
+| flag | 來源 | 命運 | 引用處 / 後續 |
+|---|---|---|---|
+| met_yao_wuya | MJ-012 | 沉線 | 「身子不是你的馬,是你的路」 |
+| tong_line_collected / yao_rule_told | MJ-012 B(requireFlag tong_fear_told) | **收尾** | 規矩是他自己定的、他也廢得了;不廢是因為「廢了她就沒有不練成的理由」。B20 的 tong_fear_told 到此結案 |
+| yao_taught_herbs | MJ-012 C(requireFlag tong_taught) | 沉線 | 教學鐵律:考過你再補九樣,給眼功經驗 |
+| yao_undertone_heard | MJ-012 D(察覺) | 沉線 | 「這谷裡只有兩個人聽得出來」——十二年沒有一句話是直接對她說的 |
+| yao_promise_kept / tingtao_pointer | MJ-012 E(requireFlag tong_tingtao_hint) | **暗線半收(沈聽雪身世主線,設計者決定動主線時收)** | 「我答應的是不說,連是誰都不說才算不說」;「去問那個敲不開門的」→ 指向 TEN-001 沈聽雪 |
+| met_hua_wuyou / curse_told_by_master | MJ-013 A | 沉線 | 「不是巫,是血」 |
+| jar_dug_out | MJ-013 B(requireFlag taohua_jars_seen\|hua_trees_told) | **收尾** | 活下來的人要自己把罈挖出來;那棵不開花的樹長在她自己的坑上。B20 的樹與罈到此結案 |
+| wulei_line_collected | MJ-013 C(requireFlag hua_mask_seen) | **收尾** | 「解不開的,就不要替她解。陪著就好」。B20 的 hua_mask_seen 到此結案 |
+| red_thread_seen | MJ-013 D(察覺) | 沉線 | 每年換一條紅線=每年重新進谷一次 |
+| new_jar_seen / dried_blossom_seen / deep_jar_girl | MJ-014 | 沉線 | 「埋深一點,開得慢一點,我就還有時間」 |
+| hunter_taught_leaves | MJ-015 A | 沉線 | 教學鐵律:給眼功經驗 + 苦葉子真的入行囊(新道具) |
+| hunter_count_told | MJ-015 B(requireFlag zhanglin_hunter_saved) | 回聲收尾 | 「我不是救人的,我是撿人的」 |
+| hunter_father_told | MJ-015 C(察覺) | **沉線(刻意不收)** | 他爹三十年前進去的。他自己說「我不是在找他,我是每天在他最後走過的地方走一圈」——這是一個人的樣子,不是一個謎 |
+| zhailao_met / ring_mark_known | MJ-016 A | **承諾待兌現** | 「看到一樣的記號,那家人都欠你一頓飯」——以後做苗疆人情事件時要兌現 |
+| thirty_years_told | MJ-016 B | **暗線(與 tingtao_pointer 極可能是同一個人;設計者決定動主線時一起收)** | 阿婆三十年沒帶中原人回來,上一個是三十年前,「他後來沒有再來」 |
+| popo_again | MJ-016 C(察覺) | 回聲收尾 | 「那她就不用把銀環討回去了」 |
+| song_answered / song_taught / song_listened / song_mimed / song_skeleton_heard / song_of_the_village | MJ-017 | 沉線;◆ 輾壓版是送人走的歌 | 教學鐵律:老太太教你把聲音放到那個位置,給耳功經驗 |
+| basket_child / walking_song_heard | MJ-018 | 沉線 | 山裡沒有里程碑,他們把路放在歌裡 |
+| rope_bridge_crossed / rope_bridge_froze / rope_bridge_detoured / bridge_wind_gaps | MJ-019 | 沉線;再遇版收尾(有人回來解布) | 七條布不是七個死人,是七個還沒回來的人 |
+| scribe_came / scribe_won_once / scribe_talked / scribe_record_given / scribe_awed | MJ-020(reputation fameTier>=4) | 沉線 | 全遊戲第一件「有人因為你出名追著你找來」;抄來的名錄真的入行囊(新道具);再遇版是下一個抄書的人 |
+| moonlit_terraces / terrace_water_touched / terrace_fell_in / terrace_silent_tier | MJ-021 | 沉線 | 「田跟人一樣」 |

@@ -172,6 +172,16 @@ const COND_NOTE = {
   "MJ-009_zhanglin": "到了瘴林才會遇到(可重複)——跟過霧中人那盞燈的人多一條路",
   "MJ-010_hand_talk": "苗疆境內都會遇到(可重複)",
   "MJ-011_miao_buji": "瘴林的稀有遭遇——榜上第五十三",
+  "MJ-012_yao_wuya": "毒醫谷的稀有遭遇(要先喝過谷口那碗湯)——榜上第三十三,童初雪的師父;收童初雪「不練成」那條線",
+  "MJ-013_hua_wuyou": "桃花谷的稀有遭遇(要先進過谷)——榜上第四十四,谷主;收樹下酒罈與花無淚那條線",
+  "MJ-014_new_jar": "到了桃花谷才會遇到(可重複)——剛進谷的姑娘自己埋自己的罈",
+  "MJ-015_leaf_hunter": "到了瘴林才會遇到(可重複)——被他拖出來過的人多一條路;教你認葉子,苦葉子真的入行囊",
+  "MJ-016_zhailao": "到了十萬大山寨才會遇到(要有阿婆那個銀環)——寨老問「給你的人叫什麼名字」",
+  "MJ-017_song_duel": "到了十萬大山寨才會遇到(可重複)——對歌;比手畫腳過的人多一條路",
+  "MJ-018_basket_child": "苗疆境內都會遇到(可重複)",
+  "MJ-019_rope_bridge": "苗疆境內都會遇到(可重複)——竿上七條布",
+  "MJ-020_scribe_came": "苗疆境內的稀有遭遇,俠名遠播才會發生——有人追著榜文從洛陽找來",
+  "MJ-021_moon_terraces": "苗疆境內都會遇到(可重複,機緣)",
   "BJ-013_army_kitchen": "到了邊軍將門才會遇到(可重複)",
   "1-1_lost_purse": "誰都可能遇到(一次性)",
   "1-2_purse_notice": "只有「拿了錢袋沒還」的人會遇到——撿錢那天起 3 天後",
@@ -421,7 +431,7 @@ P("\n---");
 P("## 苗疆(要先讓寨子裡的人願意帶你)");
 P("");
 P("聽不懂的話、叫不出名字的東西。這裡治得了人也毒得了人,谷裡的女子不談將來,霧裡走要看苔不看路。");
-for (const id of ["MJ-000_zhai_guide", "MJ-001_zhai_arrive", "MJ-002_gu_market", "MJ-003_stilt_race", "MJ-004_valley_soup", "MJ-005_tong_chuxue", "MJ-006_yao_buhui", "MJ-007_taohua_arrive", "MJ-008_hua_wulei", "MJ-009_zhanglin", "MJ-010_hand_talk", "MJ-011_miao_buji"]) {
+for (const id of ["MJ-000_zhai_guide", "MJ-001_zhai_arrive", "MJ-002_gu_market", "MJ-003_stilt_race", "MJ-004_valley_soup", "MJ-005_tong_chuxue", "MJ-006_yao_buhui", "MJ-012_yao_wuya", "MJ-007_taohua_arrive", "MJ-008_hua_wulei", "MJ-013_hua_wuyou", "MJ-014_new_jar", "MJ-009_zhanglin", "MJ-011_miao_buji", "MJ-015_leaf_hunter", "MJ-016_zhailao", "MJ-017_song_duel", "MJ-010_hand_talk", "MJ-018_basket_child", "MJ-019_rope_bridge", "MJ-021_moon_terraces", "MJ-020_scribe_came"]) {
   renderEvent(events.pool.find((e) => e.eventId === id));
 }
 

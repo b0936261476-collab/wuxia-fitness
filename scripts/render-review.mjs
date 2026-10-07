@@ -72,6 +72,32 @@ const BATCHES = {
     sub: "第五州。吊腳樓、蠱市、聽不懂的話;毒醫谷治得了人也毒得了人;桃花谷的女子不談將來;瘴林進去容易出來看運氣。<br>這批十二件把苗疆開起來,<b>圖從揚州藥市那個阿婆手上來</b>。",
     key: "wuxia-b20-review-v1",
     copyHead: "苗疆開通・十二件"
+  },
+  b21: {
+    pick: (id) => /^MJ-0(1[2-9]|2[01])_/.test(id),
+    flagLabels: {
+      duyigu_entered: "喝過谷口那碗湯的人",
+      tong_fear_told: "聽童初雪說過「所以我不練成」的人",
+      tong_taught: "被童初雪拉去認過三種草的人",
+      tong_tingtao_hint: "知道她師父有一個刻著「聽濤」的葫蘆的人",
+      taohua_entered: "進過桃花谷的人",
+      taohua_jars_seen: "看過樹下那些酒罈的人",
+      hua_trees_told: "聽花無淚說過樹跟罈是同一件事的人",
+      hua_mask_seen: "聽出花無淚笑聲尾巴往下掉的人",
+      miao_guide: "拿著阿婆那個銀環的人",
+      miao_ears_praised: "當初聽出阿婆在說「不要」的人",
+      miao_stood_between: "當初站到阿婆跟夥計中間的人",
+      miao_medicine_given: "當初買了阿婆的藥的人",
+      zhanglin_hunter_saved: "在瘴林裡被獵人拖出來過的人",
+      hand_talk_understood: "聽懂過「吃飯」那兩個字的人",
+      hand_talk_fed: "被山裡人拉回家吃過飯的人"
+    },
+    title: "苗疆補完過稿頁",
+    seal: "一步一江湖 ‧ 苗疆補完 ‧ 十件",
+    h1: "收 線",
+    sub: "苗疆開通那批埋的線,這批由兩位谷主親口收掉:<br>毒醫谷谷主說破童初雪「不練成」真正的理由,桃花谷谷主說破樹下那些罈跟她自己。<br>另外補上寨老、對歌、吊橋、梯田,和<b>一個從洛陽追著榜文找來的抄書人</b>。",
+    key: "wuxia-b21-review-v1",
+    copyHead: "苗疆補完・十件"
   }
 };
 
