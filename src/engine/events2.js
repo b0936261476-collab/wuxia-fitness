@@ -257,6 +257,13 @@ function conditionsMet(state, ev, todayStr, data) {
     const alternatives = req.split("|");
     if (!alternatives.some((f) => state.flags[f])) return false;
   }
+  // 收線門檻:任一組成立就不再出現——兒子回家以後,渡口不該再有人抱著食盒等船。
+  // 寫法與 requireFlags 對稱(每組可寫 "a|b" 表示任一成立即擋)。
+  // 註:不能改用 weightFlags 給負權重,那會讓抽選的總權重算錯。
+  for (const grp of cond.forbidFlags || []) {
+    const alternatives = grp.split("|");
+    if (alternatives.some((f) => state.flags[f])) return false;
+  }
   for (const [key, minDays] of Object.entries(cond.minDaysSince || {})) {
     let sinceDate = null;
     if (key.startsWith("flag:")) {

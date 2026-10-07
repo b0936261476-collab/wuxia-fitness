@@ -320,7 +320,7 @@
 | flag | 來源 | 命運 | 引用處 / 後續 |
 |---|---|---|---|
 | cheng_word_carried / cheng_freed / cheng_money_sent | JN-018 | 鑰匙 | ZY-011 的三種版本(帶話/扛完一船米讓他回家/帶錢) |
-| cheng_home_told | ZY-011 | **收尾** | ZY-003 等船的人從此不出現(forbidFlags,等引擎支援);ZY-013 條件 |
+| cheng_home_told | ZY-011 | **收尾** | ZY-003 等船的人從此不出現(forbidFlags,**2026-10-07 引擎已支援,真的生效了**);ZY-013 條件 |
 | cheng_reunited | ZY-013 | 回聲收尾 | 「那三層布以後用不著了」 |
 | bow_seen_for_him / bow_maker_message / bow_wine_debt | BJ-014 | 鑰匙 | BJ-015 的三種帶話 |
 | bow_word_delivered / veteran_woodshop | BJ-015 | 回聲收尾 | 半碗留著/去木匠鋪削木頭/欠著就得活著 |

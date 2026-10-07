@@ -39,9 +39,7 @@ test("收線:forbidFlags 引用的旗標都發得出來(寫錯字的話,該收�
   assert.deepEqual(bad, []);
 });
 
-test("收線:兒子回家以後,渡口不會再有人抱著食盒等船", {
-  todo: "等 Codex 實作 conditions.forbidFlags(需求見 AGENTS.md);實作後拿掉這個 todo"
-}, () => {
+test("收線:兒子回家以後,渡口不會再有人抱著食盒等船", () => {
   const data = { events, map };
   const s = newState();
   s.travel = { at: "dukou" };
